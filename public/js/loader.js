@@ -9,7 +9,9 @@ async function preload(callback) {
     let loaded = 0;
     const total = Object.keys(data).length;
     for (let i in data) {
-        data[i] = data[i].match(/(png|jp[e]?g)$/) ? await loadImage(data[i]) : await loadSound(data[i]);
+        data[i] = data[i].match(/(png|jp[e]?g)$/) ? 
+            await loadImage(data[i]) : 
+            data[i].match(/(json)$/) ? await loadJSON(data[i]) : await loadSound(data[i]);
         loaded++;
         callback(loaded, total);
     }
@@ -46,5 +48,15 @@ function loadSound(path) {
         audio.src = path;
     });    
 }
+
+function loadJSON(path) {
+    return new Promise(function(resolve, reject) {
+        fetch(path)
+        .then(response => response.json())
+        .then(json => resolve(json))
+        .catch(err => reject(err));
+    });
+}
+
 
 export { preload, data };
