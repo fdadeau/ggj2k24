@@ -36,10 +36,16 @@ const PNJ_0 = {
         [WAIT, {x: 1100, y: 140, vecX: 0, vecY: 1}, 2000],
         [WALK, {xs: 1100, ys: 140, xd: 80, yd: 140}, 10000]
     ],
-    dialog: [
-        [0, "Vous voulez un whisky ?", 1600],
-        [1, "Juste un doigt.", 1600],
-        [0, "Vous ne voulez pas un whisky d'abord ?", 2000]
+    dialog: [        [
+                [0, "Vous voulez un whisky ?", 1600],
+                [1, "Juste un doigt.", 1600],
+                [0, "Vous ne voulez pas un whisky d'abord ?", 2000]
+            ],
+            [
+                [0, "Baba et babi sont sur un bateau", 1600],
+                [1, "Babi bêle ? ", 1600],
+                [0, "et baba cool ! ", 2000]
+            ]
     ]
 }
 
