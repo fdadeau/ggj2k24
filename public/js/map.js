@@ -60,7 +60,7 @@ export class Map {
         pnj.x = px;
         pnj.y = py;
         this.adversary.updateAdversary(x,y);
-        // TODO : pb ici
+
         if(pnj instanceof PNJ){
             pnj.talk(this.adversary);
         }
@@ -94,7 +94,6 @@ export class Map {
             }
             if (c.dialog && c.dialog.isRunning()) {
                 charWithDialog.push(c);
-                console.log(c)
             }
         }
         for(let c of charWithDialog) {

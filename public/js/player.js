@@ -49,11 +49,10 @@ export class Player {
     update(dt) {
         // no movement if player is talking to a PNJ
         if (this.talkingTo !== null) {
-            if (!this.dialog.isRunning()) {
+            if (!this.dialog.isRunning() && !this.talkingTo.dialog.isRunning()) {
                 // remove "talk link" between player and PNJ
                 this.talkingTo = null;
-            }
-            else {  // dialog is not over --> update it
+            }else {  // dialog is not over --> update it
                 this.dialog.update();
             }
             return;
@@ -122,9 +121,7 @@ export class Player {
 
     talkWithAdversary(adversary){
         if(adversary.isAvailable()){
-            console.log("talking to adversary");
             this.talkingTo = adversary;
-            this.timeToInteract = INTERACTION_TIMER;
             this.dialog.start();
         }
     }
