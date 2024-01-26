@@ -11,7 +11,7 @@ import { Map } from "./map.js";
 export class Game {
 
     constructor(level, role, delay) {
-        this.map = new Map(level, delay);
+        this.map = new Map(level, delay, role == "police" ? "killer" : "police");
         this.player = new Player(role, this.map);
         this.viewport = { x: 0, y: 0, w: WIDTH, h: HEIGHT };
         this.updateViewport();

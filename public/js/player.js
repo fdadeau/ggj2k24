@@ -1,4 +1,4 @@
-import { Adversary } from "./pnj.js";
+import { Adversary, Dialog } from "./pnj.js";
 
 const SPEED = 0.2;
 
@@ -40,11 +40,22 @@ export class Player {
 
         // Timer between two interactions with other entity
         this.timeToInteract = -1;
+
+        this.dialog = (role == "police") ? 
+        new Dialog([[0,"Ecoutez laissez la police faire son travail.", 1000],[0,"Dès que nous aurons de plus amples informations,", 1000],[0,"vous en serez les premiers informés.",1000]]) :
+        new Dialog([[0,"Tu veux un whisky ?",1000]]);
     }
 
     update(dt) {
         // no movement if player is talking to a PNJ
         if (this.talkingTo !== null) {
+            if (!this.dialog.isRunning()) {
+                // remove "talk link" between player and PNJ
+                this.talkingTo = null;
+            }
+            else {  // dialog is not over --> update it
+                this.dialog.update();
+            }
             return;
         }
         const newX = this.x + this.vecX * SPEED * dt;
@@ -75,7 +86,6 @@ export class Player {
 
         ctx.lineWidth = 2;
 
-
         if (false)      // field of view (not yet finished)
         for (let w of this.FOV) {
             ctx.beginPath();
@@ -86,6 +96,12 @@ export class Player {
         }
         
     }
+
+    renderDialog(ctx) {
+        if (this.dialog.isRunning() && this.talkingTo !== null) {
+            this.dialog.render(ctx, this.x, this.y, this.talkingTo.x, this.talkingTo.y, true);
+        }
+    } 
 
 
     /** Check if the object/character at position(x,y) is seen by the player */
@@ -101,6 +117,15 @@ export class Player {
             this.closestPNJ.pnj.talk(this);
             this.talkingTo = this.closestPNJ.pnj;
             this.timeToInteract = INTERACTION_TIMER;
+        }
+    }
+
+    talkWithAdversary(adversary){
+        if(adversary.isAvailable()){
+            console.log("talking to adversary");
+            this.talkingTo = adversary;
+            this.timeToInteract = INTERACTION_TIMER;
+            this.dialog.start();
         }
     }
 
@@ -208,7 +233,7 @@ export class Player {
                 }
                 break;
         }
-        if (this.talkingTo == null && (this.vecX !== oldVX || this.vecY !== oldVY)) {
+        if (this.vecX !== oldVX || this.vecY !== oldVY) {
             return { move: { x: this.x, y: this.y, vecX: this.vecX, vecY: this.vecY } };
         }
     }

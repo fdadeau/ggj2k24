@@ -177,7 +177,7 @@ export class PNJ extends Entity {
 
 export class Adversary extends Entity {
 
-    constructor(x,y,vecX,vecY,size,role,map,dialog) {
+    constructor(x,y,vecX,vecY,size,role,map) {
         super(x,y,vecX,vecY,size);
         this.role = role;
         this.map = map;
@@ -250,14 +250,20 @@ export class Adversary extends Entity {
         super.render(ctx);
         /** prints dialog @todo move code somewhere else to avoid z-index issues */
         if (this.dialog.isRunning() && this.talkingTo !== null) {
-            this.dialog.render(ctx, this.x, this.y, this.talkingTo.x, this.talkingTo.y);
+            //this.dialog.render(ctx, this.x, this.y, this.talkingTo.x, this.talkingTo.y);
         }
     }
+
+    renderDialog(ctx) {
+        if (this.dialog.isRunning() && this.talkingTo !== null) {
+            this.dialog.render(ctx, this.x, this.y, this.talkingTo.x, this.talkingTo.y, this.talkingTo instanceof Player);
+        }
+    } 
 
 }
 
 
-class Dialog {
+export class Dialog {
 
     constructor(texts) {
         this.state = -1;
@@ -296,6 +302,7 @@ class Dialog {
             this.state = 0; 
         }
     }
+
     end() {
         this.state = -1;
     }
