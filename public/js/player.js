@@ -208,7 +208,7 @@ export class Player {
                 }
                 break;
         }
-        if (this.vecX !== oldVX || this.vecY !== oldVY) {
+        if (this.talkingTo == null && (this.vecX !== oldVX || this.vecY !== oldVY)) {
             return { move: { x: this.x, y: this.y, vecX: this.vecX, vecY: this.vecY } };
         }
     }

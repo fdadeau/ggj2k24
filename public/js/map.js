@@ -63,12 +63,11 @@ export class Map {
         this.adversary.updateAdversary(x,y,vecX,vecY);
     }
     updateAdversaryTalk(x, y, id, px, py) {
-        let pnj = this.PNJs[id];
+        let pnj = this.PNJs[Number(id)];
         pnj.x = px;
         pnj.y = py;
         this.adversary.updateAdversary(x,y);
         pnj.talk(this.adversary);
-        
     }
 
     render(ctx) {
@@ -84,6 +83,7 @@ export class Map {
         const characters = this.PNJs.filter((c) => this.player.sees(c.x, c.y));
         characters.push(this.player);
         characters.sort(function(c1,c2) { return c1.y - c2.y; })
+        const charWithDialog = [];
         for (let c of characters) {
             c.render(ctx);
             // small dot to indicate closest PNJ
@@ -93,6 +93,12 @@ export class Map {
                 ctx.closePath();
                 ctx.fill();
             }
+            if (c.dialog && c.dialog.isRunning()) {
+                charWithDialog.push(c);
+            }
+        }
+        for (let c of charWithDialog) {
+            c.renderDialog(ctx);
         }
     }
 
