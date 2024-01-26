@@ -22,7 +22,6 @@ export class Map {
         this.playerStart = level.start;
         /** 
          * @type {Adversary}
-         * @todo Change dialog
          */
         this.adversary = new Adversary(0,0,0,0,20,adversaryRole,this);
         /** @type {Entity[]} */
