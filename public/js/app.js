@@ -40,6 +40,9 @@ document.addEventListener("DOMContentLoaded", function() {
     socket.on("playerLeft", function() {
         gui.interruptGame();
     });
+    socket.on("playerTalk", function(data) {
+        gui.updateAdversaryTalk(data);
+    });
     socket.on("noSuchGame", function() {
         gui.writeInfo("No available game", 2000);
     });

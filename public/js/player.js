@@ -45,6 +45,7 @@ export class Player {
             this.y = newY;
         }
         // TODO: go against a wall 
+        
     }
 
     render(ctx) {

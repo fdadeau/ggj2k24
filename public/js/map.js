@@ -53,10 +53,12 @@ export class Map {
         this.adversary.updateAdversary(x,y,vecX,vecY);
     }
     updateAdversaryTalk(x, y, id, px, py) {
-        this.PNJs[id].x = px;
-        this.PNJs[id].y = py;
+        let pnj = this.PNJs[id];
+        pnj.x = px;
+        pnj.y = py;
         this.adversary.updateAdversary(x,y);
-        this.PNJs[id].talk(this.adversary);
+        pnj.talk(this.adversary);
+        
     }
 
     render(ctx) {

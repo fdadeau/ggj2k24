@@ -36,7 +36,7 @@ class Entity {
     }
 
     isAvailable() {
-        return true;
+        return false;
     }
 
     talk(who) {
@@ -65,6 +65,7 @@ export class PNJ extends Entity {
         this.time = 0;
         this.startTime = Date.now() - delay;
         this.step = 0;
+        this.alive = true;
     }
 
     reset() {
@@ -72,7 +73,19 @@ export class PNJ extends Entity {
         this.step = 0;
     }
 
+    die() {
+        if (this.talkingTo !== null) {
+            this.talkingTo.talkingTo = null;
+            this.talkingTo = null;
+        }
+        this.dialog.end();
+        this.alive = false;
+    }
+
     update(dt) {
+        if (!this.alive) {
+            return;
+        }
         // case 1: taking to someone
         if (this.talkingTo !== null) {
             // if dialog is over --> 
@@ -84,7 +97,6 @@ export class PNJ extends Entity {
                 this.startTime += this.dialog.getDuration();
             }
             else {  // dialog is not over --> update it
-
                 this.dialog.update();
             }
             return;
@@ -241,6 +253,9 @@ class Dialog {
             this.t0 = Date.now();
             this.state = 0; 
         }
+    }
+    end() {
+        this.state = -1;
     }
 
     render(ctx, x0, y0, x1, y1) {
