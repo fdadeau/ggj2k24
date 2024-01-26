@@ -1,3 +1,4 @@
+import { Adversary } from "./pnj.js";
 
 const SPEED = 0.2;
 
@@ -5,6 +6,9 @@ const UP = 1, DOWN = 3, LEFT = 4, RIGHT = 2, TALK = 10;
 
 const COMMANDS = { "ArrowUp": UP, "ArrowDown": DOWN, "ArrowLeft": LEFT, "ArrowRight": RIGHT, "Space": TALK };
 
+const INTERACTION_TIMER = 5000;
+
+export const END_GAME_STATE = {"WIN": 1, "LOSE": -1, "RUNNING": 0};
 
 export class Player {
 
@@ -30,7 +34,13 @@ export class Player {
         this.closestPNJ = null;
         /** @type {Entity} entity the player is currently talking to (null if none) */
         this.talkingTo = null;
-    }   
+
+        // Tells if the game ended and how
+        this.endGame = END_GAME_STATE.RUNNING;
+
+        // Timer between two interactions with other entity
+        this.timeToInteract = -1;
+    }
 
     update(dt) {
         // no movement if player is talking to a PNJ
@@ -44,8 +54,11 @@ export class Player {
             this.x = newX;
             this.y = newY;
         }
+
+        if(this.timeToInteract > 0){
+            this.timeToInteract -= dt;
+        }
         // TODO: go against a wall 
-        
     }
 
     render(ctx) {
@@ -87,6 +100,7 @@ export class Player {
         if (this.closestPNJ !== null && this.closestPNJ.pnj.isAvailable()) {
             this.closestPNJ.pnj.talk(this);
             this.talkingTo = this.closestPNJ.pnj;
+            this.timeToInteract = INTERACTION_TIMER;
         }
     }
 
@@ -95,7 +109,7 @@ export class Player {
      * @returns true if one can interact with the character 
      */
     isAvailable() {
-        return this.talkingTo == null;
+        return this.timeToInteract <= 0;
     }
 
     /**
@@ -131,6 +145,28 @@ export class Player {
     }
 
 
+    /**
+     * Kill the PNJ that we are talking to (if role == "killer")
+     */
+    kill(){
+        if(this.talkingTo instanceof Adversary){
+            this.endGame = END_GAME_STATE.LOSE;
+        }else{
+            this.talkingTo.die();
+        }
+    }
+
+    /**
+     * Arrest the PNJ that we are talking to (if role == "police")
+     */
+    arrest(){
+        if(this.talkingTo instanceof Adversary){
+            this.endGame = END_GAME_STATE.WIN;
+        }else{
+            this.endGame = END_GAME_STATE.LOSE;
+        }  
+    }
+
     /********  CONTROLS  ********/
 
     keyDown(key) {
@@ -154,10 +190,21 @@ export class Player {
                 this.orientation.y = this.vecY;
                 break;
             case TALK:
+                if(!this.isAvailable()){
+                    return;
+                }
                 const notTalkingBefore = this.talkingTo === null;
                 this.talk();
                 if (notTalkingBefore && this.talkingTo != null) {
                     return { talk: { x: this.x, y: this.y, pnjId: this.talkingTo.id, pnjX: this.talkingTo.x, pnjY: this.talkingTo.y } }
+                }
+                
+                if(this.talkingTo != null){
+                    if(this.role == "killer"){
+                        this.kill();
+                    }else{
+                        this.arrest();
+                    }
                 }
                 break;
         }

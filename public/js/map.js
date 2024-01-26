@@ -10,6 +10,13 @@ const WALL_THICKNESS = 20;
 /** @type {number} proximity of the player with other characters */
 const PROXIMITY = 10000;
 
+
+const ADVERSARY_DEFAULT_DIALOG = [
+    [0, "Vous voulez un whisky ?", 1600],
+    [1, "Juste un doigt.", 1600],
+    [0, "Vous ne voulez pas un whisky d'abord ?", 2000]
+];
+
 export class Map {
 
     constructor(level, delay) {
@@ -20,8 +27,11 @@ export class Map {
         this.bottomRight = [1260, 800];
         this.boundaries = [1280, 820];
         this.playerStart = level.start;
-        /** @type {Adversary} */
-        this.adversary = new Adversary(0,0,0,0,20,null,this);
+        /** 
+         * @type {Adversary}
+         * @todo Change dialog
+         */
+        this.adversary = new Adversary(0,0,0,0,20,null,this,ADVERSARY_DEFAULT_DIALOG);
         /** @type {Entity[]} */
         this.PNJs = [this.adversary, ...level.PNJs.map(p => new PNJ(p.scenario, p.dialog, delay))];
     }
