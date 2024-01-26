@@ -3,6 +3,8 @@
  * Class for Entities, NPCs, and the Adversary of the player
  */
 
+import { Player } from "./player.js";
+
 const WALK = "walk", WAIT = "wait", TALK = "talk";
 
 const SPEED = 0.2;
@@ -162,12 +164,14 @@ export class PNJ extends Entity {
     }
 
     render(ctx) {
-        super.render(ctx);
-        /** prints dialog @todo move code somewhere else to avoid z-index issues */
-        if (this.dialog.isRunning() && this.talkingTo !== null) {
-            this.dialog.render(ctx, this.x, this.y, this.talkingTo.x, this.talkingTo.y);
-        }
+        super.render(ctx);        
     }
+
+    renderDialog(ctx) {
+        if (this.dialog.isRunning() && this.talkingTo !== null) {
+            this.dialog.render(ctx, this.x, this.y, this.talkingTo.x, this.talkingTo.y, this.talkingTo instanceof Player);
+        }
+    } 
 }
 
 
@@ -177,6 +181,9 @@ export class Adversary extends Entity {
         super(x,y,vecX,vecY,size);
         this.role = role;
         this.map = map;
+        this.dialog = (role == "police") ? 
+            new Dialog([[0,"Ecoutez laissez la police faire son travail.", 1000],[0,"Dès que nous aurons de plus amples informations,", 1000],[0,"vous en serez les premiers informés.",1000]]) :
+            new Dialog([[0,"Tu veux un whisky ?",1000]]);
     }
 
     update(dt) {
@@ -212,6 +219,7 @@ export class Adversary extends Entity {
         this.y = y;
 
     }
+
 }
 
 
@@ -258,7 +266,7 @@ class Dialog {
         this.state = -1;
     }
 
-    render(ctx, x0, y0, x1, y1) {
+    render(ctx, x0, y0, x1, y1, showtext) {
         if (this.state >= 0) {
             ctx.fillStyle = "white";
             ctx.strokeStyle = "red";
@@ -279,10 +287,12 @@ class Dialog {
             ctx.closePath();
             ctx.stroke();
             ctx.fill();
-            ctx.fillStyle = "black";
-            ctx.textAlign = "center";
-            ctx.verticalAlign = "middle";
-            ctx.fillText(this.texts[this.state].what, x, y - dy - pad);
+            if (showtext) {
+                ctx.fillStyle = "black";
+                ctx.textAlign = "center";
+                ctx.verticalAlign = "middle";
+                ctx.fillText(this.texts[this.state].what, x, y - dy - pad);
+            }
         }
     }
 

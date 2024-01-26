@@ -73,6 +73,7 @@ export class Map {
         const characters = this.PNJs.filter((c) => this.player.sees(c.x, c.y));
         characters.push(this.player);
         characters.sort(function(c1,c2) { return c1.y - c2.y; })
+        const charWithDialog = [];
         for (let c of characters) {
             c.render(ctx);
             // small dot to indicate closest PNJ
@@ -82,6 +83,12 @@ export class Map {
                 ctx.closePath();
                 ctx.fill();
             }
+            if (c.dialog && c.dialog.isRunning()) {
+                charWithDialog.push(c);
+            }
+        }
+        for (let c of charWithDialog) {
+            c.renderDialog(ctx);
         }
     }
 
