@@ -1,3 +1,4 @@
+import { Adversary, Dialog } from "./pnj.js";
 
 const SPEED = 0.2;
 
@@ -5,6 +6,9 @@ const UP = 1, DOWN = 3, LEFT = 4, RIGHT = 2, TALK = 10;
 
 const COMMANDS = { "ArrowUp": UP, "ArrowDown": DOWN, "ArrowLeft": LEFT, "ArrowRight": RIGHT, "Space": TALK };
 
+const INTERACTION_TIMER = 5000;
+
+export const END_GAME_STATE = {"WIN": 1, "LOSE": -1, "RUNNING": 0};
 
 export class Player {
 
@@ -30,11 +34,27 @@ export class Player {
         this.closestPNJ = null;
         /** @type {Entity} entity the player is currently talking to (null if none) */
         this.talkingTo = null;
-    }   
+
+        // Tells if the game ended and how
+        this.endGame = END_GAME_STATE.RUNNING;
+
+        // Timer between two interactions with other entity
+        this.timeToInteract = -1;
+
+        this.dialog = (role == "police") ? 
+        new Dialog([[0,"Ecoutez laissez la police faire son travail.", 1000],[0,"Dès que nous aurons de plus amples informations,", 1000],[0,"vous en serez les premiers informés.",1000]]) :
+        new Dialog([[0,"Tu veux un whisky ?",1000]]);
+    }
 
     update(dt) {
         // no movement if player is talking to a PNJ
         if (this.talkingTo !== null) {
+            if (!this.dialog.isRunning() && !this.talkingTo.dialog.isRunning()) {
+                // remove "talk link" between player and PNJ
+                this.talkingTo = null;
+            }else {  // dialog is not over --> update it
+                this.dialog.update();
+            }
             return;
         }
         const newX = this.x + this.vecX * SPEED * dt;
@@ -44,8 +64,11 @@ export class Player {
             this.x = newX;
             this.y = newY;
         }
+
+        if(this.timeToInteract > 0){
+            this.timeToInteract -= dt;
+        }
         // TODO: go against a wall 
-        
     }
 
     render(ctx) {
@@ -62,7 +85,6 @@ export class Player {
 
         ctx.lineWidth = 2;
 
-
         if (false)      // field of view (not yet finished)
         for (let w of this.FOV) {
             ctx.beginPath();
@@ -73,6 +95,12 @@ export class Player {
         }
         
     }
+
+    renderDialog(ctx) {
+        if (this.dialog.isRunning() && this.talkingTo !== null) {
+            this.dialog.render(ctx, this.x, this.y, this.talkingTo.x, this.talkingTo.y, true);
+        }
+    } 
 
 
     /** Check if the object/character at position(x,y) is seen by the player */
@@ -87,6 +115,14 @@ export class Player {
         if (this.closestPNJ !== null && this.closestPNJ.pnj.isAvailable()) {
             this.closestPNJ.pnj.talk(this);
             this.talkingTo = this.closestPNJ.pnj;
+            this.timeToInteract = INTERACTION_TIMER;
+        }
+    }
+
+    talkWithAdversary(adversary){
+        if(adversary.isAvailable()){
+            this.talkingTo = adversary;
+            this.dialog.start();
         }
     }
 
@@ -95,7 +131,7 @@ export class Player {
      * @returns true if one can interact with the character 
      */
     isAvailable() {
-        return this.talkingTo == null;
+        return this.timeToInteract <= 0;
     }
 
     /**
@@ -131,6 +167,28 @@ export class Player {
     }
 
 
+    /**
+     * Kill the PNJ that we are talking to (if role == "killer")
+     */
+    kill(){
+        if(this.talkingTo instanceof Adversary){
+            this.endGame = END_GAME_STATE.LOSE;
+        }else{
+            this.talkingTo.die();
+        }
+    }
+
+    /**
+     * Arrest the PNJ that we are talking to (if role == "police")
+     */
+    arrest(){
+        if(this.talkingTo instanceof Adversary){
+            this.endGame = END_GAME_STATE.WIN;
+        }else{
+            this.endGame = END_GAME_STATE.LOSE;
+        }  
+    }
+
     /********  CONTROLS  ********/
 
     keyDown(key) {
@@ -154,14 +212,25 @@ export class Player {
                 this.orientation.y = this.vecY;
                 break;
             case TALK:
+                if(!this.isAvailable()){
+                    return;
+                }
                 const notTalkingBefore = this.talkingTo === null;
                 this.talk();
                 if (notTalkingBefore && this.talkingTo != null) {
                     return { talk: { x: this.x, y: this.y, pnjId: this.talkingTo.id, pnjX: this.talkingTo.x, pnjY: this.talkingTo.y } }
                 }
+                
+                if(this.talkingTo != null){
+                    if(this.role == "killer"){
+                        this.kill();
+                    }else{
+                        this.arrest();
+                    }
+                }
                 break;
         }
-        if (this.talkingTo == null && (this.vecX !== oldVX || this.vecY !== oldVY)) {
+        if (this.vecX !== oldVX || this.vecY !== oldVY) {
             return { move: { x: this.x, y: this.y, vecX: this.vecX, vecY: this.vecY } };
         }
     }

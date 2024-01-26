@@ -1,0 +1,18 @@
+{
+    "jokes":[
+        [
+            [0, "Vous voulez un whisky ?", 1600],
+            [1, "Juste un doigt.", 1600],
+            [0, "Vous ne voulez pas un whisky d'abord ?", 2000]
+        ],
+        [
+            [0, "Baba et babi sont sur un bateau", 1600],
+            [1, "Babi bêle ? ", 1600],
+            [0, "et baba cool ! ", 2000]
+        ],
+        [
+            [0, "Tires sur mon doigt...", 1600],
+            [1, "PROUT !", 1600]
+        ]
+    ]
+}

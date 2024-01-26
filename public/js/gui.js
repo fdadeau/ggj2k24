@@ -13,6 +13,8 @@ const STATE = {
     WAITING_BEFORE_START: 10,   // waiting for the other player 
     RUNNING: 42,                // game is playing
     CONNECTION_LOST: 100,       // one payer has left --> game is over
+    VICTORY: 69,               // player has won
+    LOSE: -69,                 // player has lost
     GAMEOVER: 999               /** @todo add new states */
 }
 
@@ -81,6 +83,14 @@ class GUI {
         this.state = STATE.TITLE_SCREEN;
     }
 
+    win(){
+        this.state = STATE.VICTORY;
+    }
+
+    lose(){
+        this.state = STATE.LOSE;
+    }
+
     /**
      * Updates the GUI
      * @param {number} dt Time elpsed since last update
@@ -105,6 +115,49 @@ class GUI {
         }
     }
 
+    renderTitleScreen(ctx) {
+        ctx.font = "24px arial";
+        ctx.textAlign = "center";
+        ctx.fillText("INSERT TITLE HERE", WIDTH/2, HEIGHT/2);
+        for (let b in this.buttons) {
+          this.buttons[b].render(ctx);
+        }
+    }
+
+    renderConnectionLost(ctx) {
+        ctx.textAlign = "center";
+        ctx.font = "18px arial";
+        ctx.fillText("Other player has been disconnected.", WIDTH / 2, HEIGHT / 2 -20);
+        ctx.fillText("Click to return to title screen.", WIDTH / 2, HEIGHT / 2 + 20);
+    }
+    
+    renderInfos(){
+        if (this.info) {
+            ctx.textAlign = "center";
+            ctx.font = "18px arial";
+            ctx.fillStyle = "black";
+            ctx.fillText(this.info.txt, WIDTH / 2, HEIGHT / 2 + 50);
+        }
+    }
+
+    renderDebug(ctx) {
+        if (this.debug) {
+            ctx.fillText("DEBUG: " + this.debug, 1, 10);
+        }
+    }
+
+    renderVictory(ctx) {
+        ctx.textAlign = "center";
+        ctx.font = "18px arial";
+        ctx.fillText("You won !", WIDTH / 2, HEIGHT / 2);
+    }
+
+    renderLose(ctx) {
+        ctx.textAlign = "center";
+        ctx.font = "18px arial";
+        ctx.fillText("You lost !", WIDTH / 2, HEIGHT / 2);
+    }
+
     /**
      * Renders the GUI
      * @param {CanvasRenderingContext2D} ctx Drawing area
@@ -115,34 +168,27 @@ class GUI {
         ctx.textAlign = "left";
         ctx.fillStyle = "black";
         ctx.fillText(framerate.rate + " fps", 1, 25);
-        if (this.state == STATE.TITLE_SCREEN) {
-            ctx.font = "24px arial";
-            ctx.textAlign = "center";
-            ctx.fillText("INSERT TITLE HERE", WIDTH/2, HEIGHT/2);
-            for (let b in this.buttons) {
-              this.buttons[b].render(ctx);
-            }
-        }
-        else {
-            if (this.game !== null) {
+
+        switch(this.state){
+            case STATE.TITLE_SCREEN:
+                this.renderTitleScreen(ctx);
+                break;
+            case STATE.CONNECTION_LOST:
+                this.renderConnectionLost(ctx);
+                break;
+            case STATE.RUNNING:
                 this.game.render(ctx);
-            }
-            if (this.state == STATE.CONNECTION_LOST) {
-                ctx.textAlign = "center";
-                ctx.font = "18px arial";
-                ctx.fillText("Other player has been disconnected.", WIDTH / 2, HEIGHT / 2 -20);
-                ctx.fillText("Click to return to title screen.", WIDTH / 2, HEIGHT / 2 + 20);
-            }
+                break;
+            case STATE.VICTORY:
+                this.renderVictory(ctx);
+                break;
+            case STATE.LOSE:
+                this.renderLose(ctx);
+                break;
         }
-        if (this.info) {
-            ctx.textAlign = "center";
-            ctx.font = "18px arial";
-            ctx.fillStyle = "black";
-            ctx.fillText(this.info.txt, WIDTH / 2, HEIGHT / 2 + 50);
-        }
-        if (this.debug) {
-            ctx.fillText("DEBUG: " + this.debug, 1, 10);
-        }
+
+        this.renderInfos(ctx);
+        this.renderDebug(ctx);
     }
 
 

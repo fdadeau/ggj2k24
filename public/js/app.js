@@ -3,6 +3,7 @@ import { preload, data } from "./loader.js";
 export const WIDTH = 800, HEIGHT = 500;     // should be a ratio of 16/10
 
 import GUI from "./gui.js";
+import {END_GAME_STATE} from "./player.js";
 
 /**
  *  Application 
@@ -84,6 +85,14 @@ document.addEventListener("DOMContentLoaded", function() {
         requestAnimationFrame(mainloop);
         let now = Date.now();
         gui.update(now - lastUpdate);
+        // Check if the game ended (depending on player actions)
+        if(gui.game !== null && gui.game.player.endGame !== END_GAME_STATE.RUNNING){
+            if(gui.game.player.endGame === END_GAME_STATE.WIN){
+                gui.win();
+            }else{
+                gui.lose();
+            }
+        }
         gui.render(CXT);
         lastUpdate = now;
     }

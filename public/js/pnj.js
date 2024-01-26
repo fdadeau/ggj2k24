@@ -148,7 +148,7 @@ export class PNJ extends Entity {
      * @returns true if the PNJ is not talking to anyone
      */
     isAvailable() {
-        return this.talkingTo == null;
+        return this.talkingTo == null && this.alive;
     }
 
     /**
@@ -193,6 +193,20 @@ export class Adversary extends Entity {
             this.x = newX;
             this.y = newY;
         }
+
+        // taking to someone
+        if (this.talkingTo !== null) {
+            // if dialog is over --> 
+            if (!this.dialog.isRunning()) {
+                // remove "talk link" between player and PNJ
+                this.talkingTo.talkingTo = null;
+                this.talkingTo = null;
+            }
+            else {  // dialog is not over --> update it
+                this.dialog.update();
+            }
+            return;
+        }
     }
 
     /**
@@ -217,13 +231,39 @@ export class Adversary extends Entity {
         this.talkingTo = id;
         this.x = x;
         this.y = y;
-
     }
+
+
+    talk(player) {
+        if (this.isAvailable()) {
+            /** @todo change orientation to face player */
+            this.talkingTo = player;
+            this.dialog.start();
+        } 
+    }
+
+    isAvailable(){
+        return this.talkingTo == null;
+    }
+
+    render(ctx) {
+        super.render(ctx);
+        /** prints dialog @todo move code somewhere else to avoid z-index issues */
+        if (this.dialog.isRunning() && this.talkingTo !== null) {
+            //this.dialog.render(ctx, this.x, this.y, this.talkingTo.x, this.talkingTo.y);
+        }
+    }
+
+    renderDialog(ctx) {
+        if (this.dialog.isRunning() && this.talkingTo !== null) {
+            this.dialog.render(ctx, this.x, this.y, this.talkingTo.x, this.talkingTo.y, this.talkingTo instanceof Player);
+        }
+    } 
 
 }
 
 
-class Dialog {
+export class Dialog {
 
     constructor(texts) {
         this.state = -1;
@@ -262,6 +302,7 @@ class Dialog {
             this.state = 0; 
         }
     }
+
     end() {
         this.state = -1;
     }

@@ -12,7 +12,7 @@ const PROXIMITY = 10000;
 
 export class Map {
 
-    constructor(level, delay) {
+    constructor(level, delay, adversaryRole) {
         // sort walls 
         this.walls = level.walls.map(e => e[0] > e[2] ? [e[2],e[1],e[0],e[3]] : e).map(e => e[1] > e[3] ? [e[0],e[3],e[2],e[1]] : e);
         /** @todo compute these values from walls data from level */
@@ -20,8 +20,10 @@ export class Map {
         this.bottomRight = [1260, 800];
         this.boundaries = [1280, 820];
         this.playerStart = level.start;
-        /** @type {Adversary} */
-        this.adversary = new Adversary(0,0,0,0,20,null,this);
+        /** 
+         * @type {Adversary}
+         */
+        this.adversary = new Adversary(0,0,0,0,20,adversaryRole,this);
         /** @type {Entity[]} */
         this.PNJs = [this.adversary, ...level.PNJs.map(p => new PNJ(p.scenario, p.dialog, delay))];
     }
@@ -57,7 +59,13 @@ export class Map {
         pnj.x = px;
         pnj.y = py;
         this.adversary.updateAdversary(x,y);
-        pnj.talk(this.adversary);
+
+        if(pnj instanceof PNJ){
+            pnj.talk(this.adversary);
+        }
+        if(pnj instanceof Adversary){
+            this.player.talkWithAdversary(this.adversary);
+        }
     }
 
     render(ctx) {
@@ -87,7 +95,7 @@ export class Map {
                 charWithDialog.push(c);
             }
         }
-        for (let c of charWithDialog) {
+        for(let c of charWithDialog) {
             c.renderDialog(ctx);
         }
     }

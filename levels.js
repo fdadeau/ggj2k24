@@ -8,7 +8,8 @@ module.exports = { generate };
 function generate() {
     const walls = WALLS;
     const PNJs = [PNJ_0];
-    const start = { police: {x: 90, y: 90 }, killer: { x: 1100, y: 650 } };
+    //const start = { police: {x: 90, y: 90 }, killer: { x: 1100, y: 650 } };
+    const start = { police: {x: 90, y: 90 }, killer: { x: 150, y: 150 } };
     return { walls, PNJs, start };
 } 
 
