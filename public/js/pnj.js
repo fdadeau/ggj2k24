@@ -63,7 +63,7 @@ export class PNJ extends Entity {
             obj.endTime = t;
             return obj;
         });
-        this.dialog = new Dialog(dialog);
+        this.dialog = new Dialog(dialog[1]);
         this.time = 0;
         this.startTime = Date.now() - delay;
         this.step = 0;
