@@ -41,9 +41,10 @@ class GUI {
      * Launched when recieved from 
      * @param {Object} level Level description 
      * @param {string} role "police", "killer"
+     * @param {number} delay the delay w.r.t. the start 
      */
-    newGame(level, role) {
-        this.game = new Game(level, role);
+    newGame(level, role, delay) {
+        this.game = new Game(level, role, delay);
         this.state = STATE.RUNNING;    
     }
     /**
@@ -61,6 +62,12 @@ class GUI {
             this.game.updateAdversary(data.x, data.y, data.vecX, data.vecY);
         }
     }
+    updateAdversaryTalk(data) {
+        if (this.game) {
+            this.game.updateAdversaryTalk(data.x, data.y, data.id, data.pnjX, data.pnjY);
+        }
+    }
+
     /**
      * Displays the message on the screen
      * @param {string} txt message to display

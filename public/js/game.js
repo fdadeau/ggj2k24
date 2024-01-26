@@ -10,8 +10,8 @@ import { Map } from "./map.js";
 
 export class Game {
 
-    constructor(level, role) {
-        this.map = new Map(level);
+    constructor(level, role, delay) {
+        this.map = new Map(level, delay);
         this.player = new Player(role, this.map);
         this.viewport = { x: 0, y: 0, w: WIDTH, h: HEIGHT };
         this.updateViewport();
@@ -37,6 +37,10 @@ export class Game {
      */
     updateAdversary(x,y,vx,vy) {
         this.map.updateAdversary(x,y,vx,vy);
+    }
+
+    updateAdversaryTalk(x,y,id,px,py) {
+        this.map.updateAdversaryTalk(x,y,id,px,py);
     }
 
     /**
@@ -77,12 +81,7 @@ export class Game {
      * @todo: update with actions on PNJ (kill, talk, accuse adversary)
      */
     keydown(e) {
-        let oldVX = this.player.vecX;
-        let oldVY = this.player.vecY; 
-        this.player.keyDown(e)
-        if (this.player.vecX !== oldVX || this.player.vecY !== oldVY) {
-            return { move: { x: this.player.x, y: this.player.y, vecX: this.player.vecX, vecY: this.player.vecY } };
-        }
+        return this.player.keyDown(e)
     }
     /**
      * Called when a key is released. 
@@ -90,11 +89,6 @@ export class Game {
      * @returns null if no movement that needs propagation, an object describing the update to send to the socket
      */
     keyup(e) {
-        let oldVX = this.player.vecX;
-        let oldVY = this.player.vecY; 
-        this.player.keyUp(e)
-        if (this.player.vecX !== oldVX || this.player.vecY !== oldVY) {
-            return { move: { x: this.player.x, y: this.player.y, vecX: this.player.vecX, vecY: this.player.vecY } };
-        }
+        return this.player.keyUp(e)
     }   
 }

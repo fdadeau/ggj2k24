@@ -133,6 +133,8 @@ export class Player {
     /********  CONTROLS  ********/
 
     keyDown(key) {
+        let oldVX = this.vecX;
+        let oldVY = this.vecY; 
         switch (COMMANDS[key.code]) {
             case UP:
                 this.vecY = this.orientation.y = -1;
@@ -151,13 +153,21 @@ export class Player {
                 this.orientation.y = this.vecY;
                 break;
             case TALK:
-                console.log("talk")
+                const notTalkingBefore = this.talkingTo === null;
                 this.talk();
+                if (notTalkingBefore && this.talkingTo != null) {
+                    return { talk: { x: this.x, y: this.y, pnjId: this.talkingTo.id, pnjX: this.talkingTo.x, pnjY: this.talkingTo.y } }
+                }
                 break;
+        }
+        if (this.vecX !== oldVX || this.vecY !== oldVY) {
+            return { move: { x: this.x, y: this.y, vecX: this.vecX, vecY: this.vecY } };
         }
     }
 
     keyUp(key) {
+        let oldVX = this.vecX;
+        let oldVY = this.vecY; 
         switch (COMMANDS[key.code]) {
             case UP: 
                 if (this.vecY < 0) {
@@ -191,6 +201,9 @@ export class Player {
                     }
                 }
                 break;
+        }
+        if (this.vecX !== oldVX || this.vecY !== oldVY) {
+            return { move: { x: this.x, y: this.y, vecX: this.vecX, vecY: this.vecY } };
         }
     }
 

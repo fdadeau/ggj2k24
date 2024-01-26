@@ -12,7 +12,7 @@ const PROXIMITY = 10000;
 
 export class Map {
 
-    constructor(level) {
+    constructor(level, delay) {
         // sort walls 
         this.walls = level.walls.map(e => e[0] > e[2] ? [e[2],e[1],e[0],e[3]] : e).map(e => e[1] > e[3] ? [e[0],e[3],e[2],e[1]] : e);
         /** @todo compute these values from walls data from level */
@@ -23,12 +23,13 @@ export class Map {
         /** @type {Adversary} */
         this.adversary = new Adversary(0,0,0,0,20,null,this);
         /** @type {Entity[]} */
-        this.PNJs = [this.adversary, ...level.PNJs.map(p => new PNJ(p.scenario, p.dialog))];
+        this.PNJs = [this.adversary, ...level.PNJs.map(p => new PNJ(p.scenario, p.dialog, delay))];
     }
 
     update(dt) {
         this.player.closestPNJ = null;
         for (let p in this.PNJs) {
+            this.PNJs[p].id = p;   // crade
             this.PNJs[p].update(dt);
             let dist = distanceSQ(this.player.x, this.player.y, this.PNJs[p].x, this.PNJs[p].y);
             if (dist < PROXIMITY && this.player.sees(this.PNJs[p].x, this.PNJs[p].y) && (this.player.closestPNJ == null || this.player.closestPNJ.distance > dist)) {
@@ -50,6 +51,12 @@ export class Map {
     /** Adversary update (propagation to dedicated object) */
     updateAdversary(x, y, vecX, vecY) {
         this.adversary.updateAdversary(x,y,vecX,vecY);
+    }
+    updateAdversaryTalk(x, y, id, px, py) {
+        this.PNJs[id].x = px;
+        this.PNJs[id].y = py;
+        this.adversary.updateAdversary(x,y);
+        this.PNJs[id].talk(this.adversary);
     }
 
     render(ctx) {

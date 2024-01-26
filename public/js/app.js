@@ -31,13 +31,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const socket = io('http://localhost:5500');
 
-    socket.on("newgame", function({level,role}) {
-        gui.newGame(level,role);
+    socket.on("newgame", function({level,role,delay}) {
+        gui.newGame(level, role, delay);
     });
     socket.on("playerMove", function(data) {
         gui.updateAdversary(data);
     });
-    socket.on("playerLeft", function(data) {
+    socket.on("playerLeft", function() {
         gui.interruptGame();
     });
     socket.on("noSuchGame", function() {

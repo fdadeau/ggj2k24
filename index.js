@@ -54,12 +54,12 @@ io.on('connection', (socket) => {
             currentGame = "#" + (Math.random() * 899999 + 100000 | 0);
         }
         while (rooms[currentGame]);
-        rooms[currentGame] = { adversary: {}, level: levels.generate(), roles: {"police": null, "killer": null} };
+        rooms[currentGame] = { adversary: {}, level: levels.generate(), t0: Date.now(), roles: {"police": null, "killer": null} };
         const role = (Math.random() < 0.5) ? "police" : "killer";
         rooms[currentGame].roles[role] = socket.id;
         games[socket.id] = currentGame;
         console.log("Player " + socket.id + " created game " + currentGame + " ("+ role+")");
-        socket.emit("newgame", { level: rooms[currentGame].level, role });
+        socket.emit("newgame", { level: rooms[currentGame].level, role, delay: 0 });
     });
 
     // Rejoindre une salle de jeu
@@ -93,7 +93,7 @@ io.on('connection', (socket) => {
         room.adversary[socket.id] = otherID;
 
         // Informer le joueur qu'il a rejoint la salle, avec son rôle
-        socket.emit('newgame', { level: rooms[roomId].level, role });
+        socket.emit('newgame', { level: rooms[roomId].level, role, delay: Date.now() - rooms[roomId].t0 });
         // Informer les autres joueurs de la salle qu'un nouveau joueur a rejoint
         socket.to(otherID).emit("playerJoined");
     });
@@ -104,6 +104,14 @@ io.on('connection', (socket) => {
         if (currentGame && rooms[currentGame]) {
             // inform the adversary of the movement
             socket.volatile.to(rooms[currentGame].adversary[socket.id]).emit('playerMove', data);
+        }
+    });
+    // Écouter les mouvements du joueur
+    socket.on('playerTalk', (data) => {
+        let currentGame = games[socket.id];
+        if (currentGame && rooms[currentGame]) {
+            // inform the adversary that two players are talking to each other
+            socket.volatile.to(rooms[currentGame].adversary[socket.id]).emit('playerTalk', data);
         }
     });
 

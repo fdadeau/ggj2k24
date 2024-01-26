@@ -40,7 +40,8 @@ class Entity {
     }
 
     talk(who) {
-
+        this.talkingTo = who;
+        who.talkingTo = this;
     }
 
 }
@@ -48,7 +49,7 @@ class Entity {
 
 export class PNJ extends Entity {
 
-    constructor(scenario,dialog) {
+    constructor(scenario,dialog, delay) {
         super(0,0,0,0,20);
         let t = 0;
         // scenario of the character
@@ -62,6 +63,7 @@ export class PNJ extends Entity {
         });
         this.dialog = new Dialog(dialog);
         this.time = 0;
+        this.startTime = Date.now() - delay;
         this.step = 0;
     }
 
@@ -190,6 +192,13 @@ export class Adversary extends Entity {
         if (vecY !== undefined) {
             this.vecY = vecY;
         }
+    }
+
+    updateAdversaryTalk(x,y,id,px,py) {
+        this.talkingTo = id;
+        this.x = x;
+        this.y = y;
+
     }
 }
 
