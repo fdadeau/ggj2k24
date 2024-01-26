@@ -41,6 +41,7 @@ document.addEventListener("DOMContentLoaded", function() {
         gui.interruptGame();
     });
     socket.on("playerTalk", function(data) {
+        console.log("playerTalk", data)
         gui.updateAdversaryTalk(data);
     });
     socket.on("noSuchGame", function() {
@@ -127,6 +128,10 @@ document.addEventListener("DOMContentLoaded", function() {
         let r = gui.keydown(e); 
         if (r && r.move) {
             socket.emit("playerMove",r.move);
+            return;
+        }
+        if (r && r.talk) {
+            socket.emit("playerTalk",r.talk);
             return;
         }
     });

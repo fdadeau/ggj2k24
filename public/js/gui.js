@@ -64,7 +64,7 @@ class GUI {
     }
     updateAdversaryTalk(data) {
         if (this.game) {
-            this.game.updateAdversaryTalk(data.x, data.y, data.id, data.pnjX, data.pnjY);
+            this.game.updateAdversaryTalk(data.x, data.y, data.pnjId, data.pnjX, data.pnjY);
         }
     }
 
