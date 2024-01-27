@@ -13,13 +13,15 @@ const data = {
     "carpet": "./assets/images/carpet.png",
     
     // spritesheets
-    "groom-spritesheet": "./assets/spritesheets/groom_spritesheet.png",
+    "groom-pink-spritesheet": "./assets/spritesheets/groom_pink_spritesheet.png",
+    "groom-blue-spritesheet": "./assets/spritesheets/groom_blue_spritesheet.png",
+    "groom-red-spritesheet": "./assets/spritesheets/groom_red_spritesheet.png",
     "default-spritesheet": "./assets/spritesheets/default_spritesheet.png",
 
     // music 
 
     // sound effects
-    
+    "theme": "./assets/sounds/theme.m4a",
 }
 
 export default data; 

@@ -10,6 +10,8 @@ import data from "./assets.js";
 
 import { INTERACTION_TIMER } from "./player.js";
 
+import { audio } from "./audio.js";
+
 export const FRAME_DELAY = 100;
 
 export const STATE = { 
@@ -55,7 +57,7 @@ class GUI {
      */
     newGame(level, role, delay) {
         this.game = new Game(level, role, delay);
-        this.state = STATE.RUNNING;    
+        this.state = STATE.RUNNING;
     }
     /**
      * Called when connection to the other player has been lost.
@@ -89,6 +91,9 @@ class GUI {
 
     start() {
         this.state = STATE.TITLE_SCREEN;
+        if(!audio.audioIsPlaying("theme")){
+            audio.playMusic("theme", 1); 
+        }
     }
 
     win(){

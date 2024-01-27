@@ -23,7 +23,7 @@ export const KILL_BACK = [21,22,21];
 
 export class Player extends Entity {
 
-    constructor(role, map) {
+    constructor(role, map, skin) {
         super(0,0,0,0,20);
         /** @type {string} role of the player "police", "killer" */
         this.role = role;
@@ -51,7 +51,9 @@ export class Player extends Entity {
         new Dialog([[0,"Ecoutez laissez la police faire son travail.", 1000],[0,"Dès que nous aurons de plus amples informations,", 1000],[0,"vous en serez les premiers informés.",1000]]) :
         new Dialog([[0,"Tu veux un whisky ?",1000]]);
 
+        this.sprite = data[skin];
         this.animation = this.whichAnimation();
+        this.switchAfterKill = null;
     }
 
     update(dt) {
@@ -223,6 +225,10 @@ export class Player extends Entity {
             if(this.talkingTo instanceof Adversary){
                 this.endGame = END_GAME_STATE.LOSE;
             }else{
+                this.switchAfterKill = {
+                    to: this.talkingTo,
+                    skin: this.talkingTo.sprite
+                };
                 this.talkingTo.die();
             }
         }

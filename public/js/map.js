@@ -4,6 +4,8 @@ import { WIDTH, HEIGHT } from "./app.js";
 import { Adversary, PNJ } from "./pnj.js";
 
 import { hitboxCollision, distanceSQ } from "./geometry.js";
+import data from "./assets.js";
+import { SKINS } from "./game.js";
 
 const WALL_THICKNESS = 20;
 
@@ -12,7 +14,7 @@ const PROXIMITY = 10000;
 
 export class Map {
 
-    constructor(level, delay, adversaryRole) {
+    constructor(level, delay, adversaryRole, skins) {
         // sort walls 
         this.walls = level.walls.map(e => e[0] > e[2] ? [e[2],e[1],e[0],e[3]] : e).map(e => e[1] > e[3] ? [e[0],e[3],e[2],e[1]] : e);
         /** @todo compute these values from walls data from level */
@@ -26,6 +28,17 @@ export class Map {
         this.adversary = new Adversary(0,0,0,0,20,adversaryRole,this);
         /** @type {Entity[]} */
         this.PNJs = [this.adversary, ...level.PNJs.map(p => new PNJ(p.scenario, p.dialog, delay))];
+
+        // Giving a random skin to each PNJ
+        for (let p in this.PNJs) {
+            let skin = skins[Math.floor(Math.random() * skins.length)];
+            console.log("skin", skin);
+            skins = skins.filter(s => s != skin);
+            this.PNJs[p].sprite = data[skin];
+            if(skins.length == 0){
+                skins = SKINS;
+            }
+        }
     }
 
     update(dt) {

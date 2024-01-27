@@ -87,6 +87,10 @@ export class Entity {
         return this.talkingTo == null;
     }
 
+    setSprite(s) {
+        this.sprite = s;
+    }
+
     /**
      * Set the entity's orientation to face a given point
      * @param {number} x 
@@ -153,6 +157,8 @@ export class Entity {
         if (this.frameDelay <= 0) {
             if(this.frame+1 == this.animation.length && (this.animation == KILL_BACK || this.animation == KILL_FRONT || this.animation == KILL_LEFT || this.animation == KILL_RIGHT)){
                 this.setAnimation(this.whichAnimation());
+                this.switchAfterKill.to.setSprite(this.sprite);
+                this.setSprite(this.switchAfterKill.skin);
             }
             this.frameDelay = FRAME_DELAY;
             this.frame = (this.frame + 1) % this.animation.length;

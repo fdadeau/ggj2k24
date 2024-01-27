@@ -7,12 +7,21 @@ import { WIDTH, HEIGHT } from "./app.js";
 
 import { Player } from "./player.js";
 import { Map } from "./map.js";
+export const SKINS = ["groom-pink-spritesheet", "groom-blue-spritesheet", "groom-red-spritesheet"];
 
 export class Game {
 
     constructor(level, role, delay) {
-        this.map = new Map(level, delay, role == "police" ? "killer" : "police");
-        this.player = new Player(role, this.map);
+        let availableSkins = SKINS;
+        // Getting a random skin    
+        let skin = availableSkins[Math.floor(Math.random() * availableSkins.length)];
+        // Removing the skin from the list of available skins
+        availableSkins = availableSkins.filter(s => s != skin);
+
+
+        // Create the map
+        this.map = new Map(level, delay, role == "police" ? "killer" : "police", availableSkins);
+        this.player = new Player(role, this.map, skin);
         this.viewport = { x: 0, y: 0, w: WIDTH, h: HEIGHT };
         this.updateViewport();
     }
