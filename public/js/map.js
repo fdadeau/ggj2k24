@@ -10,15 +10,29 @@ const WALL_THICKNESS = 20;
 /** @type {number} proximity of the player with other characters */
 const PROXIMITY = 10000;
 
+const TILE_TYPE = {
+    PLANKS_FLOOR: 0,
+    BATHROOM_FLOOR: 1,
+    BAR_FLOOR: 2,
+    ROOM_FLOOR: 3,
+    KITCHEN_FLOOR: 4,
+
+    OUTSIDE_WALL: 5,
+    BATHROOM_WALL: 6,
+    BAR_WALL: 7,
+    ROOM_LIGH_WALL: 8,
+    ROOM_DARK_WALL: 9
+}
+
 export class Map {
 
     constructor(level, delay, adversaryRole) {
         // sort walls 
-        this.walls = level.walls.map(e => e[0] > e[2] ? [e[2],e[1],e[0],e[3]] : e).map(e => e[1] > e[3] ? [e[0],e[3],e[2],e[1]] : e);
+        this.walls = level.walls;//.map(e => e[0] > e[2] ? [e[2],e[1],e[0],e[3]] : e).map(e => e[1] > e[3] ? [e[0],e[3],e[2],e[1]] : e);
         /** @todo compute these values from walls data from level */
         this.topLeft = [20, 20];
-        this.bottomRight = [1260, 800];
-        this.boundaries = [1280, 820];
+        this.bottomRight = [1024, 1024];
+        this.boundaries = [1024, 1024];
         this.playerStart = level.start;
         /** 
          * @type {Adversary}
@@ -58,7 +72,7 @@ export class Map {
         let pnj = this.PNJs[Number(id)];
         pnj.x = px;
         pnj.y = py;
-        this.adversary.updateAdversary(x,y);
+        this.adversary.updateAdversary(x,y,0,0);
 
         if(pnj instanceof PNJ){
             pnj.talk(this.adversary);
@@ -69,14 +83,51 @@ export class Map {
     }
 
     render(ctx) {
-        ctx.lineWidth = WALL_THICKNESS;
+        // ctx.lineWidth = WALL_THICKNESS;
         ctx.lineCap = "round";
         ctx.strokeStyle = "grey";
         for (let w of this.walls) {
-            ctx.beginPath();
-            ctx.moveTo(w[0],w[1]);
-            ctx.lineTo(w[2],w[3]);
-            ctx.stroke();
+            // ctx.beginPath();
+            // ctx.moveTo(w[0],w[1]);
+            // ctx.lineTo(w[0]+w[2],w[1]);
+            // ctx.lineTo(w[0]+w[2],w[1]+w[3]);
+            // ctx.lineTo(w[0],w[1]+w[3]);
+            // ctx.lineTo(w[0],w[1]);
+            // ctx.stroke();
+            switch (w[4]) {
+                case TILE_TYPE.PLANKS_FLOOR:
+                    ctx.fillStyle = '#964B00'; // Brown
+                    break;
+                case TILE_TYPE.BATHROOM_FLOOR:
+                    ctx.fillStyle = '#ADD8E6'; // Light Blue
+                    break;
+                case TILE_TYPE.BAR_FLOOR:
+                    ctx.fillStyle = '#FFD700'; // Gold
+                    break;
+                case TILE_TYPE.ROOM_FLOOR:
+                    ctx.fillStyle = '#90EE90'; // Light Green
+                    break;
+                case TILE_TYPE.KITCHEN_FLOOR:
+                    ctx.fillStyle = '#D2691E'; // Chocolate
+                    break;
+                case TILE_TYPE.OUTSIDE_WALL:
+                    ctx.fillStyle = '#696969'; // Dim Gray
+                    break;
+                case TILE_TYPE.BATHROOM_WALL:
+                    ctx.fillStyle = '#008080'; // Teal
+                    break;
+                case TILE_TYPE.BAR_WALL:
+                    ctx.fillStyle = '#8B4513'; // Saddle Brown
+                    break;
+                case TILE_TYPE.ROOM_LIGH_WALL:
+                    ctx.fillStyle = '#FFFFE0'; // Light Yellow
+                    break;
+                case TILE_TYPE.ROOM_DARK_WALL:
+                    ctx.fillStyle = '#A9A9A9'; // Dark Gray
+                    break;
+            }
+            
+            ctx.fillRect(w[0], w[1], w[2], w[3])
         }
         const characters = this.PNJs.filter((c) => this.player.sees(c.x, c.y));
         characters.push(this.player);
@@ -86,10 +137,23 @@ export class Map {
             c.render(ctx);
             // small dot to indicate closest PNJ
             if (this.player.closestPNJ && this.player.closestPNJ.pnj == c && c.isAvailable()) {
+                ctx.strokeStyle = "black";
+                ctx.beginPath();
+                ctx.lineWidth = 1;
+                ctx.roundRect(c.x-20, c.y-50, 40, 20, [10]);
+                ctx.stroke();
+                ctx.fillStyle = "white";
+                ctx.fill();
+                ctx.closePath();
+                ctx.font = "bold 30px serif";
+                ctx.fillStyle = "black";
+                ctx.fillText("...",c.x-11, c.y-37);
+                /*
                 ctx.beginPath();
                 ctx.arc(c.x, c.y - c.size - 15, 5, 0, 2*Math.PI);
                 ctx.closePath();
                 ctx.fill();
+                */
             }
             if (c.dialog && c.dialog.isRunning()) {
                 charWithDialog.push(c);
@@ -102,11 +166,13 @@ export class Map {
 
 
     isTooCloseFromOneWall(x, y, size) {
+        console.log(this.walls);
         for (let wall of this.walls) {
-            if (!(x + size < wall[0]-WALL_THICKNESS/2 || x - size > wall[2]+WALL_THICKNESS/2 || y + size < wall[1]-WALL_THICKNESS/2 || y - size > wall[3] + WALL_THICKNESS/2)) {
+            //if (!(x + size < wall[0]-WALL_THICKNESS/2 || x - size > wall[2]+WALL_THICKNESS/2 || y + size < wall[1]-WALL_THICKNESS/2 || y - size > wall[3] + WALL_THICKNESS/2)) {
+            if (x + size > wall[0] && x - size < wall[0] + wall[2] && y + size > wall[1] && y - size < wall[1] + wall[3] && wall[4] >= TILE_TYPE.OUTSIDE_WALL && wall[4] <= TILE_TYPE.ROOM_DARK_WALL) {
                 return wall;
             }   
-        }
+        } 
         return null;
     }
 
