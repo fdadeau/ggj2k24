@@ -160,6 +160,8 @@ class GUI {
 
     renderDebug(ctx) {
         if (this.debug) {
+            ctx.font = "8px arial";
+            ctx.textAlign = "left";
             ctx.fillText("DEBUG: " + this.debug, 1, 10);
         }
     }

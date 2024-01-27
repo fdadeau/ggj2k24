@@ -165,6 +165,16 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
+
+    const manette = document.getElementById("manette");
+    const manetteBB = manette.getBoundingClientRect();
+    document.addEventListener("touchstart", function(e) {
+        const x = e.targetTouches[0].clientX - manetteBB.left - manetteBB.width / 2;
+        const y = e.targetTouches[0].clientY - manetteBB.top - manetteBB.height / 2;
+        gui.debug = `Touch ${x},${y}`;
+    });
+
+
     /** Polyfill for setting fullscreen display */
     function goFullScreen() {
         CVS.requestFullscreen && CVS.requestFullscreen() || CVS.webkitRequestFullscreen && CVS.webkitRequestFullscreen() || CVS.msRequestFullscreen && CVS.msRequestFullscreen();
