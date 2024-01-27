@@ -261,12 +261,22 @@ export class Map {
     }
 
     renderFurnitures(ctx, w) {
+        let furniture = this.getFurniture(w);
+        if (furniture != null) {
+            ctx.drawImage(furniture.img, furniture.x, furniture.y, furniture.width * 2, furniture.height * 2);
+        }
+    }
+
+    getFurniture(w) {
         let x = w[0];
         let y = w[1];
-        let furniture_img, width, height = null;
+        let furniture_img = null;
+        let width = null;
+        let height = null;
+
         switch (w[5]) {
             case FURNITURE_TYPE.NONE: // -1
-                return;
+                return null;
             case FURNITURE_TYPE.SINK_FRONT: // 0
                 furniture_img =  data['sink_front'];
                 width = 24;
@@ -430,15 +440,31 @@ export class Map {
                 x = x + TILE_SIDE - width * 2;
                 break;
         }
-        ctx.drawImage(furniture_img, x, y, width * 2, height  * 2);
+        return {img: furniture_img, x: x, y: y, width: width, height: height};
     }
 
 
     isTooCloseFromOneWall(x, y, size) {
         size = size * 2;
+        // j, i, width, height, type, type
         for (let wall of this.walls) {
-            //if (!(x + size < wall[0]-WALL_THICKNESS/2 || x - size > wall[2]+WALL_THICKNESS/2 || y + size < wall[1]-WALL_THICKNESS/2 || y - size > wall[3] + WALL_THICKNESS/2)) {
-            if (x + size > wall[0] && x - size < wall[0] + wall[2] && y + size > wall[1] && y < wall[1] + wall[3] - TILE_SIDE / 8 && ((wall[4] >= TILE_TYPE.OUTSIDE_WALL && wall[4] <= TILE_TYPE.CORRIDOR_WALL) || wall[4] == TILE_TYPE.BAR_SHELVES)) {
+            //if (!(x + size < wall[0]-WALL_THICKNESS/2 || x - size > wall[2]+wall[3]/2 || y + size < wall[1]-wall[4]/2 || y - size > wall[3] + wall[4]/2)) {
+            let furniture = this.getFurniture(wall);
+            if ((x + size > wall[0] + TILE_SIDE / 16 && 
+                x < wall[0] + wall[2] + TILE_SIDE / 16 &&  // HERE
+                y + size > wall[1] - TILE_SIDE / 16 && // To down
+                y < wall[1] + wall[3] - TILE_SIDE / 4 && // To up
+                (
+                    (wall[4] >= TILE_TYPE.OUTSIDE_WALL 
+                        && wall[4] <= TILE_TYPE.CORRIDOR_WALL) || 
+                    wall[4] == TILE_TYPE.BAR_SHELVES)
+                ) ||
+                (furniture !== null &&
+                x + size > furniture.x && 
+                x < furniture.x + furniture.width + TILE_SIDE / 4 &&  // HERE
+                y + size > furniture.y /*- TILE_SIDE/16*/ && // To down
+                y < furniture.y + furniture.height /*- TILE_SIDE / 8*/ &&
+                wall[5] != FURNITURE_TYPE.CARPET)) {
                 return wall;
             }   
         } 
