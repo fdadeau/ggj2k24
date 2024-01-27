@@ -37,6 +37,7 @@ class Entity {
         this.animation = IDLE_RIGHT;
         this.frame = 0;
         this.frameDelay = FRAME_DELAY;
+        this.sprite = data["default-spritesheet"];
     }
 
     update(dt) {
@@ -51,7 +52,7 @@ class Entity {
         let row = Math.floor(frame / 3);
 
         ctx.drawImage(
-            data["default-spritesheet"], 
+            this.sprite, 
             col * size, 
             row * size, 
             size, 
@@ -107,6 +108,8 @@ export class PNJ extends Entity {
         this.startTime = Date.now() - delay;
         this.step = 0;
         this.alive = true;
+
+        this.sprite = data["default-spritesheet"];
     }
 
     reset() {
@@ -228,6 +231,7 @@ export class PNJ extends Entity {
             /** @todo change orientation to face player */
             this.talkingTo = player;
             this.dialog.start();
+            this.setAnimation(IDLE_FRONT);
         } 
     }
 
@@ -252,6 +256,10 @@ export class Adversary extends Entity {
         this.dialog = (role == "police") ? 
             new Dialog([[0,"Ecoutez laissez la police faire son travail.", 1000],[0,"Dès que nous aurons de plus amples informations,", 1000],[0,"vous en serez les premiers informés.",1000]]) :
             new Dialog([[0,"Tu veux un whisky ?",1000]]);
+
+        this.sprite = data["groom-spritesheet"];
+        this.oldVecX;
+        this.oldVecY;
     }
 
     update(dt) {
@@ -275,6 +283,12 @@ export class Adversary extends Entity {
             }
             return;
         }
+
+        this.frameDelay -= dt;
+        if (this.frameDelay <= 0) {
+            this.frameDelay = FRAME_DELAY;
+            this.frame = (this.frame + 1) % this.animation.length;
+        }
     }
 
     /**
@@ -287,11 +301,40 @@ export class Adversary extends Entity {
     updateAdversary(x,y,vecX,vecY) {
         this.x = x;
         this.y = y;
+        this.oldVecX = this.vecX;
+        this.oldVecY = this.vecY;
         if (vecX !== undefined) {
             this.vecX = vecX;
+            if(this.vecX == 1){
+                this.setAnimation(WALK_RIGHT);
+            }
+            if(this.vecX == -1){
+                this.setAnimation(WALK_LEFT);
+            }
         }
         if (vecY !== undefined) {
             this.vecY = vecY;
+            if(this.vecY == -1){
+                this.setAnimation(WALK_BACK);
+            }
+            if(this.vecY == 1){
+                this.setAnimation(WALK_FRONT);
+            }
+        }
+
+        if(vecY == 0 && vecX == 0){
+            if(this.oldVecX == 1){
+                this.setAnimation(IDLE_RIGHT);
+            }
+            if(this.oldVecX == -1){
+                this.setAnimation(IDLE_LEFT);
+            }
+            if(this.oldVecY == -1){
+                this.setAnimation(IDLE_BACK);
+            }
+            if(this.oldVecY == 1){
+                this.setAnimation(IDLE_FRONT);
+            }
         }
     }
 
@@ -299,6 +342,7 @@ export class Adversary extends Entity {
         this.talkingTo = id;
         this.x = x;
         this.y = y;
+        this.setAnimation(IDLE_FRONT);
     }
 
 
@@ -307,6 +351,7 @@ export class Adversary extends Entity {
             /** @todo change orientation to face player */
             this.talkingTo = player;
             this.dialog.start();
+            this.setAnimation(IDLE_FRONT);
         } 
     }
 
