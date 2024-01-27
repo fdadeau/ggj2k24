@@ -40,8 +40,8 @@ class GUI {
 
         /** buttons */
         this.buttons = {
-            "CREATE": new Button("Create game", WIDTH*0.4, HEIGHT*0.8, 140, 40),
-            "JOIN": new Button("Join game", WIDTH*0.7, HEIGHT*0.8, 140, 40)
+            "CREATE": new Button("Create game", WIDTH*0.3, HEIGHT*0.7, 140, 40),
+            "JOIN": new Button("Join game", WIDTH*0.7, HEIGHT*0.7, 140, 40)
         }
 
         this.interactionButton = new InteractionButton("", WIDTH*.95, HEIGHT*.93, 64, 64, this);
@@ -278,6 +278,7 @@ class Button {
     }
 
     render(ctx) {
+        /*
         ctx.verticalAlign = "middle";
         ctx.textAlign = "center";
         ctx.font = `${this.height/2}px arial`;
@@ -285,6 +286,13 @@ class Button {
         ctx.fillRect(this.x0, this.y0, this.width + this.padding, this.height+this.padding/2);
         ctx.fillStyle = "black";
         ctx.fillRect(this.x0 + this.padding/2, this.y0 + this.padding/2, this.width, this.height - this.padding/2);
+        ctx.fillStyle = "white";
+        ctx.fillText(this.txt, this.x, this.y);
+        */
+        ctx.verticalAlign = "middle";
+        ctx.textAlign = "center";
+        ctx.font = `${this.height/2}px arial`;
+        ctx.drawImage(data["carpet"], this.x0, this.y0, this.width + this.padding, this.height+this.padding/2);
         ctx.fillStyle = "white";
         ctx.fillText(this.txt, this.x, this.y);
     }

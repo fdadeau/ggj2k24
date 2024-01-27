@@ -10,6 +10,7 @@ const data = {
     "saussage": "./assets/images/saussage.png",
     "question": "./assets/images/question.png",
     "trap": "./assets/images/trap.png",
+    "carpet": "./assets/images/carpet.png",
     
     // spritesheets
     "groom-spritesheet": "./assets/spritesheets/groom_spritesheet.png",

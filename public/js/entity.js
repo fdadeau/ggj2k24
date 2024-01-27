@@ -15,6 +15,8 @@ const IDLE_LEFT = [4];
 const IDLE_RIGHT = [7];
 const IDLE_BACK = [10];
 
+const DEAD = [10];
+
 /**
  * Abstract class for entities
  */
@@ -117,6 +119,9 @@ export class Entity {
         }
     }
     whichAnimation() {
+        if(this.alive !== undefined && !this.alive){
+            return DEAD;
+        }
         // determine animation
         if (this.vecX == 0 && this.vecY == 0) {
             // not moving --> maybe only use IDLE_FRONT ?
