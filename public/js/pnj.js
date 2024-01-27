@@ -216,7 +216,7 @@ export class Adversary extends Entity {
         if (this.animation != newAnim) {
             this.setAnimation(newAnim);
         }
-        console.log({orientation: this.orientation})
+        //console.log({orientation: this.orientation})
     }
 
     updateAdversaryTalk(x,y,id,px,py) {

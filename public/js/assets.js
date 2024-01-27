@@ -7,6 +7,9 @@ const data = {
     
     // images (backgrounds, titles, etc.)
     "logoGGJ": "./assets/logos/logoGGJ.png",
+    "saussage": "./assets/images/saussage.png",
+    "question": "./assets/images/question.png",
+    "trap": "./assets/images/trap.png",
     
     // spritesheets
     "groom-spritesheet": "./assets/spritesheets/groom_spritesheet.png",

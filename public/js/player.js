@@ -12,7 +12,7 @@ const UP = 1, DOWN = 3, LEFT = 4, RIGHT = 2, TALK = 10;
 
 const COMMANDS = { "ArrowUp": UP, "ArrowDown": DOWN, "ArrowLeft": LEFT, "ArrowRight": RIGHT, "Space": TALK };
 
-const INTERACTION_TIMER = 5000;
+export const INTERACTION_TIMER = 5000;
 
 export const END_GAME_STATE = {"WIN": 1, "LOSE": -1, "RUNNING": 0};
 
@@ -130,7 +130,7 @@ export class Player extends Entity {
      * Start discussion if character is close to the player and available. 
      */
     talk() {
-        if (this.closestPNJ !== null && this.closestPNJ.pnj.isAvailable()) {
+        if (this.closestPNJ !== null && this.closestPNJ.pnj.isAvailable() && this.isAvailable()) {
             this.vecX = 0;
             this.vecY = 0;
             this.closestPNJ.pnj.talk(this);
@@ -188,15 +188,36 @@ export class Player extends Entity {
         this.FOV.push([this.x, this.y, this.x + 50*vEnd.x, this.y + 50*vEnd.y]);
     }
 
+    /**
+     * Interact with the closest PNJ
+     */
+    interact(){
+        if(this.talkingTo != null){
+            if(this.role == "killer"){
+                this.kill();
+            }else{
+                this.arrest();
+            }
+            return;
+        }
+        if(this.isAvailable() && this.closestPNJ != null){
+            if(this.talkingTo == null){
+                this.talk();
+            }
+        }
+    }
+
 
     /**
      * Kill the PNJ that we are talking to (if role == "killer")
      */
     kill(){
-        if(this.talkingTo instanceof Adversary){
-            this.endGame = END_GAME_STATE.LOSE;
-        }else{
-            this.talkingTo.die();
+        if(this.talkingTo != null){
+            if(this.talkingTo instanceof Adversary){
+                this.endGame = END_GAME_STATE.LOSE;
+            }else{
+                this.talkingTo.die();
+            }
         }
     }
 
@@ -204,11 +225,13 @@ export class Player extends Entity {
      * Arrest the PNJ that we are talking to (if role == "police")
      */
     arrest(){
-        if(this.talkingTo instanceof Adversary){
-            this.endGame = END_GAME_STATE.WIN;
-        }else{
-            this.endGame = END_GAME_STATE.LOSE;
-        }  
+        if(this.talkingTo != null){
+            if(this.talkingTo instanceof Adversary){
+                this.endGame = END_GAME_STATE.WIN;
+            }else{
+                this.endGame = END_GAME_STATE.LOSE;
+            }  
+        }
     }
 
     /********  CONTROLS  ********/
