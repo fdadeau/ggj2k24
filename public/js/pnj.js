@@ -4,10 +4,21 @@
  */
 
 import { Player } from "./player.js";
+import data from "./assets.js";
+import { FRAME_DELAY } from "./gui.js";
 
 const WALK = "walk", WAIT = "wait", TALK = "talk";
 
 const SPEED = 0.2;
+
+const WALK_FRONT = [0,1,2];
+const WALK_LEFT = [3,4,5];
+const WALK_RIGHT = [6,7,8];
+const WALK_BACK = [9,10,11];
+const IDLE_FRONT = [1];
+const IDLE_LEFT = [4];
+const IDLE_RIGHT = [7];
+const IDLE_BACK = [10];
 
 /**
  * Abstract class for entities
@@ -22,6 +33,10 @@ class Entity {
         this.size = size;
         this.speed = SPEED;
         this.talkingTo = null;
+
+        this.animation = IDLE_RIGHT;
+        this.frame = 0;
+        this.frameDelay = FRAME_DELAY;
     }
 
     update(dt) {
@@ -30,11 +45,30 @@ class Entity {
     }
 
     render(ctx) {
+        let size = 48;
+        let frame = this.animation[this.frame];
+        let col = frame % 3;
+        let row = Math.floor(frame / 3);
+
+        ctx.drawImage(
+            data["default-spritesheet"], 
+            col * size, 
+            row * size, 
+            size, 
+            size, 
+            this.x - size/2,
+            this.y -size/2,
+            size, 
+            size
+        );
+        
+        /*
         ctx.fillStyle = "orange";
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, 2*Math.PI);
         ctx.closePath();
         ctx.fill();
+        */
     }
 
     isAvailable() {
@@ -46,6 +80,11 @@ class Entity {
         who.talkingTo = this;
     }
 
+    setAnimation(anim){
+        this.animation = anim;
+        this.frameDelay = FRAME_DELAY;
+        this.frame = 0;
+    }
 }
 
 
@@ -128,10 +167,21 @@ export class PNJ extends Entity {
                 if (startX == endX) {
                     this.vecX = 0;
                     this.vecY = (endY < startY) ? -1 : 1;
-                }
-                else {
+                    if(this.vecY == -1 && this.animation != WALK_BACK){
+                        this.setAnimation(WALK_BACK);
+                    }
+                    if(this.vecY == 1 && this.animation != WALK_FRONT){
+                        this.setAnimation(WALK_FRONT);
+                    }
+                }else{
                     this.vecY = 0;
                     this.vecX = (endX < startX) ? -1 : 1;
+                    if(this.vecX == -1 && this.animation != WALK_LEFT){
+                        this.setAnimation(WALK_LEFT);
+                    }
+                    if(this.vecX == 1 && this.animation != WALK_RIGHT){
+                        this.setAnimation(WALK_RIGHT);
+                    }
                 }
                 break;
             case WAIT:
@@ -139,7 +189,25 @@ export class PNJ extends Entity {
                 this.y = this.scenario[this.step].y;
                 this.vecX = this.scenario[this.step].vecX;
                 this.vecY = this.scenario[this.step].vecY;
+                if(this.vecX == -1){
+                    this.setAnimation(IDLE_LEFT);
+                }
+                else if(this.vecX == 1){
+                    this.setAnimation(IDLE_RIGHT);
+                }
+                else if(this.vecY == -1){
+                    this.setAnimation(IDLE_BACK);
+                }
+                else if(this.vecY == 1){
+                    this.setAnimation(IDLE_FRONT);
+                }
                 break;
+        }
+        // Updating animation
+        this.frameDelay -= dt;
+        if (this.frameDelay <= 0) {
+            this.frameDelay = FRAME_DELAY;
+            this.frame = (this.frame + 1) % this.animation.length;
         }
     }
 

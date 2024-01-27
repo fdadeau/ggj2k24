@@ -86,10 +86,23 @@ export class Map {
             c.render(ctx);
             // small dot to indicate closest PNJ
             if (this.player.closestPNJ && this.player.closestPNJ.pnj == c && c.isAvailable()) {
+                ctx.strokeStyle = "black";
+                ctx.beginPath();
+                ctx.lineWidth = 1;
+                ctx.roundRect(c.x-20, c.y-50, 40, 20, [10]);
+                ctx.stroke();
+                ctx.fillStyle = "white";
+                ctx.fill();
+                ctx.closePath();
+                ctx.font = "bold 30px serif";
+                ctx.fillStyle = "black";
+                ctx.fillText("...",c.x-11, c.y-37);
+                /*
                 ctx.beginPath();
                 ctx.arc(c.x, c.y - c.size - 15, 5, 0, 2*Math.PI);
                 ctx.closePath();
                 ctx.fill();
+                */
             }
             if (c.dialog && c.dialog.isRunning()) {
                 charWithDialog.push(c);
