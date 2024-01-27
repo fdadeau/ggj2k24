@@ -74,7 +74,9 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         // loading complete!
         loaded = true;
+        CXT.imageSmoothingEnabled = true;
         CXT.drawImage(data["logoGGJ"], WIDTH - 130, HEIGHT - 130, 120, 120)
+        CXT.imageSmoothingEnabled = false;
         CXT.fillText(`Resources loaded. Click to start game.`, WIDTH / 2, HEIGHT * 0.5);
     }
     function onError(err) {

@@ -14,6 +14,7 @@ const data = {
     "arrest": "./assets/images/arrest.png",
     "kill": "./assets/images/kill.png",
     "home": "./assets/images/home.png",
+    "home_shiny": "./assets/images/home_shiny.png",
     
     // spritesheets
     "groom-pink-spritesheet": "./assets/spritesheets/groom_pink_spritesheet.png",
