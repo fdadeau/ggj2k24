@@ -70,8 +70,8 @@ export class Entity {
             size, 
             this.x - size/2,
             this.y -size/2,
-            size, 
-            size
+            size * 1.5, 
+            size * 1.5
         );
         
         /*
