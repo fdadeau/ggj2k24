@@ -6,6 +6,8 @@ import { WIDTH, HEIGHT } from "./app.js";
 
 import { Game } from "./game.js";
 
+export const FRAME_DELAY = 100;
+
 const STATE = { 
     LOADING: -999,                
     TITLE_SCREEN: 0,            // 2 buttons "create" "join"

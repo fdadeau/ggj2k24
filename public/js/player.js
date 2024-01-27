@@ -1,5 +1,8 @@
 import { Adversary, Dialog } from "./pnj.js";
 
+import data from "./assets.js";
+import { FRAME_DELAY } from "./gui.js";
+
 const SPEED = 0.2;
 
 const UP = 1, DOWN = 3, LEFT = 4, RIGHT = 2, TALK = 10;
@@ -9,6 +12,15 @@ const COMMANDS = { "ArrowUp": UP, "ArrowDown": DOWN, "ArrowLeft": LEFT, "ArrowRi
 const INTERACTION_TIMER = 5000;
 
 export const END_GAME_STATE = {"WIN": 1, "LOSE": -1, "RUNNING": 0};
+
+const WALK_FRONT = [0,1,2];
+const WALK_LEFT = [3,4,5];
+const WALK_RIGHT = [6,7,8];
+const WALK_BACK = [9,10,11];
+const IDLE_FRONT = [1];
+const IDLE_LEFT = [4];
+const IDLE_RIGHT = [7];
+const IDLE_BACK = [10];
 
 export class Player {
 
@@ -41,9 +53,14 @@ export class Player {
         // Timer between two interactions with other entity
         this.timeToInteract = -1;
 
+        // Dialogs
         this.dialog = (role == "police") ? 
         new Dialog([[0,"Ecoutez laissez la police faire son travail.", 1000],[0,"Dès que nous aurons de plus amples informations,", 1000],[0,"vous en serez les premiers informés.",1000]]) :
         new Dialog([[0,"Tu veux un whisky ?",1000]]);
+
+        this.animation = IDLE_RIGHT;
+        this.frame = 0;
+        this.frameDelay = FRAME_DELAY;
     }
 
     update(dt) {
@@ -68,23 +85,41 @@ export class Player {
         if(this.timeToInteract > 0){
             this.timeToInteract -= dt;
         }
+
+        // Updating animation
+        this.frameDelay -= dt;
+        if (this.frameDelay <= 0) {
+            this.frameDelay = FRAME_DELAY;
+            this.frame = (this.frame + 1) % this.animation.length;
+        }
+
         // TODO: go against a wall 
     }
 
+    setAnimation(anim){
+        this.animation = anim;
+        this.frameDelay = FRAME_DELAY;
+        this.frame = 0;
+    }
+
     render(ctx) {
-        ctx.fillStyle = ctx.strokeStyle = (this.role == "killer") ? "#008" : "maroon";
-        ctx.beginPath();
-        ctx.moveTo(this.x, this.y);
-        ctx.lineTo(this.x + this.orientation.x * this.size * 1.5, this.y + this.orientation.y * this.size * 1.5);
-        ctx.closePath();
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, 2*Math.PI);
-        ctx.closePath();
-        ctx.fill();
+        let size = 48;
+        let frame = this.animation[this.frame];
+        let col = frame % 3;
+        let row = Math.floor(frame / 3);
 
-        ctx.lineWidth = 2;
-
+        ctx.drawImage(
+            data["default-spritesheet"], 
+            col * size, 
+            row * size, 
+            size, 
+            size, 
+            this.x - size/2,
+            this.y -size/2,
+            size, 
+            size
+        );
+        
         if (false)      // field of view (not yet finished)
         for (let w of this.FOV) {
             ctx.beginPath();
@@ -198,23 +233,28 @@ export class Player {
             case UP:
                 this.vecY = this.orientation.y = -1;
                 this.orientation.x = this.vecX;
+                this.setAnimation(WALK_BACK);
                 break;
             case DOWN: 
                 this.vecY = this.orientation.y = 1;
                 this.orientation.x = this.vecX;
+                this.setAnimation(WALK_FRONT);
                 break;
             case LEFT: 
                 this.vecX = this.orientation.x = -1;
                 this.orientation.y = this.vecY;
+                this.setAnimation(WALK_LEFT);
                 break;
             case RIGHT: 
                 this.vecX = this.orientation.x = 1;
                 this.orientation.y = this.vecY;
+                this.setAnimation(WALK_RIGHT);
                 break;
             case TALK:
                 if(!this.isAvailable()){
                     return;
                 }
+                this.setAnimation(IDLE_FRONT);
                 const notTalkingBefore = this.talkingTo === null;
                 this.talk();
                 if (notTalkingBefore && this.talkingTo != null) {
@@ -245,6 +285,15 @@ export class Player {
                     if (this.orientation.x != 0) {
                         this.orientation.y = 0;
                     }
+                    if(this.vecX != 0){
+                        if(this.vecX > 0){
+                            this.setAnimation(WALK_RIGHT);
+                        }else{
+                            this.setAnimation(WALK_LEFT);
+                        }
+                    }else{
+                        this.setAnimation(IDLE_BACK);
+                    }
                 }
                 break;
             case DOWN:
@@ -252,6 +301,15 @@ export class Player {
                     this.vecY = 0
                     if (this.orientation.x != 0) {
                         this.orientation.y = 0;
+                    }
+                    if(this.vecX != 0){
+                        if(this.vecX > 0){
+                            this.setAnimation(WALK_RIGHT);
+                        }else{
+                            this.setAnimation(WALK_LEFT);
+                        }
+                    }else{
+                        this.setAnimation(IDLE_FRONT);
                     }
                 }
                 break;
@@ -261,6 +319,15 @@ export class Player {
                     if (this.orientation.y != 0) {
                         this.orientation.x = 0;
                     }
+                    if(this.vecY != 0){
+                        if(this.vecY > 0){
+                            this.setAnimation(WALK_FRONT);
+                        }else{
+                            this.setAnimation(WALK_BACK);
+                        }
+                    }else{
+                        this.setAnimation(IDLE_LEFT);
+                    }
                 }
                 break;
             case RIGHT: 
@@ -268,6 +335,15 @@ export class Player {
                     this.vecX = 0;
                     if (this.orientation.y != 0) {
                         this.orientation.x = 0;
+                    }
+                    if(this.vecY != 0){
+                        if(this.vecY > 0){
+                            this.setAnimation(WALK_FRONT);
+                        }else{
+                            this.setAnimation(WALK_BACK);
+                        }
+                    }else{
+                        this.setAnimation(IDLE_RIGHT);
                     }
                 }
                 break;

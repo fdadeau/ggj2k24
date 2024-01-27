@@ -9,6 +9,8 @@ const data = {
     "logoGGJ": "./assets/logos/logoGGJ.png",
     
     // spritesheets
+    "groom-spritesheet": "./assets/spritesheets/groom_spritesheet.png",
+    "default-spritesheet": "./assets/spritesheets/default_spritesheet.png",
 
     // music 
 
