@@ -3,95 +3,20 @@
  * Class for Entities, NPCs, and the Adversary of the player
  */
 
-import { Player } from "./player.js";
 import data from "./assets.js";
+
+import { Player } from "./player.js";
+import { Entity } from "./entity.js";
+
 import { FRAME_DELAY } from "./gui.js";
 
 const WALK = "walk", WAIT = "wait", TALK = "talk";
 
 const SPEED = 0.2;
 
-const WALK_FRONT = [0,1,2];
-const WALK_LEFT = [3,4,5];
-const WALK_RIGHT = [6,7,8];
-const WALK_BACK = [9,10,11];
-const IDLE_FRONT = [1];
-const IDLE_LEFT = [4];
-const IDLE_RIGHT = [7];
-const IDLE_BACK = [10];
-
-/**
- * Abstract class for entities
- */
-class Entity {
-
-    constructor(x,y,vecX,vecY,size) {
-        this.x = x;
-        this.y = y;
-        this.vecX = vecX;
-        this.vecY = vecY;
-        this.size = size;
-        this.speed = SPEED;
-        this.talkingTo = null;
-
-        this.animation = IDLE_RIGHT;
-        this.frame = 0;
-        this.frameDelay = FRAME_DELAY;
-        this.sprite = data["default-spritesheet"];
-    }
-
-    update(dt) {
-        this.x += this.vecX * this.speed * dt;
-        this.y += this.vecY * this.speed * dt;
-    }
-
-    render(ctx) {
-        let size = 48;
-        let frame = this.animation[this.frame];
-        let col = frame % 3;
-        let row = Math.floor(frame / 3);
-
-        ctx.drawImage(
-            this.sprite, 
-            col * size, 
-            row * size, 
-            size, 
-            size, 
-            this.x - size/2,
-            this.y -size/2,
-            size, 
-            size
-        );
-        
-        /*
-        ctx.fillStyle = "orange";
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, 2*Math.PI);
-        ctx.closePath();
-        ctx.fill();
-        */
-    }
-
-    isAvailable() {
-        return false;
-    }
-
-    talk(who) {
-        this.talkingTo = who;
-        who.talkingTo = this;
-    }
-
-    setAnimation(anim){
-        this.animation = anim;
-        this.frameDelay = FRAME_DELAY;
-        this.frame = 0;
-    }
-}
-
-
 export class PNJ extends Entity {
 
-    constructor(scenario,dialog, delay) {
+    constructor(scenario, dialog, delay) {
         super(0,0,0,0,20);
         let t = 0;
         // scenario of the character
@@ -112,10 +37,6 @@ export class PNJ extends Entity {
         this.sprite = data["default-spritesheet"];
     }
 
-    reset() {
-        this.time = 0;
-        this.step = 0;
-    }
 
     die() {
         if (this.talkingTo !== null) {
@@ -170,48 +91,29 @@ export class PNJ extends Entity {
                 if (startX == endX) {
                     this.vecX = 0;
                     this.vecY = (endY < startY) ? -1 : 1;
-                    if(this.vecY == -1 && this.animation != WALK_BACK){
-                        this.setAnimation(WALK_BACK);
-                    }
-                    if(this.vecY == 1 && this.animation != WALK_FRONT){
-                        this.setAnimation(WALK_FRONT);
-                    }
                 }else{
                     this.vecY = 0;
                     this.vecX = (endX < startX) ? -1 : 1;
-                    if(this.vecX == -1 && this.animation != WALK_LEFT){
-                        this.setAnimation(WALK_LEFT);
-                    }
-                    if(this.vecX == 1 && this.animation != WALK_RIGHT){
-                        this.setAnimation(WALK_RIGHT);
-                    }
+                }
+                this.orientation.x = this.vecX;
+                this.orientation.y = this.vecY;
+                const newAnimation = this.whichAnimation();
+                if (newAnimation !== this.animation) {
+                    this.setAnimation(newAnimation);
                 }
                 break;
             case WAIT:
                 this.x = this.scenario[this.step].x;
                 this.y = this.scenario[this.step].y;
-                this.vecX = this.scenario[this.step].vecX;
-                this.vecY = this.scenario[this.step].vecY;
-                if(this.vecX == -1){
-                    this.setAnimation(IDLE_LEFT);
-                }
-                else if(this.vecX == 1){
-                    this.setAnimation(IDLE_RIGHT);
-                }
-                else if(this.vecY == -1){
-                    this.setAnimation(IDLE_BACK);
-                }
-                else if(this.vecY == 1){
-                    this.setAnimation(IDLE_FRONT);
-                }
+                this.vecX = 0;
+                this.vecY = 0;
+                this.orientation.x = this.scenario[this.step].vecX;
+                this.orientation.y = this.scenario[this.step].vecY;
+                this.setAnimation(this.whichAnimation());
                 break;
         }
         // Updating animation
-        this.frameDelay -= dt;
-        if (this.frameDelay <= 0) {
-            this.frameDelay = FRAME_DELAY;
-            this.frame = (this.frame + 1) % this.animation.length;
-        }
+        this.updateAnimation(dt);
     }
 
     /**
@@ -228,10 +130,12 @@ export class PNJ extends Entity {
      */
     talk(player) {
         if (this.isAvailable()) {
-            /** @todo change orientation to face player */
+            this.vecX = 0;
+            this.vecY = 0;
+            this.setOrientationToFace(player.x, player.y);
+            this.setAnimation(this.whichAnimation());
             this.talkingTo = player;
             this.dialog.start();
-            this.setAnimation(IDLE_FRONT);
         } 
     }
 
@@ -305,36 +209,19 @@ export class Adversary extends Entity {
         this.oldVecY = this.vecY;
         if (vecX !== undefined) {
             this.vecX = vecX;
-            if(this.vecX == 1){
-                this.setAnimation(WALK_RIGHT);
-            }
-            if(this.vecX == -1){
-                this.setAnimation(WALK_LEFT);
+            if (this.vecX !== 0) {
+                this.orientation.x = this.vecX;
             }
         }
         if (vecY !== undefined) {
             this.vecY = vecY;
-            if(this.vecY == -1){
-                this.setAnimation(WALK_BACK);
-            }
-            if(this.vecY == 1){
-                this.setAnimation(WALK_FRONT);
+            if (this.vecY !== 0) {
+                this.orientation.y = this.vecY;
             }
         }
-
-        if(vecY == 0 && vecX == 0){
-            if(this.oldVecX == 1){
-                this.setAnimation(IDLE_RIGHT);
-            }
-            if(this.oldVecX == -1){
-                this.setAnimation(IDLE_LEFT);
-            }
-            if(this.oldVecY == -1){
-                this.setAnimation(IDLE_BACK);
-            }
-            if(this.oldVecY == 1){
-                this.setAnimation(IDLE_FRONT);
-            }
+        const newAnim = this.whichAnimation();
+        if (this.animation != newAnim) {
+            this.setAnimation(newAnim);
         }
     }
 
@@ -342,7 +229,10 @@ export class Adversary extends Entity {
         this.talkingTo = id;
         this.x = x;
         this.y = y;
-        this.setAnimation(IDLE_FRONT);
+        this.setOrientationToFace(px,py);
+        this.vecX = 0;
+        this.vecY = 0;
+        this.setAnimation(this.whichAnimation());
     }
 
 
@@ -351,7 +241,8 @@ export class Adversary extends Entity {
             /** @todo change orientation to face player */
             this.talkingTo = player;
             this.dialog.start();
-            this.setAnimation(IDLE_FRONT);
+            this.setOrientationToFace(player.x, player.y);
+            this.setAnimation(this.whichAnimation());
         } 
     }
 
@@ -361,10 +252,6 @@ export class Adversary extends Entity {
 
     render(ctx) {
         super.render(ctx);
-        /** prints dialog @todo move code somewhere else to avoid z-index issues */
-        if (this.dialog.isRunning() && this.talkingTo !== null) {
-            //this.dialog.render(ctx, this.x, this.y, this.talkingTo.x, this.talkingTo.y);
-        }
     }
 
     renderDialog(ctx) {
@@ -374,6 +261,7 @@ export class Adversary extends Entity {
     } 
 
 }
+
 
 
 export class Dialog {
@@ -449,6 +337,5 @@ export class Dialog {
             }
         }
     }
-
 
 }

@@ -1,6 +1,9 @@
-import { Adversary, Dialog } from "./pnj.js";
 
 import data from "./assets.js";
+
+import { Entity } from "./entity.js";
+import { Adversary, Dialog } from "./pnj.js";
+
 import { FRAME_DELAY } from "./gui.js";
 
 const SPEED = 0.2;
@@ -13,35 +16,21 @@ const INTERACTION_TIMER = 5000;
 
 export const END_GAME_STATE = {"WIN": 1, "LOSE": -1, "RUNNING": 0};
 
-const WALK_FRONT = [0,1,2];
-const WALK_LEFT = [3,4,5];
-const WALK_RIGHT = [6,7,8];
-const WALK_BACK = [9,10,11];
-const IDLE_FRONT = [1];
-const IDLE_LEFT = [4];
-const IDLE_RIGHT = [7];
-const IDLE_BACK = [10];
 
-export class Player {
+export class Player extends Entity {
 
     constructor(role, map) {
+        super(0,0,0,0,20);
         /** @type {string} role of the player "police", "killer" */
         this.role = role;
-        /** @type {number} size of the player (hitbox) */
-        this.size = 20;
         /** @type {Map} map of the level */
         this.map = map;
         // coordinates of the player
         const {x, y} = map.getPlayerStart(this);
         this.x = x;
         this.y = y;
-        /* direction/orientation of the player */
-        this.vecX = 0;
-        this.vecY = 0;
         // segments defining the field of vision
         this.FOV = [];
-        // direction 
-        this.orientation = { x: 1, y: 0 };
         /** @type {Object} entity (PNJ or adversary) that is the closest { pnj, distance } */
         this.closestPNJ = null;
         /** @type {Entity} entity the player is currently talking to (null if none) */
@@ -58,9 +47,7 @@ export class Player {
         new Dialog([[0,"Ecoutez laissez la police faire son travail.", 1000],[0,"Dès que nous aurons de plus amples informations,", 1000],[0,"vous en serez les premiers informés.",1000]]) :
         new Dialog([[0,"Tu veux un whisky ?",1000]]);
 
-        this.animation = IDLE_RIGHT;
-        this.frame = 0;
-        this.frameDelay = FRAME_DELAY;
+        this.animation = this.whichAnimation();
     }
 
     update(dt) {
@@ -87,11 +74,7 @@ export class Player {
         }
 
         // Updating animation
-        this.frameDelay -= dt;
-        if (this.frameDelay <= 0) {
-            this.frameDelay = FRAME_DELAY;
-            this.frame = (this.frame + 1) % this.animation.length;
-        }
+        this.updateAnimation(dt);
 
         // TODO: go against a wall 
     }
@@ -148,8 +131,12 @@ export class Player {
      */
     talk() {
         if (this.closestPNJ !== null && this.closestPNJ.pnj.isAvailable()) {
+            this.vecX = 0;
+            this.vecY = 0;
             this.closestPNJ.pnj.talk(this);
             this.talkingTo = this.closestPNJ.pnj;
+            this.setOrientationToFace(this.closestPNJ.pnj.x, this.closestPNJ.pnj.y);
+            this.setAnimation(this.whichAnimation());
             this.timeToInteract = INTERACTION_TIMER;
         }
     }
@@ -233,28 +220,22 @@ export class Player {
             case UP:
                 this.vecY = this.orientation.y = -1;
                 this.orientation.x = this.vecX;
-                this.setAnimation(WALK_BACK);
+                //this.setAnimation(WALK_BACK);
                 break;
             case DOWN: 
                 this.vecY = this.orientation.y = 1;
                 this.orientation.x = this.vecX;
-                this.setAnimation(WALK_FRONT);
+                //this.setAnimation(WALK_FRONT);
                 break;
             case LEFT: 
                 this.vecX = this.orientation.x = -1;
                 this.orientation.y = this.vecY;
-                this.setAnimation(WALK_LEFT);
                 break;
             case RIGHT: 
                 this.vecX = this.orientation.x = 1;
                 this.orientation.y = this.vecY;
-                this.setAnimation(WALK_RIGHT);
                 break;
             case TALK:
-                if(!this.isAvailable()){
-                    return;
-                }
-                this.setAnimation(IDLE_FRONT);
                 const notTalkingBefore = this.talkingTo === null;
                 this.talk();
                 if (notTalkingBefore && this.talkingTo != null) {
@@ -271,6 +252,7 @@ export class Player {
                 break;
         }
         if (this.vecX !== oldVX || this.vecY !== oldVY) {
+            this.setAnimation(this.whichAnimation())
             return { move: { x: this.x, y: this.y, vecX: this.vecX, vecY: this.vecY } };
         }
     }
@@ -285,15 +267,6 @@ export class Player {
                     if (this.orientation.x != 0) {
                         this.orientation.y = 0;
                     }
-                    if(this.vecX != 0){
-                        if(this.vecX > 0){
-                            this.setAnimation(WALK_RIGHT);
-                        }else{
-                            this.setAnimation(WALK_LEFT);
-                        }
-                    }else{
-                        this.setAnimation(IDLE_BACK);
-                    }
                 }
                 break;
             case DOWN:
@@ -301,15 +274,6 @@ export class Player {
                     this.vecY = 0
                     if (this.orientation.x != 0) {
                         this.orientation.y = 0;
-                    }
-                    if(this.vecX != 0){
-                        if(this.vecX > 0){
-                            this.setAnimation(WALK_RIGHT);
-                        }else{
-                            this.setAnimation(WALK_LEFT);
-                        }
-                    }else{
-                        this.setAnimation(IDLE_FRONT);
                     }
                 }
                 break;
@@ -319,15 +283,6 @@ export class Player {
                     if (this.orientation.y != 0) {
                         this.orientation.x = 0;
                     }
-                    if(this.vecY != 0){
-                        if(this.vecY > 0){
-                            this.setAnimation(WALK_FRONT);
-                        }else{
-                            this.setAnimation(WALK_BACK);
-                        }
-                    }else{
-                        this.setAnimation(IDLE_LEFT);
-                    }
                 }
                 break;
             case RIGHT: 
@@ -336,19 +291,11 @@ export class Player {
                     if (this.orientation.y != 0) {
                         this.orientation.x = 0;
                     }
-                    if(this.vecY != 0){
-                        if(this.vecY > 0){
-                            this.setAnimation(WALK_FRONT);
-                        }else{
-                            this.setAnimation(WALK_BACK);
-                        }
-                    }else{
-                        this.setAnimation(IDLE_RIGHT);
-                    }
                 }
                 break;
         }
         if (this.vecX !== oldVX || this.vecY !== oldVY) {
+            this.setAnimation(this.whichAnimation())
             return { move: { x: this.x, y: this.y, vecX: this.vecX, vecY: this.vecY } };
         }
     }
