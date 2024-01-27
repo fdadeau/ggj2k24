@@ -5,6 +5,8 @@ import { Adversary, PNJ } from "./pnj.js";
 
 import { hitboxCollision, distanceSQ } from "./geometry.js";
 
+import { data } from "./loader.js";
+
 const WALL_THICKNESS = 20;
 
 /** @type {number} proximity of the player with other characters */
@@ -25,10 +27,12 @@ const TILE_TYPE = {
 
     ROOM_HORIZONTAL_DOOR: 10,
     BAR_HORIZONTAL_DOOR: 11,
-    ROOM_VERTICAL_DOOR: 12,
-    BAR_VERTICAL_DOOR: 13,
-    BATHROOM_HORIZONTAL_DOOR:14,
-    BATHROOM_VERTICAL_DOOR: 15
+    CORRIDOR_HORIZONTAL_DOOR: 12,
+    ROOM_VERTICAL_DOOR: 13,
+    BAR_VERTICAL_DOOR: 14,
+    CORRIDOR_VERTICAL_DOOR: 15,
+    BATHROOM_HORIZONTAL_DOOR: 16,
+    BATHROOM_VERTICAL_DOOR: 17
 }
 
 export class Map {
@@ -94,8 +98,10 @@ export class Map {
         ctx.lineCap = "round";
         ctx.strokeStyle = "grey";
         for (let w of this.walls) {
+            let texture = null;
             switch (w[4]) {
                 case TILE_TYPE.PLANKS_FLOOR: // 0
+                    texture = data['planks_floor'];
                     ctx.fillStyle = '#916023';
                     break;
                 case TILE_TYPE.BATHROOM_FLOOR: // 1
@@ -108,44 +114,60 @@ export class Map {
                     ctx.fillStyle = '#96502e';
                     break;
                 case TILE_TYPE.KITCHEN_FLOOR: // 4
+                    texture = data['kitchen_floor'];
                     ctx.fillStyle = '#eed9d0';
                     break;
 
                 case TILE_TYPE.OUTSIDE_WALL: // 5
-                    ctx.fillStyle = 'lightgray';
+                    ctx.fillStyle = 'black';
                     break;
                 case TILE_TYPE.BATHROOM_WALL: // 6
+                    texture = data['bathroom_wall'];
                     ctx.fillStyle = '#bce8eb';
                     break;
                 case TILE_TYPE.BAR_WALL: // 7
+                    texture = data['bar_wall'];
                     ctx.fillStyle = '#781900';
                     break;
                 case TILE_TYPE.ROOM_WALL: // 8
+                    texture = data['room_wall'];
                     ctx.fillStyle = '#e3b286';
                     break;
                 case TILE_TYPE.CORRIDOR_WALL: // 9
+                    texture = data['corridor_wall'];
                     ctx.fillStyle = '#b83a25'; // Dark Gray
                     break;
 
                 case TILE_TYPE.ROOM_HORIZONTAL_DOOR: // 10
+                    texture = data['room_horizontal_door'];
                     ctx.fillStyle = '#6d2a02';
                     break;
                 case TILE_TYPE.BAR_HORIZONTAL_DOOR: // 11
+                    texture = data['bar_horizontal_door'];
                     ctx.fillStyle = '#6d2a02';
                     break;
-                case TILE_TYPE.ROOM_VERTICAL_DOOR: // 12
-                case TILE_TYPE.BAR_VERTICAL_DOOR: // 13
+                case TILE_TYPE.CORRIDOR_HORIZONTAL_DOOR: // 12
+                    texture = data['corridor_horizontal_door'];
                     ctx.fillStyle = '#6d2a02';
                     break;
-                case TILE_TYPE.BATHROOM_HORIZONTAL_DOOR: // 14
+                case TILE_TYPE.ROOM_VERTICAL_DOOR: // 13
+                case TILE_TYPE.BAR_VERTICAL_DOOR: // 14
+                case TILE_TYPE.CORRIDOR_VERTICAL_DOOR: // 15
+                    ctx.fillStyle = '#6d2a02';
+                    break;
+                case TILE_TYPE.BATHROOM_HORIZONTAL_DOOR: // 16
                     ctx.fillStyle = '#10585d';
                     break;
-                case TILE_TYPE.BATHROOM_VERTICAL_DOOR: // 15
+                case TILE_TYPE.BATHROOM_VERTICAL_DOOR: // 17
                     ctx.fillStyle = '#10585d';
                     break;
             }
             
-            ctx.fillRect(w[0], w[1], w[2], w[3])
+            if (texture == null) {
+                ctx.fillRect(w[0], w[1], w[2]+1, w[3]+1);
+            } else {
+                ctx.drawImage(texture, w[0], w[1], w[2]+1, w[3]+1);
+            }
         }
         const characters = this.PNJs.filter((c) => this.player.sees(c.x, c.y));
         characters.push(this.player);
