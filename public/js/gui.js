@@ -6,7 +6,15 @@ import { WIDTH, HEIGHT } from "./app.js";
 
 import { Game } from "./game.js";
 
-const STATE = { 
+import data from "./assets.js";
+
+import { INTERACTION_TIMER } from "./player.js";
+
+import { audio } from "./audio.js";
+
+export const FRAME_DELAY = 100;
+
+export const STATE = { 
     LOADING: -999,                
     TITLE_SCREEN: 0,            // 2 buttons "create" "join"
     JOIN_SCREEN: 5,             // 2 buttons "back", "refresh"
@@ -34,9 +42,11 @@ class GUI {
 
         /** buttons */
         this.buttons = {
-            "CREATE": new Button("Create game", WIDTH*0.4, HEIGHT*0.8, 140, 40),
-            "JOIN": new Button("Join game", WIDTH*0.7, HEIGHT*0.8, 140, 40)
+            "CREATE": new Button("Create game", WIDTH*0.35, HEIGHT*0.7, 140, 40),
+            "JOIN": new Button("Join game", WIDTH*0.7, HEIGHT*0.7, 140, 40)
         }
+
+        this.interactionButton = new InteractionButton("", WIDTH*.95, HEIGHT*.93, 64, 64, this);
     };
 
     /**
@@ -47,7 +57,7 @@ class GUI {
      */
     newGame(level, role, delay) {
         this.game = new Game(level, role, delay);
-        this.state = STATE.RUNNING;    
+        this.state = STATE.RUNNING;
     }
     /**
      * Called when connection to the other player has been lost.
@@ -81,14 +91,19 @@ class GUI {
 
     start() {
         this.state = STATE.TITLE_SCREEN;
+        if(!audio.audioIsPlaying("theme")){
+            audio.playMusic("theme", 1); 
+        }
     }
 
-    win(){
+    win(winner){
         this.state = STATE.VICTORY;
+        this.winner = winner;
     }
 
-    lose(){
+    lose(winner){
         this.state = STATE.LOSE;
+        this.winner = winner;
     }
 
     /**
@@ -111,14 +126,17 @@ class GUI {
         }
         if (this.state == STATE.RUNNING && this.game !== null) {
             this.game.update(dt);
-            this.debug = JSON.stringify({x: this.game.map.adversary.x, y: this.game.map.adversary.y, vx: this.game.map.adversary.vecX, vy: this.game.map.adversary.vecY});
+            this.debug = JSON.stringify({x: this.game.map.adversary.x, y: this.game.map.adversary.y, vx: this.game.map.adversary.vecX, vy: this.game.map.adversary.vecY, role: this.game.player.role});
         }
     }
 
     renderTitleScreen(ctx) {
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, WIDTH, HEIGHT);
+        ctx.drawImage(data["home"],16, 26, 768, 448);
         ctx.font = "24px arial";
         ctx.textAlign = "center";
-        ctx.fillText("INSERT TITLE HERE", WIDTH/2, HEIGHT/2);
+        ctx.fillText("INSERT TITLE HERE", WIDTH/2+20, HEIGHT/2);
         for (let b in this.buttons) {
           this.buttons[b].render(ctx);
         }
@@ -131,7 +149,7 @@ class GUI {
         ctx.fillText("Click to return to title screen.", WIDTH / 2, HEIGHT / 2 + 20);
     }
     
-    renderInfos(){
+    renderInfos(ctx){
         if (this.info) {
             ctx.textAlign = "center";
             ctx.font = "18px arial";
@@ -147,15 +165,39 @@ class GUI {
     }
 
     renderVictory(ctx) {
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, WIDTH, HEIGHT);
+        if(this.winner == "police" && this.game.player.role == "police"){
+            ctx.drawImage(data["arrest"],16, 26, 768, 448);
+        }
+        if(this.winner == "killer" && this.game.player.role == "killer"){
+            ctx.drawImage(data["kill"],16, 26, 768, 448);
+        }
+        ctx.font = "24px arial";
+        ctx.fillStyle = "white";
         ctx.textAlign = "center";
-        ctx.font = "18px arial";
-        ctx.fillText("You won !", WIDTH / 2, HEIGHT / 2);
+        ctx.fillText("Victoire !", WIDTH/2+20, HEIGHT/2);
+        for (let b in this.buttons) {
+          this.buttons[b].render(ctx);
+        }
     }
 
     renderLose(ctx) {
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, WIDTH, HEIGHT);
+        if(this.winner == "police" && this.game.player.role == "killer"){
+            ctx.drawImage(data["arrest"],16, 26, 768, 448);
+        }
+        if(this.winner == "killer" && this.game.player.role == "police"){
+            ctx.drawImage(data["kill"],16, 26, 768, 448);
+        }
+        ctx.font = "24px arial";
+        ctx.fillStyle = "white";
         ctx.textAlign = "center";
-        ctx.font = "18px arial";
-        ctx.fillText("You lost !", WIDTH / 2, HEIGHT / 2);
+        ctx.fillText("Défaite...", WIDTH/2+20, HEIGHT/2);
+        for (let b in this.buttons) {
+          this.buttons[b].render(ctx);
+        }
     }
 
     /**
@@ -178,6 +220,8 @@ class GUI {
                 break;
             case STATE.RUNNING:
                 this.game.render(ctx);
+                // Rendering the interaction button
+                this.interactionButton.render(ctx);
                 break;
             case STATE.VICTORY:
                 this.renderVictory(ctx);
@@ -223,20 +267,27 @@ class GUI {
      */
     click(x,y) {
         this.debug = x+","+y;
-        if (this.state == STATE.TITLE_SCREEN) {
-            if (this.buttons["CREATE"].isAt(x,y)) {
-                console.log("clic sur create");
-                return "create";
-            }
-            if (this.buttons["JOIN"].isAt(x,y)) {
-                console.log("clic sur join");
-                return "join";
-            }
-            return;
-        }
-        if (this.state == STATE.CONNECTION_LOST) {
-            this.game = null;
-            this.state = STATE.TITLE_SCREEN;
+        switch(this.state){
+            case STATE.TITLE_SCREEN:
+                if (this.buttons["CREATE"].isAt(x,y)) {
+                    console.log("clic sur create");
+                    return "create";
+                }
+                if (this.buttons["JOIN"].isAt(x,y)) {
+                    console.log("clic sur join");
+                    return "join";
+                }
+                break;
+            case STATE.CONNECTION_LOST:
+                this.game = null;
+                this.state = STATE.TITLE_SCREEN;
+                break;
+            case STATE.RUNNING:
+                if(this.interactionButton.isAt(x,y)){
+                    console.log("clic sur interaction");
+                    return "interaction";
+                }
+                break;
         }
     }
     dblclick(x, y) { }
@@ -261,6 +312,7 @@ class Button {
     }
 
     render(ctx) {
+        /*
         ctx.verticalAlign = "middle";
         ctx.textAlign = "center";
         ctx.font = `${this.height/2}px arial`;
@@ -270,12 +322,51 @@ class Button {
         ctx.fillRect(this.x0 + this.padding/2, this.y0 + this.padding/2, this.width, this.height - this.padding/2);
         ctx.fillStyle = "white";
         ctx.fillText(this.txt, this.x, this.y);
+        */
+        ctx.verticalAlign = "middle";
+        ctx.textAlign = "center";
+        ctx.font = `${this.height/2}px arial`;
+        ctx.drawImage(data["carpet"], this.x0, this.y0, this.width + this.padding, this.height+this.padding/2);
+        ctx.fillStyle = "white";
+        ctx.fillText(this.txt, this.x, this.y);
     }
 
     isAt(x, y) {
         return x >= this.x0 && x <= this.x0 + this.width + this.padding && y >= this.y0 && y <= this.y0 + this.height + this.padding;
     }
+}
 
+class InteractionButton extends Button {
+    constructor(txt, x, y, w, h, gui) {
+        super(txt, x, y, w, h);
+        this.gui = gui;
+    }
+
+    render(ctx) {
+        if(!this.gui.game.player.isAvailable() && this.gui.game.player.timeToInteract < INTERACTION_TIMER){
+            // Draw the timer
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.width/2, 0, 2*Math.PI);
+            ctx.fillStyle = "rgba(0,0,0,0.5)";
+            ctx.fill();
+            ctx.closePath();
+            ctx.beginPath();    
+            ctx.moveTo(this.x, this.y);
+            ctx.arc(this.x, this.y, this.width/2, 0, 2*Math.PI*this.gui.game.player.timeToInteract/INTERACTION_TIMER);
+            ctx.fillStyle = "rgba(255,255,255,0.5)";
+            ctx.fill();
+        }else{
+            if(this.gui.game.player.talkingTo == null){
+                ctx.drawImage(data["question"], this.x0, this.y0);
+            }else{
+                if(this.gui.game.player.role == "killer"){;
+                    ctx.drawImage(data["saussage"], this.x0, this.y0);
+                }else{
+                    ctx.drawImage(data["trap"], this.x0, this.y0);
+                }
+            }
+        }
+    }
 }
 
 export default GUI;

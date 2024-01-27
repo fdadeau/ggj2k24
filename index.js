@@ -140,5 +140,19 @@ io.on('connection', (socket) => {
         }
         currentGame = null;
     });
+
+    // Gérer la fin de partie
+    socket.on('endGame', (data) => {
+        let currentGame = games[socket.id];
+        console.log(`Game ${currentGame} ended, data = ${data.winner} won`);
+        delete games[socket.id];
+        // Retirer le joueur de la salle
+        if (currentGame && rooms[currentGame]) {
+            socket.to(rooms[currentGame].adversary[socket.id]).emit('endGame', data);
+            delete rooms[currentGame];   
+            console.log("--> Game " + currentGame + " deleted")
+        }
+        currentGame = null;
+    });
 });
 

@@ -1,4 +1,10 @@
+
+import data from "./assets.js";
+
+import { Entity } from "./entity.js";
 import { Adversary, Dialog } from "./pnj.js";
+
+import { FRAME_DELAY } from "./gui.js";
 
 const SPEED = 0.2;
 
@@ -6,30 +12,29 @@ const UP = 1, DOWN = 3, LEFT = 4, RIGHT = 2, TALK = 10;
 
 const COMMANDS = { "ArrowUp": UP, "ArrowDown": DOWN, "ArrowLeft": LEFT, "ArrowRight": RIGHT, "Space": TALK };
 
-const INTERACTION_TIMER = 5000;
+export const INTERACTION_TIMER = 5000;
 
 export const END_GAME_STATE = {"WIN": 1, "LOSE": -1, "RUNNING": 0};
 
-export class Player {
+export const KILL_FRONT = [12,13,12];
+export const KILL_RIGHT = [15,16,15];
+export const KILL_LEFT = [18,19,18];
+export const KILL_BACK = [21,22,21];
 
-    constructor(role, map) {
+export class Player extends Entity {
+
+    constructor(role, map, skin) {
+        super(0,0,0,0,20);
         /** @type {string} role of the player "police", "killer" */
         this.role = role;
-        /** @type {number} size of the player (hitbox) */
-        this.size = 20;
         /** @type {Map} map of the level */
         this.map = map;
         // coordinates of the player
         const {x, y} = map.getPlayerStart(this);
         this.x = x;
         this.y = y;
-        /* direction/orientation of the player */
-        this.vecX = 0;
-        this.vecY = 0;
         // segments defining the field of vision
         this.FOV = [];
-        // direction 
-        this.orientation = { x: 1, y: 0 };
         /** @type {Object} entity (PNJ or adversary) that is the closest { pnj, distance } */
         this.closestPNJ = null;
         /** @type {Entity} entity the player is currently talking to (null if none) */
@@ -41,9 +46,14 @@ export class Player {
         // Timer between two interactions with other entity
         this.timeToInteract = -1;
 
+        // Dialogs
         this.dialog = (role == "police") ? 
         new Dialog([[0,"Ecoutez laissez la police faire son travail.", 1000],[0,"Dès que nous aurons de plus amples informations,", 1000],[0,"vous en serez les premiers informés.",1000]]) :
         new Dialog([[0,"Tu veux un whisky ?",1000]]);
+
+        this.sprite = data[skin];
+        this.animation = this.whichAnimation();
+        this.switchAfterKill = null;
     }
 
     update(dt) {
@@ -68,23 +78,37 @@ export class Player {
         if(this.timeToInteract > 0){
             this.timeToInteract -= dt;
         }
+
+        // Updating animation
+        this.updateAnimation(dt);
+
         // TODO: go against a wall 
     }
 
+    setAnimation(anim){
+        this.animation = anim;
+        this.frameDelay = FRAME_DELAY;
+        this.frame = 0;
+    }
+
     render(ctx) {
-        ctx.fillStyle = ctx.strokeStyle = (this.role == "killer") ? "#008" : "maroon";
-        ctx.beginPath();
-        ctx.moveTo(this.x, this.y);
-        ctx.lineTo(this.x + this.orientation.x * this.size * 1.5, this.y + this.orientation.y * this.size * 1.5);
-        ctx.closePath();
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, 2*Math.PI);
-        ctx.closePath();
-        ctx.fill();
+        let size = 48;
+        let frame = this.animation[this.frame];
+        let col = frame % 3;
+        let row = Math.floor(frame / 3);
 
-        ctx.lineWidth = 2;
-
+        ctx.drawImage(
+            this.sprite, 
+            col * size, 
+            row * size, 
+            size, 
+            size, 
+            this.x - size/2,
+            this.y -size/2,
+            size, 
+            size
+        );
+        
         if (false)      // field of view (not yet finished)
         for (let w of this.FOV) {
             ctx.beginPath();
@@ -112,9 +136,13 @@ export class Player {
      * Start discussion if character is close to the player and available. 
      */
     talk() {
-        if (this.closestPNJ !== null && this.closestPNJ.pnj.isAvailable()) {
+        if (this.closestPNJ !== null && this.closestPNJ.pnj.isAvailable() && this.isAvailable()) {
+            this.vecX = 0;
+            this.vecY = 0;
             this.closestPNJ.pnj.talk(this);
             this.talkingTo = this.closestPNJ.pnj;
+            this.setOrientationToFace(this.closestPNJ.pnj.x, this.closestPNJ.pnj.y);
+            this.setAnimation(this.whichAnimation());
             this.timeToInteract = INTERACTION_TIMER;
         }
     }
@@ -166,15 +194,55 @@ export class Player {
         this.FOV.push([this.x, this.y, this.x + 50*vEnd.x, this.y + 50*vEnd.y]);
     }
 
+    /**
+     * Interact with the closest PNJ
+     */
+    interact(){
+        if(this.talkingTo != null){
+            if(this.role == "killer"){
+                this.kill();
+            }else{
+                this.arrest();
+            }
+            return;
+        }
+        if(this.isAvailable() && this.closestPNJ != null){
+            if(this.talkingTo == null){
+                this.talk();
+            }
+        }
+    }
+
 
     /**
      * Kill the PNJ that we are talking to (if role == "killer")
      */
     kill(){
-        if(this.talkingTo instanceof Adversary){
-            this.endGame = END_GAME_STATE.LOSE;
-        }else{
-            this.talkingTo.die();
+        if(this.talkingTo != null){
+            this.setAnimation(
+                this.whichKillAnimation()
+            );
+            if(this.talkingTo instanceof Adversary){
+                this.endGame = END_GAME_STATE.LOSE;
+            }else{
+                this.switchAfterKill = {
+                    to: this.talkingTo,
+                    skin: this.talkingTo.sprite
+                };
+                this.talkingTo.die();
+            }
+        }
+    }
+
+    whichKillAnimation(){
+        if(this.orientation.x == 1){
+            return KILL_RIGHT;
+        }else if(this.orientation.x == -1){
+            return KILL_LEFT;
+        }else if(this.orientation.y == 1){
+            return KILL_FRONT;
+        }else if(this.orientation.y == -1){
+            return KILL_BACK;
         }
     }
 
@@ -182,11 +250,13 @@ export class Player {
      * Arrest the PNJ that we are talking to (if role == "police")
      */
     arrest(){
-        if(this.talkingTo instanceof Adversary){
-            this.endGame = END_GAME_STATE.WIN;
-        }else{
-            this.endGame = END_GAME_STATE.LOSE;
-        }  
+        if(this.talkingTo != null){
+            if(this.talkingTo instanceof Adversary){
+                this.endGame = END_GAME_STATE.WIN;
+            }else{
+                this.endGame = END_GAME_STATE.LOSE;
+            }  
+        }
     }
 
     /********  CONTROLS  ********/
@@ -198,10 +268,12 @@ export class Player {
             case UP:
                 this.vecY = this.orientation.y = -1;
                 this.orientation.x = this.vecX;
+                //this.setAnimation(WALK_BACK);
                 break;
             case DOWN: 
                 this.vecY = this.orientation.y = 1;
                 this.orientation.x = this.vecX;
+                //this.setAnimation(WALK_FRONT);
                 break;
             case LEFT: 
                 this.vecX = this.orientation.x = -1;
@@ -212,9 +284,6 @@ export class Player {
                 this.orientation.y = this.vecY;
                 break;
             case TALK:
-                if(!this.isAvailable()){
-                    return;
-                }
                 const notTalkingBefore = this.talkingTo === null;
                 this.talk();
                 if (notTalkingBefore && this.talkingTo != null) {
@@ -231,6 +300,7 @@ export class Player {
                 break;
         }
         if (this.vecX !== oldVX || this.vecY !== oldVY) {
+            this.setAnimation(this.whichAnimation())
             return { move: { x: this.x, y: this.y, vecX: this.vecX, vecY: this.vecY } };
         }
     }
@@ -273,6 +343,7 @@ export class Player {
                 break;
         }
         if (this.vecX !== oldVX || this.vecY !== oldVY) {
+            this.setAnimation(this.whichAnimation())
             return { move: { x: this.x, y: this.y, vecX: this.vecX, vecY: this.vecY } };
         }
     }

@@ -3,55 +3,20 @@
  * Class for Entities, NPCs, and the Adversary of the player
  */
 
+import data from "./assets.js";
+
 import { Player } from "./player.js";
+import { Entity } from "./entity.js";
+
+import { FRAME_DELAY } from "./gui.js";
 
 const WALK = "walk", WAIT = "wait", TALK = "talk";
 
 const SPEED = 0.2;
 
-/**
- * Abstract class for entities
- */
-class Entity {
-
-    constructor(x,y,vecX,vecY,size) {
-        this.x = x;
-        this.y = y;
-        this.vecX = vecX;
-        this.vecY = vecY;
-        this.size = size;
-        this.speed = SPEED;
-        this.talkingTo = null;
-    }
-
-    update(dt) {
-        this.x += this.vecX * this.speed * dt;
-        this.y += this.vecY * this.speed * dt;
-    }
-
-    render(ctx) {
-        ctx.fillStyle = "orange";
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, 2*Math.PI);
-        ctx.closePath();
-        ctx.fill();
-    }
-
-    isAvailable() {
-        return false;
-    }
-
-    talk(who) {
-        this.talkingTo = who;
-        who.talkingTo = this;
-    }
-
-}
-
-
 export class PNJ extends Entity {
 
-    constructor(scenario,dialog, delay) {
+    constructor(scenario, dialog, delay) {
         super(0,0,0,0,20);
         let t = 0;
         // scenario of the character
@@ -70,10 +35,6 @@ export class PNJ extends Entity {
         this.alive = true;
     }
 
-    reset() {
-        this.time = 0;
-        this.step = 0;
-    }
 
     die() {
         if (this.talkingTo !== null) {
@@ -82,6 +43,9 @@ export class PNJ extends Entity {
         }
         this.dialog.end();
         this.alive = false;
+        this.setAnimation(
+            this.whichAnimation()
+        );
     }
 
     update(dt) {
@@ -128,19 +92,29 @@ export class PNJ extends Entity {
                 if (startX == endX) {
                     this.vecX = 0;
                     this.vecY = (endY < startY) ? -1 : 1;
-                }
-                else {
+                }else{
                     this.vecY = 0;
                     this.vecX = (endX < startX) ? -1 : 1;
+                }
+                this.orientation.x = this.vecX;
+                this.orientation.y = this.vecY;
+                const newAnimation = this.whichAnimation();
+                if (newAnimation !== this.animation) {
+                    this.setAnimation(newAnimation);
                 }
                 break;
             case WAIT:
                 this.x = this.scenario[this.step].x;
                 this.y = this.scenario[this.step].y;
-                this.vecX = this.scenario[this.step].vecX;
-                this.vecY = this.scenario[this.step].vecY;
+                this.vecX = 0;
+                this.vecY = 0;
+                this.orientation.x = this.scenario[this.step].vecX;
+                this.orientation.y = this.scenario[this.step].vecY;
+                this.setAnimation(this.whichAnimation());
                 break;
         }
+        // Updating animation
+        this.updateAnimation(dt);
     }
 
     /**
@@ -157,7 +131,10 @@ export class PNJ extends Entity {
      */
     talk(player) {
         if (this.isAvailable()) {
-            /** @todo change orientation to face player */
+            this.vecX = 0;
+            this.vecY = 0;
+            this.setOrientationToFace(player.x, player.y);
+            this.setAnimation(this.whichAnimation());
             this.talkingTo = player;
             this.dialog.start();
         } 
@@ -184,6 +161,8 @@ export class Adversary extends Entity {
         this.dialog = (role == "police") ? 
             new Dialog([[0,"Ecoutez laissez la police faire son travail.", 1000],[0,"Dès que nous aurons de plus amples informations,", 1000],[0,"vous en serez les premiers informés.",1000]]) :
             new Dialog([[0,"Tu veux un whisky ?",1000]]);
+        this.oldVecX;
+        this.oldVecY;
     }
 
     update(dt) {
@@ -207,6 +186,7 @@ export class Adversary extends Entity {
             }
             return;
         }
+        this.updateAnimation(dt);
     }
 
     /**
@@ -219,26 +199,42 @@ export class Adversary extends Entity {
     updateAdversary(x,y,vecX,vecY) {
         this.x = x;
         this.y = y;
-        if (vecX !== undefined) {
-            this.vecX = vecX;
+        this.oldVecX = this.vecX;
+        this.oldVecY = this.vecY;
+        this.vecX = vecX;
+        if (this.vecX !== 0) {
+            this.orientation.y = 0;
+            this.orientation.x = this.vecX;
         }
-        if (vecY !== undefined) {
-            this.vecY = vecY;
+        this.vecY = vecY;
+        if (this.vecY !== 0) {
+            this.orientation.x = 0;
+            this.orientation.y = this.vecY;
         }
+        const newAnim = this.whichAnimation();
+        if (this.animation != newAnim) {
+            this.setAnimation(newAnim);
+        }
+        //console.log({orientation: this.orientation})
     }
 
     updateAdversaryTalk(x,y,id,px,py) {
         this.talkingTo = id;
         this.x = x;
         this.y = y;
+        this.vecX = 0;
+        this.vecY = 0;
+        this.setOrientationToFace(px,py);
+        this.setAnimation(this.whichAnimation());
     }
 
 
     talk(player) {
         if (this.isAvailable()) {
-            /** @todo change orientation to face player */
             this.talkingTo = player;
             this.dialog.start();
+            this.setOrientationToFace(player.x, player.y);
+            this.setAnimation(this.whichAnimation());
         } 
     }
 
@@ -248,10 +244,6 @@ export class Adversary extends Entity {
 
     render(ctx) {
         super.render(ctx);
-        /** prints dialog @todo move code somewhere else to avoid z-index issues */
-        if (this.dialog.isRunning() && this.talkingTo !== null) {
-            //this.dialog.render(ctx, this.x, this.y, this.talkingTo.x, this.talkingTo.y);
-        }
     }
 
     renderDialog(ctx) {
@@ -261,6 +253,7 @@ export class Adversary extends Entity {
     } 
 
 }
+
 
 
 export class Dialog {
@@ -336,6 +329,5 @@ export class Dialog {
             }
         }
     }
-
 
 }

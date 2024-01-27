@@ -2,7 +2,7 @@ import { preload, data } from "./loader.js";
 
 export const WIDTH = 800, HEIGHT = 500;     // should be a ratio of 16/10
 
-import GUI from "./gui.js";
+import GUI, { STATE } from "./gui.js";
 import {END_GAME_STATE} from "./player.js";
 
 /**
@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", function() {
     CXT.verticalAlign = "middle";
     CXT.font = "20px arial";
     CXT.fillStyle = "black";
+    CXT.imageSmoothingEnabled = false;
 
     // GUI for game interactions
     const gui = new GUI();
@@ -36,13 +37,14 @@ document.addEventListener("DOMContentLoaded", function() {
         gui.newGame(level, role, delay);
     });
     socket.on("playerMove", function(data) {
+        //console.log("playerMove", data)
         gui.updateAdversary(data);
     });
     socket.on("playerLeft", function() {
         gui.interruptGame();
     });
     socket.on("playerTalk", function(data) {
-        console.log("playerTalk", data)
+        //console.log("playerTalk", data)
         gui.updateAdversaryTalk(data);
     });
     socket.on("noSuchGame", function() {
@@ -51,7 +53,11 @@ document.addEventListener("DOMContentLoaded", function() {
     socket.on("gameIsFull", function() {
         gui.writeInfo("Game is full", 2000);
     });
-    
+    socket.on("endGame", function({winner}) {
+        console.log("endGame", winner);
+        gui.game.player.endGame = winner == gui.game.player.role ? END_GAME_STATE.WIN : END_GAME_STATE.LOSE;
+    }
+    );
     
     /**  
      * Callback invoked each time a resource has been loaded. 
@@ -86,11 +92,15 @@ document.addEventListener("DOMContentLoaded", function() {
         let now = Date.now();
         gui.update(now - lastUpdate);
         // Check if the game ended (depending on player actions)
-        if(gui.game !== null && gui.game.player.endGame !== END_GAME_STATE.RUNNING){
+        if(gui.state ==  STATE.RUNNING && gui.game !== null && gui.game.player.endGame !== END_GAME_STATE.RUNNING){
+            console.log("endGame", gui.game.player.endGame);
             if(gui.game.player.endGame === END_GAME_STATE.WIN){
-                gui.win();
+                socket.emit("endGame",{winner:gui.game.player.role});
+                gui.win(gui.game.player.role);
             }else{
-                gui.lose();
+                let winner = gui.game.player.role == "police" ? "killer" : "police";
+                gui.lose(winner);
+                socket.emit("endGame",{winner:winner});
             }
         }
         gui.render(CXT);
@@ -125,6 +135,9 @@ document.addEventListener("DOMContentLoaded", function() {
         if (r == "exit") {
             socket.emit("exit");
             return;
+        }
+        if(r == "interaction"){
+            gui.game.player.interact();
         }
     });
     document.addEventListener("dblclick", function(e) {
