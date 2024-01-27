@@ -6,11 +6,12 @@ module.exports = { generate };
 
 // Main function that generates the level
 function generate() {
-    const walls = WALLS;
+    const walls = WALLS_FLOORS;
+    const furnitures = FURNITURES;
     const PNJs = [PNJ_0];
     //const start = { police: {x: 90, y: 90 }, killer: { x: 1100, y: 650 } };
     const start = { police: {x: 600, y: 900 }, killer: { x: 600, y: 900 } };
-    return { walls, PNJs, start };
+    return { walls, furnitures, PNJs, start };
 } 
 
 const TILE_SIDE = 128;
@@ -34,7 +35,7 @@ const TILES = [
     [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
 ];
 
-const FURNITURES = [
+const FURNITURES_MAP = [
     [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
     [-1, 7, 8, -1, -1, -1, 16, -1, -1, 16, -1, -1, -1, 8, 7, -1],
     [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
@@ -53,10 +54,12 @@ const FURNITURES = [
     [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
 ]
 
-let WALLS = [];
+let WALLS_FLOORS = [];
+let FURNITURES = [];
 for (let i = 0; i < TILES.length; i++) {
     for (let j = 0; j < TILES.length; j++) {
-        WALLS.push([TILE_SIDE * j, TILE_SIDE * i, TILE_SIDE, TILE_SIDE, TILES[i][j], FURNITURES[i][j]]) // [x, y, width, length, tyles_type, furniture_type]
+        FURNITURES.push([TILE_SIDE * j, TILE_SIDE * i, TILE_SIDE, TILE_SIDE, FURNITURES_MAP[i][j]]) // [x, y, width, length, tyles_type, furniture_type]
+        WALLS_FLOORS.push([TILE_SIDE * j, TILE_SIDE * i, TILE_SIDE, TILE_SIDE, TILES[i][j],])
     }
 }
 

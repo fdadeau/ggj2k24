@@ -75,6 +75,7 @@ export class Map {
     constructor(level, delay, adversaryRole, skins) {
         // sort walls 
         this.walls = level.walls;//.map(e => e[0] > e[2] ? [e[2],e[1],e[0],e[3]] : e).map(e => e[1] > e[3] ? [e[0],e[3],e[2],e[1]] : e);
+        this.furnitures = level.furnitures;
         /** @todo compute these values from walls data from level */
         this.topLeft = [20, 20];
         this.bottomRight = [2048, 2048];
@@ -145,6 +146,9 @@ export class Map {
         ctx.strokeStyle = "grey";
         for (let w of this.walls) {
             this.renderTiles(ctx, w);
+        }
+
+        for (let w of this.furnitures) {
             this.renderFurnitures(ctx, w);
         }
 
@@ -274,7 +278,7 @@ export class Map {
         let width = null;
         let height = null;
 
-        switch (w[5]) {
+        switch (w[4]) {
             case FURNITURE_TYPE.NONE: // -1
                 return null;
             case FURNITURE_TYPE.SINK_FRONT: // 0
@@ -443,32 +447,40 @@ export class Map {
         return {img: furniture_img, x: x, y: y, width: width, height: height};
     }
 
+    isTooCloseFromOneFurniture(x, y, size) {
+        for(let f of this.furnitures){
+            let furniture = this.getFurniture(f);
+            if(furniture !== null &&
+                x + size > furniture.x && 
+                x < furniture.x + furniture.width + TILE_SIDE / 4 &&
+                y + size > furniture.y &&
+                y < furniture.y + furniture.height &&
+                f[4] != FURNITURE_TYPE.CARPET){
+                    return furniture;
+            }
+        }
+        return null;
+    }
 
     isTooCloseFromOneWall(x, y, size) {
         size = size * 2;
-        // j, i, width, height, type, type
+        // Check collision with walls
         for (let wall of this.walls) {
-            //if (!(x + size < wall[0]-WALL_THICKNESS/2 || x - size > wall[2]+wall[3]/2 || y + size < wall[1]-wall[4]/2 || y - size > wall[3] + wall[4]/2)) {
-            let furniture = this.getFurniture(wall);
-            if ((x + size > wall[0] + TILE_SIDE / 16 && 
-                x < wall[0] + wall[2] + TILE_SIDE / 16 &&  // HERE
-                y + size > wall[1] - TILE_SIDE / 16 && // To down
-                y < wall[1] + wall[3] - TILE_SIDE / 4 && // To up
+            if (x + size > wall[0] + TILE_SIDE / 16 && 
+                x < wall[0] + wall[2] + TILE_SIDE / 16 &&
+                y + size > wall[1] - TILE_SIDE / 16 &&
+                y < wall[1] + wall[3] - TILE_SIDE / 4 &&
                 (
                     (wall[4] >= TILE_TYPE.OUTSIDE_WALL 
                         && wall[4] <= TILE_TYPE.CORRIDOR_WALL) || 
                     wall[4] == TILE_TYPE.BAR_SHELVES)
-                ) ||
-                (furniture !== null &&
-                x + size > furniture.x && 
-                x < furniture.x + furniture.width + TILE_SIDE / 4 &&  // HERE
-                y + size > furniture.y /*- TILE_SIDE/16*/ && // To down
-                y < furniture.y + furniture.height /*- TILE_SIDE / 8*/ &&
-                wall[5] != FURNITURE_TYPE.CARPET)) {
+                ) {
                 return wall;
             }   
         } 
-        return null;
+
+        // Check collision with furnitures
+        return this.isTooCloseFromOneFurniture(x, y, size);
     }
 
 
