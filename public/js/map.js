@@ -23,7 +23,12 @@ const TILE_TYPE = {
     ROOM_WALL: 8,
     CORRIDOR_WALL: 9,
 
-    DOOR: 10
+    ROOM_HORIZONTAL_DOOR: 10,
+    BAR_HORIZONTAL_DOOR: 11,
+    ROOM_VERTICAL_DOOR: 12,
+    BAR_VERTICAL_DOOR: 13,
+    BATHROOM_HORIZONTAL_DOOR:14,
+    BATHROOM_VERTICAL_DOOR: 15
 }
 
 export class Map {
@@ -89,46 +94,55 @@ export class Map {
         ctx.lineCap = "round";
         ctx.strokeStyle = "grey";
         for (let w of this.walls) {
-            // ctx.beginPath();
-            // ctx.moveTo(w[0],w[1]);
-            // ctx.lineTo(w[0]+w[2],w[1]);
-            // ctx.lineTo(w[0]+w[2],w[1]+w[3]);
-            // ctx.lineTo(w[0],w[1]+w[3]);
-            // ctx.lineTo(w[0],w[1]);
-            // ctx.stroke();
             switch (w[4]) {
                 case TILE_TYPE.PLANKS_FLOOR: // 0
-                    ctx.fillStyle = '#916023'; // Brown
+                    ctx.fillStyle = '#916023';
                     break;
                 case TILE_TYPE.BATHROOM_FLOOR: // 1
-                    ctx.fillStyle = '#7fb9bd'; // Light Blue
+                    ctx.fillStyle = '#7fb9bd';
                     break;
                 case TILE_TYPE.BAR_FLOOR: // 2
                     ctx.fillStyle = '#772b09'; // Gold
                     break;
                 case TILE_TYPE.ROOM_FLOOR: // 3
-                    ctx.fillStyle = '#96502e'; // Light Green
+                    ctx.fillStyle = '#96502e';
                     break;
                 case TILE_TYPE.KITCHEN_FLOOR: // 4
-                    ctx.fillStyle = '#eed9d0'; // Chocolate
+                    ctx.fillStyle = '#eed9d0';
                     break;
+
                 case TILE_TYPE.OUTSIDE_WALL: // 5
-                    ctx.fillStyle = 'lightgray'; // Dim Gray
+                    ctx.fillStyle = 'lightgray';
                     break;
                 case TILE_TYPE.BATHROOM_WALL: // 6
-                    ctx.fillStyle = '#bce8eb'; // Teal
+                    ctx.fillStyle = '#bce8eb';
                     break;
                 case TILE_TYPE.BAR_WALL: // 7
-                    ctx.fillStyle = '#781900'; // Saddle Brown
+                    ctx.fillStyle = '#781900';
                     break;
                 case TILE_TYPE.ROOM_WALL: // 8
-                    ctx.fillStyle = '#e3b286'; // Light Yellow
+                    ctx.fillStyle = '#e3b286';
                     break;
                 case TILE_TYPE.CORRIDOR_WALL: // 9
                     ctx.fillStyle = '#b83a25'; // Dark Gray
                     break;
-                case TILE_TYPE.DOOR: // 10
-                    ctx.fillStyle = 'black';
+
+                case TILE_TYPE.ROOM_HORIZONTAL_DOOR: // 10
+                    ctx.fillStyle = '#6d2a02';
+                    break;
+                case TILE_TYPE.BAR_HORIZONTAL_DOOR: // 11
+                    ctx.fillStyle = '#6d2a02';
+                    break;
+                case TILE_TYPE.ROOM_VERTICAL_DOOR: // 12
+                case TILE_TYPE.BAR_VERTICAL_DOOR: // 13
+                    ctx.fillStyle = '#6d2a02';
+                    break;
+                case TILE_TYPE.BATHROOM_HORIZONTAL_DOOR: // 14
+                    ctx.fillStyle = '#10585d';
+                    break;
+                case TILE_TYPE.BATHROOM_VERTICAL_DOOR: // 15
+                    ctx.fillStyle = '#10585d';
+                    break;
             }
             
             ctx.fillRect(w[0], w[1], w[2], w[3])
