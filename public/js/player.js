@@ -16,6 +16,10 @@ export const INTERACTION_TIMER = 5000;
 
 export const END_GAME_STATE = {"WIN": 1, "LOSE": -1, "RUNNING": 0};
 
+export const KILL_FRONT = [12,13,12];
+export const KILL_RIGHT = [15,16,15];
+export const KILL_LEFT = [18,19,18];
+export const KILL_BACK = [21,22,21];
 
 export class Player extends Entity {
 
@@ -92,7 +96,7 @@ export class Player extends Entity {
         let row = Math.floor(frame / 3);
 
         ctx.drawImage(
-            data["default-spritesheet"], 
+            this.sprite, 
             col * size, 
             row * size, 
             size, 
@@ -213,11 +217,26 @@ export class Player extends Entity {
      */
     kill(){
         if(this.talkingTo != null){
+            this.setAnimation(
+                this.whichKillAnimation()
+            );
             if(this.talkingTo instanceof Adversary){
                 this.endGame = END_GAME_STATE.LOSE;
             }else{
                 this.talkingTo.die();
             }
+        }
+    }
+
+    whichKillAnimation(){
+        if(this.orientation.x == 1){
+            return KILL_RIGHT;
+        }else if(this.orientation.x == -1){
+            return KILL_LEFT;
+        }else if(this.orientation.y == 1){
+            return KILL_FRONT;
+        }else if(this.orientation.y == -1){
+            return KILL_BACK;
         }
     }
 

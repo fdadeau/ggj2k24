@@ -33,8 +33,6 @@ export class PNJ extends Entity {
         this.startTime = Date.now() - delay;
         this.step = 0;
         this.alive = true;
-
-        this.sprite = data["default-spritesheet"];
     }
 
 
@@ -45,6 +43,9 @@ export class PNJ extends Entity {
         }
         this.dialog.end();
         this.alive = false;
+        this.setAnimation(
+            this.whichAnimation()
+        );
     }
 
     update(dt) {
@@ -160,8 +161,6 @@ export class Adversary extends Entity {
         this.dialog = (role == "police") ? 
             new Dialog([[0,"Ecoutez laissez la police faire son travail.", 1000],[0,"Dès que nous aurons de plus amples informations,", 1000],[0,"vous en serez les premiers informés.",1000]]) :
             new Dialog([[0,"Tu veux un whisky ?",1000]]);
-
-        this.sprite = data["groom-spritesheet"];
         this.oldVecX;
         this.oldVecY;
     }

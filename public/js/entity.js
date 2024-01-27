@@ -3,6 +3,7 @@ import data from "./assets.js";
 
 import { FRAME_DELAY } from "./gui.js";
 
+import { KILL_BACK, KILL_FRONT, KILL_LEFT, KILL_RIGHT } from "./player.js";
 
 const SPEED = 0.2;
 
@@ -15,7 +16,7 @@ const IDLE_LEFT = [4];
 const IDLE_RIGHT = [7];
 const IDLE_BACK = [10];
 
-const DEAD = [10];
+const DEAD = [14];
 
 /**
  * Abstract class for entities
@@ -46,7 +47,7 @@ export class Entity {
         this.frame = 0;
         this.frameDelay = FRAME_DELAY;
         /** @type {Image} spritesheet used for the entity */
-        this.sprite = data["default-spritesheet"];
+        this.sprite = data["groom-pink-spritesheet"];
     }
 
     update(dt) {
@@ -150,6 +151,9 @@ export class Entity {
     updateAnimation(dt) {
         this.frameDelay -= dt;
         if (this.frameDelay <= 0) {
+            if(this.frame+1 == this.animation.length && (this.animation == KILL_BACK || this.animation == KILL_FRONT || this.animation == KILL_LEFT || this.animation == KILL_RIGHT)){
+                this.setAnimation(this.whichAnimation());
+            }
             this.frameDelay = FRAME_DELAY;
             this.frame = (this.frame + 1) % this.animation.length;
         }
