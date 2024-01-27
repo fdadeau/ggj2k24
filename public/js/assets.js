@@ -51,6 +51,7 @@ const data = {
     "wc_front": "./assets/images/furnitures/wc_front.png",
     "wc_left": "./assets/images/furnitures/wc_left.png",
     "wc_right": "./assets/images/furnitures/wc_right.png",
+    "carpet": "./assets/images/furnitures/carpet.png",
 
     // spritesheets
 

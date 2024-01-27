@@ -64,7 +64,8 @@ const FURNITURE_TYPE = {
     BAR: 21,
     WC_FRONT: 22,
     WC_LEFT: 23,
-    WC_RIGHT: 24
+    WC_RIGHT: 24,
+    CARPET: 25,
 }
 
 export class Map {
@@ -408,6 +409,12 @@ export class Map {
                 furniture_img = data['wc_right'];
                 width = 24;
                 height = 30;
+                break;
+            case FURNITURE_TYPE.CARPET: // 25
+                furniture_img = data['carpet'];
+                width = 64;
+                height = 32;
+                x = x + TILE_SIDE - width * 2;
                 break;
         }
         ctx.drawImage(furniture_img, x, y, width * 2, height  * 2);
