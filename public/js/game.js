@@ -34,7 +34,7 @@ export class Game {
         this.map.update(dt);
         this.player.update(dt);
         this.updateViewport();
-        this.player.computeFOV(this.viewport);
+        //this.player.computeFOV(this.viewport);
     }
 
     /**

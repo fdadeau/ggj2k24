@@ -133,7 +133,7 @@ class GUI {
     renderTitleScreen(ctx) {
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, WIDTH, HEIGHT);
-        ctx.drawImage(data["home"],16, 26, 768, 448);
+        ctx.drawImage(data["home_shiny"],16, 26, 768, 448);
         ctx.font = "24px arial";
         ctx.textAlign = "center";
         ctx.fillText("INSERT TITLE HERE", WIDTH/2+20, HEIGHT/2);
