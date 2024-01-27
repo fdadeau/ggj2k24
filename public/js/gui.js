@@ -133,7 +133,7 @@ class GUI {
         ctx.fillText("Click to return to title screen.", WIDTH / 2, HEIGHT / 2 + 20);
     }
     
-    renderInfos(){
+    renderInfos(ctx){
         if (this.info) {
             ctx.textAlign = "center";
             ctx.font = "18px arial";
