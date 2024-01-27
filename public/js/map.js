@@ -20,8 +20,10 @@ const TILE_TYPE = {
     OUTSIDE_WALL: 5,
     BATHROOM_WALL: 6,
     BAR_WALL: 7,
-    ROOM_LIGH_WALL: 8,
-    ROOM_DARK_WALL: 9
+    ROOM_WALL: 8,
+    CORRIDOR_WALL: 9,
+
+    DOOR: 10
 }
 
 export class Map {
@@ -95,36 +97,38 @@ export class Map {
             // ctx.lineTo(w[0],w[1]);
             // ctx.stroke();
             switch (w[4]) {
-                case TILE_TYPE.PLANKS_FLOOR:
-                    ctx.fillStyle = '#964B00'; // Brown
+                case TILE_TYPE.PLANKS_FLOOR: // 0
+                    ctx.fillStyle = '#916023'; // Brown
                     break;
-                case TILE_TYPE.BATHROOM_FLOOR:
-                    ctx.fillStyle = '#ADD8E6'; // Light Blue
+                case TILE_TYPE.BATHROOM_FLOOR: // 1
+                    ctx.fillStyle = '#7fb9bd'; // Light Blue
                     break;
-                case TILE_TYPE.BAR_FLOOR:
-                    ctx.fillStyle = '#FFD700'; // Gold
+                case TILE_TYPE.BAR_FLOOR: // 2
+                    ctx.fillStyle = '#772b09'; // Gold
                     break;
-                case TILE_TYPE.ROOM_FLOOR:
-                    ctx.fillStyle = '#90EE90'; // Light Green
+                case TILE_TYPE.ROOM_FLOOR: // 3
+                    ctx.fillStyle = '#96502e'; // Light Green
                     break;
-                case TILE_TYPE.KITCHEN_FLOOR:
-                    ctx.fillStyle = '#D2691E'; // Chocolate
+                case TILE_TYPE.KITCHEN_FLOOR: // 4
+                    ctx.fillStyle = '#eed9d0'; // Chocolate
                     break;
-                case TILE_TYPE.OUTSIDE_WALL:
-                    ctx.fillStyle = '#696969'; // Dim Gray
+                case TILE_TYPE.OUTSIDE_WALL: // 5
+                    ctx.fillStyle = 'lightgray'; // Dim Gray
                     break;
-                case TILE_TYPE.BATHROOM_WALL:
-                    ctx.fillStyle = '#008080'; // Teal
+                case TILE_TYPE.BATHROOM_WALL: // 6
+                    ctx.fillStyle = '#bce8eb'; // Teal
                     break;
-                case TILE_TYPE.BAR_WALL:
-                    ctx.fillStyle = '#8B4513'; // Saddle Brown
+                case TILE_TYPE.BAR_WALL: // 7
+                    ctx.fillStyle = '#781900'; // Saddle Brown
                     break;
-                case TILE_TYPE.ROOM_LIGH_WALL:
-                    ctx.fillStyle = '#FFFFE0'; // Light Yellow
+                case TILE_TYPE.ROOM_WALL: // 8
+                    ctx.fillStyle = '#e3b286'; // Light Yellow
                     break;
-                case TILE_TYPE.ROOM_DARK_WALL:
-                    ctx.fillStyle = '#A9A9A9'; // Dark Gray
+                case TILE_TYPE.CORRIDOR_WALL: // 9
+                    ctx.fillStyle = '#b83a25'; // Dark Gray
                     break;
+                case TILE_TYPE.DOOR: // 10
+                    ctx.fillStyle = 'black';
             }
             
             ctx.fillRect(w[0], w[1], w[2], w[3])
@@ -166,10 +170,9 @@ export class Map {
 
 
     isTooCloseFromOneWall(x, y, size) {
-        console.log(this.walls);
         for (let wall of this.walls) {
             //if (!(x + size < wall[0]-WALL_THICKNESS/2 || x - size > wall[2]+WALL_THICKNESS/2 || y + size < wall[1]-WALL_THICKNESS/2 || y - size > wall[3] + WALL_THICKNESS/2)) {
-            if (x + size > wall[0] && x - size < wall[0] + wall[2] && y + size > wall[1] && y - size < wall[1] + wall[3] && wall[4] >= TILE_TYPE.OUTSIDE_WALL && wall[4] <= TILE_TYPE.ROOM_DARK_WALL) {
+            if (x + size > wall[0] && x - size < wall[0] + wall[2] && y + size > wall[1] && y - size / 4 < wall[1] + wall[3] && wall[4] >= TILE_TYPE.OUTSIDE_WALL && wall[4] <= TILE_TYPE.CORRIDOR_WALL) {
                 return wall;
             }   
         } 
