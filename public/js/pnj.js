@@ -204,16 +204,19 @@ export class Adversary extends Entity {
         this.oldVecY = this.vecY;
         this.vecX = vecX;
         if (this.vecX !== 0) {
+            this.orientation.y = 0;
             this.orientation.x = this.vecX;
         }
         this.vecY = vecY;
         if (this.vecY !== 0) {
+            this.orientation.x = 0;
             this.orientation.y = this.vecY;
         }
         const newAnim = this.whichAnimation();
         if (this.animation != newAnim) {
             this.setAnimation(newAnim);
         }
+        console.log({orientation: this.orientation})
     }
 
     updateAdversaryTalk(x,y,id,px,py) {

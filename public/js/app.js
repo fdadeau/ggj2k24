@@ -36,13 +36,14 @@ document.addEventListener("DOMContentLoaded", function() {
         gui.newGame(level, role, delay);
     });
     socket.on("playerMove", function(data) {
+        //console.log("playerMove", data)
         gui.updateAdversary(data);
     });
     socket.on("playerLeft", function() {
         gui.interruptGame();
     });
     socket.on("playerTalk", function(data) {
-        console.log("playerTalk", data)
+        //console.log("playerTalk", data)
         gui.updateAdversaryTalk(data);
     });
     socket.on("noSuchGame", function() {
