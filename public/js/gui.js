@@ -44,7 +44,7 @@ class GUI {
         this.buttons = {
             "CREATE": new Button("Create game", WIDTH*0.35, HEIGHT*0.7, 140, 40, true),
             "JOIN": new Button("Join game", WIDTH*0.65, HEIGHT*0.7, 140, 40, true),
-            "CREDITS": new Button("Cedits", WIDTH*0.35, HEIGHT*0.84, 140, 40, true),
+            "CREDITS": new Button("Credits", WIDTH*0.35, HEIGHT*0.84, 140, 40, true),
             "CONTROLS": new Button("Rules", WIDTH*0.65, HEIGHT*0.84, 140, 40, true)
         }
 
