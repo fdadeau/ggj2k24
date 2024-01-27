@@ -42,11 +42,18 @@ class GUI {
 
         /** buttons */
         this.buttons = {
-            "CREATE": new Button("Create game", WIDTH*0.35, HEIGHT*0.7, 140, 40),
-            "JOIN": new Button("Join game", WIDTH*0.7, HEIGHT*0.7, 140, 40)
+            "CREATE": new Button("Create game", WIDTH*0.35, HEIGHT*0.7, 140, 40, true),
+            "JOIN": new Button("Join game", WIDTH*0.65, HEIGHT*0.7, 140, 40, true),
+            "CREDITS": new Button("Cedits", WIDTH*0.35, HEIGHT*0.84, 140, 40, true),
+            "CONTROLS": new Button("Rules", WIDTH*0.65, HEIGHT*0.84, 140, 40, true)
         }
 
         this.interactionButton = new InteractionButton("", WIDTH*.95, HEIGHT*.93, 64, 64, this);
+
+        this.closeButton = new Button("X", WIDTH*.95, HEIGHT*.05, 32, 32, false);
+
+        this.credits = false;
+        this.controls = false;
     };
 
     /**
@@ -134,9 +141,7 @@ class GUI {
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, WIDTH, HEIGHT);
         ctx.drawImage(data["home_shiny"],16, 26, 768, 448);
-        ctx.font = "24px arial";
-        ctx.textAlign = "center";
-        ctx.fillText("INSERT TITLE HERE", WIDTH/2+20, HEIGHT/2);
+        ctx.drawImage(data["title"],WIDTH / 2 - 280/2, HEIGHT/2 - 80/2, 280, 80);
         for (let b in this.buttons) {
           this.buttons[b].render(ctx);
         }
@@ -200,6 +205,62 @@ class GUI {
         }
     }
 
+    renderControls(ctx){
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, WIDTH, HEIGHT);
+        ctx.drawImage(data["home"],16, 26, 768, 448);
+        ctx.drawImage(data["carpet"], 100, 50, 600, 400);
+        ctx.fillStyle = '#ffd728';
+        ctx.font = "bold small-caps 25px arial"
+        ctx.fillText('Concept', 320, 160);
+        ctx.fillText('Controls', 320, 330);
+
+        this.closeButton.render(ctx);
+    }
+
+    renderCredits(ctx){
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, WIDTH, HEIGHT);
+        ctx.drawImage(data["home"],16, 26, 768, 448);
+        ctx.drawImage(data["carpet"], 100, 50, 600, 400);
+        ctx.fillStyle = '#ffd728';
+        ctx.font = "bold small-caps 25px arial"
+        ctx.fillText('Coding', 170, 160);
+        ctx.fillStyle = '#000';
+        ctx.font = "bold small-caps 20px arial"
+        ctx.fillText('Fred Dadeau', 170, 200);
+        ctx.fillText('Robin Grappe', 170, 230);
+        ctx.fillText('Tayeb Hakkar', 170, 260);
+
+
+        ctx.fillStyle = '#ffd728';
+        ctx.font = "bold small-caps 25px arial"
+        ctx.fillText('Music', 490, 160);
+        ctx.fillStyle = '#000';
+        ctx.font = "bold small-caps 20px arial"
+        ctx.fillText('Raphaël Dadeau', 490, 200);
+        // TODO + bruiteurs
+
+        ctx.fillStyle = '#ffd728';
+        ctx.font = "bold small-caps 25px arial"
+        ctx.fillText('Game Art', 330, 160);
+        ctx.fillStyle = '#000';
+        ctx.font = "bold small-caps 20px arial"
+        ctx.fillText('Marie-Almina', 330, 200);
+        ctx.fillText('Gindre', 330, 230);
+        ctx.fillText('Éléa Jacquin', 330, 260);
+
+        ctx.fillStyle = '#ffd728';
+        ctx.font = "bold small-caps 25px arial"
+        ctx.fillText('Thanks to :', 320, 330);
+        ctx.fillStyle = '#000';
+        ctx.font = "bold small-caps 20px arial"
+        ctx.fillText('All Besançon participants', 250, 360);
+        ctx.fillText('for their jokes', 320, 390);
+
+        this.closeButton.render(ctx);
+    }
+
     /**
      * Renders the GUI
      * @param {CanvasRenderingContext2D} ctx Drawing area
@@ -213,6 +274,14 @@ class GUI {
 
         switch(this.state){
             case STATE.TITLE_SCREEN:
+                if(this.controls){
+                    this.renderControls(ctx);
+                    return;   
+                }
+                if(this.credits){
+                    this.renderCredits(ctx);
+                    return;
+                }
                 this.renderTitleScreen(ctx);
                 break;
             case STATE.CONNECTION_LOST:
@@ -270,12 +339,20 @@ class GUI {
         switch(this.state){
             case STATE.TITLE_SCREEN:
                 if (this.buttons["CREATE"].isAt(x,y)) {
-                    console.log("clic sur create");
                     return "create";
                 }
                 if (this.buttons["JOIN"].isAt(x,y)) {
-                    console.log("clic sur join");
                     return "join";
+                }
+                if (this.buttons["CREDITS"].isAt(x,y)) {
+                    this.credits = true;
+                }
+                if (this.buttons["CONTROLS"].isAt(x,y)) {
+                    this.controls = true;
+                }
+                if(this.closeButton.isAt(x,y)){
+                    this.credits = false;
+                    this.controls = false;
                 }
                 break;
             case STATE.CONNECTION_LOST:
@@ -300,7 +377,7 @@ class GUI {
  */
 class Button {
 
-    constructor(txt, x, y, w, h) {
+    constructor(txt, x, y, w, h, background) {
         this.x = x;
         this.y = y;
         this.txt = txt;
@@ -309,6 +386,7 @@ class Button {
         this.width = w;
         this.x0 = x - w/2 - this.padding / 2;
         this.y0 = y - h/2 - this.padding / 2; 
+        this.background = background;
     }
 
     render(ctx) {
@@ -326,7 +404,9 @@ class Button {
         ctx.verticalAlign = "middle";
         ctx.textAlign = "center";
         ctx.font = `${this.height/2}px arial`;
-        ctx.drawImage(data["carpet"], this.x0, this.y0, this.width + this.padding, this.height+this.padding/2);
+        if(this.background){
+            ctx.drawImage(data["carpet"], this.x0, this.y0, this.width + this.padding, this.height+this.padding/2);
+        }
         ctx.fillStyle = "white";
         ctx.fillText(this.txt, this.x, this.y);
     }

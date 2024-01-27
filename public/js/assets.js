@@ -16,6 +16,7 @@ const data = {
     "kill": "./assets/images/kill.png",
     "home": "./assets/images/home.png",
     "home_shiny": "./assets/images/home_shiny.png",
+    "title": "./assets/images/title.png",
     
     // tiles textures
     "planks_floor": "./assets/images/floors/planks_floor.png",
