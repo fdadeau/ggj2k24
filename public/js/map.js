@@ -58,7 +58,7 @@ export class Map {
         let pnj = this.PNJs[Number(id)];
         pnj.x = px;
         pnj.y = py;
-        this.adversary.updateAdversary(x,y);
+        this.adversary.updateAdversary(x,y,0,0);
 
         if(pnj instanceof PNJ){
             pnj.talk(this.adversary);

@@ -187,12 +187,7 @@ export class Adversary extends Entity {
             }
             return;
         }
-
-        this.frameDelay -= dt;
-        if (this.frameDelay <= 0) {
-            this.frameDelay = FRAME_DELAY;
-            this.frame = (this.frame + 1) % this.animation.length;
-        }
+        this.updateAnimation(dt);
     }
 
     /**
@@ -207,17 +202,13 @@ export class Adversary extends Entity {
         this.y = y;
         this.oldVecX = this.vecX;
         this.oldVecY = this.vecY;
-        if (vecX !== undefined) {
-            this.vecX = vecX;
-            if (this.vecX !== 0) {
-                this.orientation.x = this.vecX;
-            }
+        this.vecX = vecX;
+        if (this.vecX !== 0) {
+            this.orientation.x = this.vecX;
         }
-        if (vecY !== undefined) {
-            this.vecY = vecY;
-            if (this.vecY !== 0) {
-                this.orientation.y = this.vecY;
-            }
+        this.vecY = vecY;
+        if (this.vecY !== 0) {
+            this.orientation.y = this.vecY;
         }
         const newAnim = this.whichAnimation();
         if (this.animation != newAnim) {
@@ -229,16 +220,15 @@ export class Adversary extends Entity {
         this.talkingTo = id;
         this.x = x;
         this.y = y;
-        this.setOrientationToFace(px,py);
         this.vecX = 0;
         this.vecY = 0;
+        this.setOrientationToFace(px,py);
         this.setAnimation(this.whichAnimation());
     }
 
 
     talk(player) {
         if (this.isAvailable()) {
-            /** @todo change orientation to face player */
             this.talkingTo = player;
             this.dialog.start();
             this.setOrientationToFace(player.x, player.y);
