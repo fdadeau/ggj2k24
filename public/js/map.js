@@ -436,9 +436,18 @@ export class Map {
 
     isTooCloseFromOneWall(x, y, size) {
         size = size * 2;
+        // j, i, width, height, type, type
         for (let wall of this.walls) {
-            //if (!(x + size < wall[0]-WALL_THICKNESS/2 || x - size > wall[2]+WALL_THICKNESS/2 || y + size < wall[1]-WALL_THICKNESS/2 || y - size > wall[3] + WALL_THICKNESS/2)) {
-            if (x + size > wall[0] && x - size < wall[0] + wall[2] && y + size > wall[1] && y < wall[1] + wall[3] - TILE_SIDE / 8 && ((wall[4] >= TILE_TYPE.OUTSIDE_WALL && wall[4] <= TILE_TYPE.CORRIDOR_WALL) || wall[4] == TILE_TYPE.BAR_SHELVES)) {
+            //if (!(x + size < wall[0]-WALL_THICKNESS/2 || x - size > wall[2]+wall[3]/2 || y + size < wall[1]-wall[4]/2 || y - size > wall[3] + wall[4]/2)) {
+            if (x + size > wall[0] && 
+                x < wall[0] + wall[2] + TILE_SIDE/16 &&  // HERE
+                y + size > wall[1] - TILE_SIDE/16 && // To down
+                y < wall[1] + wall[3] - TILE_SIDE / 8 && // To up
+                (
+                    (wall[4] >= TILE_TYPE.OUTSIDE_WALL 
+                        && wall[4] <= TILE_TYPE.CORRIDOR_WALL) || 
+                    wall[4] == TILE_TYPE.BAR_SHELVES)
+                ) {
                 return wall;
             }   
         } 
