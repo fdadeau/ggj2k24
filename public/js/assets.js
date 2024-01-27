@@ -13,6 +13,7 @@ const data = {
     "kitchen_floor": "./assets/images/floors/kitchen_floor.png",
     "bathroom_wall": "./assets/images/walls/bathroom_wall.png",
     "bar_wall": "./assets/images/walls/bar_wall.png",
+    "bar_shelves": "./assets/images/walls/bar_shelves.png",
     "room_wall": "./assets/images/walls/room_wall.png",
     "corridor_wall": "./assets/images/walls/corridor_wall.png",
     "room_horizontal_door": "./assets/images/doors/room_horizontal_door.png",
@@ -44,6 +45,12 @@ const data = {
     "sofa_red_front": "./assets/images/furnitures/sofa_red_front.png",
     "sofa_red_left": "./assets/images/furnitures/sofa_red_left.png",
     "sofa_red_right": "./assets/images/furnitures/sofa_red_right.png",
+    "chevalet": "./assets/images/furnitures/chevalet.png",
+    "round_table": "./assets/images/furnitures/round_table.png",
+    "bar": "./assets/images/furnitures/bar.png",
+    "wc_front": "./assets/images/furnitures/wc_front.png",
+    "wc_left": "./assets/images/furnitures/wc_left.png",
+    "wc_right": "./assets/images/furnitures/wc_right.png",
 
     // spritesheets
 

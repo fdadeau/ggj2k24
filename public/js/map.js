@@ -24,6 +24,7 @@ const TILE_TYPE = {
     OUTSIDE_WALL: 5,
     BATHROOM_WALL: 6,
     BAR_WALL: 7,
+    BAR_SHELVES: 18,
     ROOM_WALL: 8,
     CORRIDOR_WALL: 9,
 
@@ -58,6 +59,12 @@ const FURNITURE_TYPE = {
     SOFA_RED_FRONT: 16,
     SOFA_RED_LEFT: 17,
     SOFA_RED_RIGHT: 18,
+    CHEVALET: 19,
+    ROUND_TABLE: 20,
+    BAR: 21,
+    WC_FRONT: 22,
+    WC_LEFT: 23,
+    WC_RIGHT: 24
 }
 
 export class Map {
@@ -194,6 +201,10 @@ export class Map {
                 tile_img = data['bar_wall'];
                 ctx.fillStyle = '#781900';
                 break;
+            case TILE_TYPE.BAR_SHELVES: // 18
+                tile_img = data['bar_shelves'];
+                ctx.fillStyle = '#781900';
+                break;
             case TILE_TYPE.ROOM_WALL: // 8
                 tile_img = data['room_wall'];
                 ctx.fillStyle = '#e3b286';
@@ -242,123 +253,161 @@ export class Map {
         switch (w[5]) {
             case FURNITURE_TYPE.NONE: // -1
                 return;
-            case FURNITURE_TYPE.SINK_FRONT:
+            case FURNITURE_TYPE.SINK_FRONT: // 0
                 furniture_img =  data['sink_front'];
                 width = 24;
                 height = 33;
                 x = x + TILE_SIDE / 2 - width;
                 y = y - TILE_SIDE / 4;
                 break;
-            case FURNITURE_TYPE.SINK_LEFT:
+            case FURNITURE_TYPE.SINK_LEFT: // 1
                 furniture_img =  data['sink_left'];
                 width = 14;
                 height = 30;
                 x = x + TILE_SIDE - width * 2;
                 break;
-            case FURNITURE_TYPE.SINK_RIGHT:
+            case FURNITURE_TYPE.SINK_RIGHT: // 2
                 furniture_img =  data['sink_right'];
                 width = 14;
                 height = 30;
                 break;
-            case FURNITURE_TYPE.TUB:
+            case FURNITURE_TYPE.TUB: // 3
                 furniture_img =  data['tub'];
                 width = 62;
                 height = 28;
                 x = x + TILE_SIDE / 2 - width;
                 y = y - TILE_SIDE / 4;
                 break;
-            case FURNITURE_TYPE.BED_FRONT:
+            case FURNITURE_TYPE.BED_FRONT: // 4
                 furniture_img =  data['bed_front'];
                 width = 46;
                 height = 62;
                 x = x + TILE_SIDE / 2 - width;
                 y = y - TILE_SIDE / 4;
                 break;
-            case FURNITURE_TYPE.BED_LEFT:
+            case FURNITURE_TYPE.BED_LEFT: // 5
                 furniture_img =  data['bed_left'];
                 width = 57;
                 height = 41;
                 x = x + TILE_SIDE - width * 2;
                 break;
-            case FURNITURE_TYPE.BED_RIGHT:
+            case FURNITURE_TYPE.BED_RIGHT: // 6
                 furniture_img =  data['bed_right'];
                 width = 57;
                 height = 41;
                 break;
-            case FURNITURE_TYPE.PLANT_1:
+            case FURNITURE_TYPE.PLANT_1: // 7
                 furniture_img =  data['plant_1'];
                 width = 13;
                 height = 28;
                 x = x + TILE_SIDE / 2 - width;
                 y = y - TILE_SIDE / 4;
                 break;
-            case FURNITURE_TYPE.PLANT_2:
+            case FURNITURE_TYPE.PLANT_2: // 8
                 furniture_img =  data['plant_2'];
                 width = 25;
                 height = 28;
                 x = x + TILE_SIDE / 2 - width;
                 y = y - TILE_SIDE / 4;
                 break;
-            case FURNITURE_TYPE.PLANT_3:
+            case FURNITURE_TYPE.PLANT_3: // 9
                 furniture_img =  data['plant_3'];
                 width = 17;
                 height = 30;
                 x = x + TILE_SIDE / 2 - width;
                 y = y - TILE_SIDE / 4;
                 break;
-            case FURNITURE_TYPE.SOFA_BLUE_FRONT:
+            case FURNITURE_TYPE.SOFA_BLUE_FRONT: // 10
                 furniture_img =  data['sofa_blue_front'];
                 width = 50;
                 height = 32;
                 x = x + TILE_SIDE / 2 - width;
                 y = y - TILE_SIDE / 4;
                 break;
-            case FURNITURE_TYPE.SOFA_BLUE_LEFT:
+            case FURNITURE_TYPE.SOFA_BLUE_LEFT: // 11
                 furniture_img =  data['sofa_blue_left'];
                 width = 20;
                 height = 53;
                 x = x + TILE_SIDE - width * 2;
                 break;
-            case FURNITURE_TYPE.SOFA_BLUE_RIGHT:
+            case FURNITURE_TYPE.SOFA_BLUE_RIGHT: // 12
                 furniture_img =  data['sofa_blue_right'];
                 width = 20;
                 height = 53;
                 break;
-            case FURNITURE_TYPE.SOFA_GREEN_FRONT:
+            case FURNITURE_TYPE.SOFA_GREEN_FRONT: // 13
                 furniture_img =  data['sofa_green_front'];
                 width = 50;
                 height = 32;
                 x = x + TILE_SIDE / 2 - width;
-                y = y - TILE_SIDE / 4;
+                y = y + TILE_SIDE / 2;
                 break;
-            case FURNITURE_TYPE.SOFA_GREEN_LEFT:
+            case FURNITURE_TYPE.SOFA_GREEN_LEFT: // 14
                 furniture_img =  data['sofa_green_left'];
                 width = 20;
                 height = 53;
                 x = x + TILE_SIDE - width * 2;
                 break;
-            case FURNITURE_TYPE.SOFA_GREEN_RIGHT:
+            case FURNITURE_TYPE.SOFA_GREEN_RIGHT: // 15
                 furniture_img =  data['sofa_green_right'];
                 width = 20;
                 height = 53;
                 break;
-            case FURNITURE_TYPE.SOFA_RED_FRONT:
+            case FURNITURE_TYPE.SOFA_RED_FRONT: // 16
                 furniture_img =  data['sofa_red_front'];
                 width = 50;
                 height = 32;
                 x = x + TILE_SIDE / 2 - width;
                 y = y - TILE_SIDE / 4;
                 break;
-            case FURNITURE_TYPE.SOFA_RED_LEFT:
+            case FURNITURE_TYPE.SOFA_RED_LEFT: // 17
                 furniture_img =  data['sofa_red_left'];
                 width = 20;
                 height = 53;
                 x = x + TILE_SIDE - width * 2;
                 break;
-            case FURNITURE_TYPE.SOFA_RED_RIGHT:
+            case FURNITURE_TYPE.SOFA_RED_RIGHT: // 18
                 furniture_img =  data['sofa_red_right'];
                 width = 20;
                 height = 53;
+                break;
+            case FURNITURE_TYPE.CHEVALET: // 19
+                furniture_img = data['chevalet'];
+                width = 64;
+                height = 64;
+                x = x + TILE_SIDE / 2 - width;
+                y = y - TILE_SIDE * 0.75;
+                break;
+            case FURNITURE_TYPE.ROUND_TABLE: // 20
+                furniture_img = data['round_table'];
+                width = 18;
+                height = 22;
+                x = x + TILE_SIDE / 2 - width;
+                y = y - TILE_SIDE / 4;
+                break;
+            case FURNITURE_TYPE.BAR: // 21
+                furniture_img = data['bar'];
+                width = 64;
+                height = 37;
+                x = x + TILE_SIDE / 2 - width;
+                break;
+            case FURNITURE_TYPE.WC_FRONT: // 22
+                furniture_img = data['wc_front'];
+                width = 18;
+                height = 31;
+                x = x + TILE_SIDE / 2 - width;
+                y = y - TILE_SIDE / 4;
+                break;
+            case FURNITURE_TYPE.WC_LEFT: // 23
+                furniture_img = data['wc_left'];
+                width = 24;
+                height = 30;
+                x = x + TILE_SIDE - width * 2;
+                break;
+            case FURNITURE_TYPE.WC_RIGHT: // 24
+                furniture_img = data['wc_right'];
+                width = 24;
+                height = 30;
                 break;
         }
         ctx.drawImage(furniture_img, x, y, width * 2, height  * 2);
