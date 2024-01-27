@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", function() {
     CXT.verticalAlign = "middle";
     CXT.font = "20px arial";
     CXT.fillStyle = "black";
+    CXT.imageSmoothingEnabled = false;
 
     // GUI for game interactions
     const gui = new GUI();
@@ -95,10 +96,11 @@ document.addEventListener("DOMContentLoaded", function() {
             console.log("endGame", gui.game.player.endGame);
             if(gui.game.player.endGame === END_GAME_STATE.WIN){
                 socket.emit("endGame",{winner:gui.game.player.role});
-                gui.win();
+                gui.win(gui.game.player.role);
             }else{
-                gui.lose();
-                socket.emit("endGame",{winner:gui.game.player.role == "police" ? "killer" : "police"});
+                let winner = gui.game.player.role == "police" ? "killer" : "police";
+                gui.lose(winner);
+                socket.emit("endGame",{winner:winner});
             }
         }
         gui.render(CXT);

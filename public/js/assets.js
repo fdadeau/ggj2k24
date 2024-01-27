@@ -11,6 +11,9 @@ const data = {
     "question": "./assets/images/question.png",
     "trap": "./assets/images/trap.png",
     "carpet": "./assets/images/carpet.png",
+    "arrest": "./assets/images/arrest.png",
+    "kill": "./assets/images/kill.png",
+    "home": "./assets/images/home.png",
     
     // spritesheets
     "groom-pink-spritesheet": "./assets/spritesheets/groom_pink_spritesheet.png",

@@ -42,7 +42,7 @@ class GUI {
 
         /** buttons */
         this.buttons = {
-            "CREATE": new Button("Create game", WIDTH*0.3, HEIGHT*0.7, 140, 40),
+            "CREATE": new Button("Create game", WIDTH*0.35, HEIGHT*0.7, 140, 40),
             "JOIN": new Button("Join game", WIDTH*0.7, HEIGHT*0.7, 140, 40)
         }
 
@@ -96,12 +96,14 @@ class GUI {
         }
     }
 
-    win(){
+    win(winner){
         this.state = STATE.VICTORY;
+        this.winner = winner;
     }
 
-    lose(){
+    lose(winner){
         this.state = STATE.LOSE;
+        this.winner = winner;
     }
 
     /**
@@ -129,9 +131,12 @@ class GUI {
     }
 
     renderTitleScreen(ctx) {
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, WIDTH, HEIGHT);
+        ctx.drawImage(data["home"],16, 26, 768, 448);
         ctx.font = "24px arial";
         ctx.textAlign = "center";
-        ctx.fillText("INSERT TITLE HERE", WIDTH/2, HEIGHT/2);
+        ctx.fillText("INSERT TITLE HERE", WIDTH/2+20, HEIGHT/2);
         for (let b in this.buttons) {
           this.buttons[b].render(ctx);
         }
@@ -160,15 +165,39 @@ class GUI {
     }
 
     renderVictory(ctx) {
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, WIDTH, HEIGHT);
+        if(this.winner == "police" && this.game.player.role == "police"){
+            ctx.drawImage(data["arrest"],16, 26, 768, 448);
+        }
+        if(this.winner == "killer" && this.game.player.role == "killer"){
+            ctx.drawImage(data["kill"],16, 26, 768, 448);
+        }
+        ctx.font = "24px arial";
+        ctx.fillStyle = "white";
         ctx.textAlign = "center";
-        ctx.font = "18px arial";
-        ctx.fillText("You won !", WIDTH / 2, HEIGHT / 2);
+        ctx.fillText("Victoire !", WIDTH/2+20, HEIGHT/2);
+        for (let b in this.buttons) {
+          this.buttons[b].render(ctx);
+        }
     }
 
     renderLose(ctx) {
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, WIDTH, HEIGHT);
+        if(this.winner == "police" && this.game.player.role == "killer"){
+            ctx.drawImage(data["arrest"],16, 26, 768, 448);
+        }
+        if(this.winner == "killer" && this.game.player.role == "police"){
+            ctx.drawImage(data["kill"],16, 26, 768, 448);
+        }
+        ctx.font = "24px arial";
+        ctx.fillStyle = "white";
         ctx.textAlign = "center";
-        ctx.font = "18px arial";
-        ctx.fillText("You lost !", WIDTH / 2, HEIGHT / 2);
+        ctx.fillText("Défaite...", WIDTH/2+20, HEIGHT/2);
+        for (let b in this.buttons) {
+          this.buttons[b].render(ctx);
+        }
     }
 
     /**
