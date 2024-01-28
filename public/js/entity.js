@@ -1,5 +1,6 @@
 
 import data from "./assets.js";
+import { audio } from "./audio.js";
 
 import { FRAME_DELAY } from "./gui.js";
 
@@ -7,16 +8,22 @@ import { KILL_BACK, KILL_FRONT, KILL_LEFT, KILL_RIGHT } from "./player.js";
 
 const SPEED = 0.2;
 
-const WALK_FRONT = [0,1,2];
-const WALK_LEFT = [3,4,5];
-const WALK_RIGHT = [6,7,8];
-const WALK_BACK = [9,10,11];
+const WALK_FRONT = [0,2];
+const WALK_LEFT = [3,5];
+const WALK_RIGHT = [6,8];
+const WALK_BACK = [9,11];
 const IDLE_FRONT = [1];
 const IDLE_LEFT = [4];
 const IDLE_RIGHT = [7];
 const IDLE_BACK = [10];
 
 const DEAD = [14];
+const DIE_FRONT = [1,1,1,1,1,1,1];
+const DIE_LEFT = [4,4,4,4,4,4,4];
+const DIE_RIGHT = [7,7,7,7,7,7,7];
+const DIE_BACK = [10,10,10,10,10,10,10];
+
+const ARRESTED = [17,17,17,17,17,17,17,17,17,17];
 
 /**
  * Abstract class for entities
@@ -48,12 +55,13 @@ export class Entity {
         this.frameDelay = FRAME_DELAY;
         /** @type {Image} spritesheet used for the entity */
         this.sprite = data["groom-pink-spritesheet"];
+
+        this.alive = true;
     }
 
     update(dt) {
         this.x += this.vecX * this.speed * dt;
         this.y += this.vecY * this.speed * dt;
-
     }
 
     render(ctx) {
@@ -61,6 +69,30 @@ export class Entity {
         let frame = this.animation[this.frame];
         let col = frame % 3;
         let row = Math.floor(frame / 3);
+
+        if(this.animation == DEAD || this.animation == ARRESTED){
+            let mirrorX = 1;
+            if (this.orientation.x <= 0) {
+                mirrorX = -1;
+            }
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.scale(mirrorX, 1);
+            ctx.drawImage(
+                this.sprite,
+                col * size,
+                row * size,
+                size,
+                size,
+                -size / 2,
+                -size / 2,
+                size * 1.5,
+                size * 1.5
+            );
+
+            ctx.restore();
+            return;
+        }
 
         ctx.drawImage(
             this.sprite, 
@@ -73,14 +105,6 @@ export class Entity {
             size * 1.5, 
             size * 1.5
         );
-        
-        /*
-        ctx.fillStyle = "orange";
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, 2*Math.PI);
-        ctx.closePath();
-        ctx.fill();
-        */
     }
 
     isAvailable() {
@@ -115,6 +139,25 @@ export class Entity {
         who.talkingTo = this;
     }
 
+    arrest(arrestedBy, endFlag) {
+        this.dialog.end();
+        this.arrestedBy = arrestedBy;
+        this.endAfterThis = endFlag;
+        this.setAnimation(this.whichAnimation());
+    }
+
+    die() {
+        if (this.talkingTo !== null) {
+            this.talkingTo.talkingTo = null;
+            this.talkingTo = null;
+        }
+        this.dialog.end();
+        this.alive = false;
+        this.setAnimation(
+            this.whichAnimation()
+        );
+    }
+
     /** Sets the animation */
     setAnimation(anim){
         if (this.animation !== anim) {
@@ -123,13 +166,26 @@ export class Entity {
             this.frame = 0;
         }
     }
+
     whichAnimation() {
+        if(this.arrestedBy != null){
+            return ARRESTED;
+        }
         if(this.alive !== undefined && !this.alive){
-            return DEAD;
+            if (this.orientation.x > 0) {
+                return DIE_RIGHT;
+            }
+            if (this.orientation.x < 0) {
+                return DIE_LEFT
+            }
+            if (this.orientation.y < 0) {
+                return DIE_BACK;
+            }
+            return DIE_FRONT;
         }
         // determine animation
         if (this.vecX == 0 && this.vecY == 0) {
-            // not moving --> maybe only use IDLE_FRONT ?
+            // not moving --> maybe only use IDLE_FRONT ?*
             if (this.orientation.x > 0) {
                 return IDLE_RIGHT;
             }
@@ -155,10 +211,24 @@ export class Entity {
     updateAnimation(dt) {
         this.frameDelay -= dt;
         if (this.frameDelay <= 0) {
+            
             if(this.frame+1 == this.animation.length && (this.animation == KILL_BACK || this.animation == KILL_FRONT || this.animation == KILL_LEFT || this.animation == KILL_RIGHT)){
-                this.setAnimation(this.whichAnimation());
-                this.switchAfterKill.to.setSprite(this.sprite);
-                this.setSprite(this.switchAfterKill.skin);
+                if(this.endAfterThis != undefined){
+                    this.endGame = this.endAfterThis;
+                }else{
+                    this.setAnimation(this.whichAnimation());
+                    this.switchAfterKill.to.setSprite(this.sprite);
+                    this.setSprite(this.switchAfterKill.skin);
+                }
+            }
+
+            if(this.frame+1 == this.animation.length && (this.animation == DIE_BACK || this.animation == DIE_FRONT || this.animation == DIE_LEFT || this.animation == DIE_RIGHT)){
+                this.setAnimation(DEAD);
+            }
+
+            if(this.frame+1 == this.animation.length && this.animation == ARRESTED){
+                console.log("ARRESTED", this);
+                this.arrestedBy.endGame = this.endAfterThis;
             }
             this.frameDelay = FRAME_DELAY;
             this.frame = (this.frame + 1) % this.animation.length;

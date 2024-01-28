@@ -71,7 +71,14 @@
         [
             [0, "Qu’est-ce qu’un homme avec une mitraillette dans un champ de blé ?", 1600],
             [1, "Un américain ?", 1600],
-            [0, "Un céréale killer !", 1600]
+            [0, "Un céréale killer !", 1600],
+            [1, "Un quoi ?", 1000],
+            [0, "Un céréale killer !", 1600],
+            [1, "Un quoi ?", 1000],
+            [0, "Un céréale killer !", 1600],
+            [1, "Un quoi ?", 1000],
+            [0, "Un cé-ré-a-le killer !", 1600],
+            [1, "Ah un céréale-killer.", 1000]
         ],
         [
             [0, "Que dit la mère d'un geek quand il est l'heure de manger ?", 1600],

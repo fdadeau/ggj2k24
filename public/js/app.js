@@ -30,7 +30,6 @@ document.addEventListener("DOMContentLoaded", function() {
     // start preload
     preload(onLoad).catch(onError);
 
-
     const socket = io();//('http://localhost:5500');
 
     socket.on("newgame", function({level,role,delay}) {
