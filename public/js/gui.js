@@ -172,40 +172,38 @@ class GUI {
         }
     }
 
+    zoomIn(ctx) {
+
+  
+
+      }
+
     renderVictory(ctx) {
-        ctx.fillStyle = "black";
-        ctx.fillRect(0, 0, WIDTH, HEIGHT);
-        if(this.winner == "police" && this.game.player.role == "police"){
-            ctx.drawImage(data["arrest"],16, 26, 768, 448);
+        if(!this.endScreen){
+            const zoomFactor = 1.75;
+            ctx.scale(zoomFactor, zoomFactor);
+            ctx.translate(-200,-125);
+            this.game.render(ctx);
+            ctx.font = "bold small-caps 60px HotelMadriz";
+            ctx.fillStyle = "white";
+            ctx.textAlign = "center";
+            ctx.fillText("Victoire", WIDTH/2+20, HEIGHT/2+HEIGHT/4);
         }
-        if(this.winner == "killer" && this.game.player.role == "killer"){
-            ctx.drawImage(data["kill"],16, 26, 768, 448);
-        }
-        ctx.font = "24px arial";
-        ctx.fillStyle = "white";
-        ctx.textAlign = "center";
-        ctx.fillText("Victoire !", WIDTH/2+20, HEIGHT/2);
-        for (let b in this.buttons) {
-          this.buttons[b].render(ctx);
-        }
+        this.endScreen = true;
     }
 
     renderLose(ctx) {
-        ctx.fillStyle = "black";
-        ctx.fillRect(0, 0, WIDTH, HEIGHT);
-        if(this.winner == "police" && this.game.player.role == "killer"){
-            ctx.drawImage(data["arrest"],16, 26, 768, 448);
+        if(!this.endScreen){
+            const zoomFactor = 1.75;
+            ctx.scale(zoomFactor, zoomFactor);
+            ctx.translate(-200,-125);
+            this.game.render(ctx);
+            ctx.font = "bold small-caps 60px HotelMadriz";
+            ctx.fillStyle = "white";
+            ctx.textAlign = "center";
+            ctx.fillText("Defaite", WIDTH/2+20, HEIGHT/2+HEIGHT/4);
         }
-        if(this.winner == "killer" && this.game.player.role == "police"){
-            ctx.drawImage(data["kill"],16, 26, 768, 448);
-        }
-        ctx.font = "24px arial";
-        ctx.fillStyle = "white";
-        ctx.textAlign = "center";
-        ctx.fillText("Défaite...", WIDTH/2+20, HEIGHT/2);
-        for (let b in this.buttons) {
-          this.buttons[b].render(ctx);
-        }
+        this.endScreen = true;
     }
 
     renderControls(ctx){
@@ -285,7 +283,9 @@ class GUI {
      * @param {CanvasRenderingContext2D} ctx Drawing area
      */
     render(ctx) {
-        ctx.clearRect(0, 0, WIDTH, HEIGHT)
+        if(!(this.state == STATE.VICTORY || this.state == STATE.LOSE)){
+            ctx.clearRect(0, 0, WIDTH, HEIGHT);
+        }
         ctx.font = "10px arial";
         ctx.textAlign = "left";
         ctx.fillStyle = "black";
@@ -309,7 +309,9 @@ class GUI {
             case STATE.RUNNING:
                 this.game.render(ctx);
                 // Rendering the interaction button
-                this.interactionButton.render(ctx);
+                if(this.game.player.closestPNJ != null){
+                    this.interactionButton.render(ctx);
+                }
                 break;
             case STATE.VICTORY:
                 this.renderVictory(ctx);
