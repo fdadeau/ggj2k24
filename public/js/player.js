@@ -309,39 +309,45 @@ export class Player extends Entity {
     keyUp(key) {
         let oldVX = this.vecX;
         let oldVY = this.vecY; 
-        switch (COMMANDS[key.code]) {
-            case UP: 
-                if (this.vecY < 0) {
-                    this.vecY = 0;
-                    if (this.orientation.x != 0) {
-                        this.orientation.y = 0;
+        if (key) {
+            switch (COMMANDS[key.code]) {
+                case UP: 
+                    if (this.vecY < 0) {
+                        this.vecY = 0;
+                        if (this.orientation.x != 0) {
+                            this.orientation.y = 0;
+                        }
                     }
-                }
-                break;
-            case DOWN:
-                if (this.vecY > 0) {
-                    this.vecY = 0
-                    if (this.orientation.x != 0) {
-                        this.orientation.y = 0;
+                    break;
+                case DOWN:
+                    if (this.vecY > 0) {
+                        this.vecY = 0
+                        if (this.orientation.x != 0) {
+                            this.orientation.y = 0;
+                        }
                     }
-                }
-                break;
-            case LEFT: 
-                if (this.vecX < 0) {
-                    this.vecX = 0;
-                    if (this.orientation.y != 0) {
-                        this.orientation.x = 0;
+                    break;
+                case LEFT: 
+                    if (this.vecX < 0) {
+                        this.vecX = 0;
+                        if (this.orientation.y != 0) {
+                            this.orientation.x = 0;
+                        }
                     }
-                }
-                break;
-            case RIGHT: 
-                if (this.vecX > 0) {
-                    this.vecX = 0;
-                    if (this.orientation.y != 0) {
-                        this.orientation.x = 0;
+                    break;
+                case RIGHT: 
+                    if (this.vecX > 0) {
+                        this.vecX = 0;
+                        if (this.orientation.y != 0) {
+                            this.orientation.x = 0;
+                        }
                     }
-                }
-                break;
+                    break;
+            }
+        }
+        else {
+            this.vecX = 0;
+            this.vecY = 0;
         }
         if (this.vecX !== oldVX || this.vecY !== oldVY) {
             this.setAnimation(this.whichAnimation())

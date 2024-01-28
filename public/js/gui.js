@@ -371,6 +371,48 @@ class GUI {
     }
     dblclick(x, y) { }
     mousemove(x, y) { }
+    touchStart(x, y) {
+        if (!this.game) return;
+        let key = "";
+        if (Math.abs(x) > Math.abs(y)) {
+            key = x < 0 ? "ArrowLeft" : "ArrowRight";
+        }
+        else {
+            key = y < 0 ? "ArrowUp" : "ArrowDown";
+        }
+        if (this.lastKey !== key) {
+            this.lastKey = key;
+            let r = this.game.keydown({ code: key })
+            if (r) {
+                r.klass = key;
+            }
+            return r;
+        }
+    }
+    touchMove(x,y) {
+        if (!this.game) return;
+        let key = "";
+        if (Math.abs(x) > Math.abs(y)) {
+            key = x < 0 ? "ArrowLeft" : "ArrowRight";
+        }
+        else {
+            key = y < 0 ? "ArrowUp" : "ArrowDown";
+        }
+        if (this.lastKey !== key) {
+            this.game.keyup();
+            this.lastKey = key;
+            let r = this.game.keydown({ code: key })
+            if (r) {
+                r.klass = key;
+            }
+            return r;
+        }
+    }
+    touchEnd() {
+        if (!this.game) return;
+        this.lastKey = null;
+        return this.game.keyup()
+    }
 }
 
 

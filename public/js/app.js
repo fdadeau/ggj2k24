@@ -170,10 +170,25 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const manette = document.getElementById("manette");
     const manetteBB = manette.getBoundingClientRect();
-    document.addEventListener("touchstart", function(e) {
-        const x = e.targetTouches[0].clientX - manetteBB.left - manetteBB.width / 2;
-        const y = e.targetTouches[0].clientY - manetteBB.top - manetteBB.height / 2;
-        gui.debug = `Touch ${x},${y}`;
+    manette.addEventListener("touchstart", function(e) {
+        const x = e.changedTouches.item(0).clientX - manetteBB.left - manetteBB.width / 2;
+        const y = e.changedTouches.item(0).clientY - manetteBB.top - manetteBB.height / 2;
+        let c = gui.touchStart(x,y);
+        if (c) {
+            manette.setAttribute("class",c.klass);
+        }
+    });
+    manette.addEventListener("touchmove", function (e) {
+        const x = e.changedTouches.item(0).clientX - manetteBB.left - manetteBB.width / 2;
+        const y = e.changedTouches.item(0).clientY - manetteBB.top - manetteBB.height / 2;
+        let c = gui.touchMove(x,y);
+        if (c) {
+            manette.setAttribute("class",c.klass);
+        }
+    });
+    manette.addEventListener("touchend", function(e) {
+        gui.touchEnd();
+        manette.setAttribute("class","");
     });
 
 

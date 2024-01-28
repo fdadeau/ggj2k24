@@ -85,6 +85,19 @@ canvas:fullscreen {
 	display: block;
 }
 
+#manette.ArrowUp:before {
+	top: 20%;
+}
+#manette.ArrowDown:before {
+	top: 80%;
+}
+#manette.ArrowLeft:before {
+	left: 20%;
+}
+#manette.ArrowRight:before {
+	left: 80%;
+}
+
 #manette:before {
 	content: '';
 	display: block;
