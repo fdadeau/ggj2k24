@@ -67,7 +67,10 @@ canvas:fullscreen {
     border: none;
 }
 
-
+@font-face {
+    font-family: "HotelMadriz";
+    src: url("../assets/fonts/hotel-madriz.ttf");
+}
 
 #manette {
 	position: fixed; 
