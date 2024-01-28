@@ -296,17 +296,17 @@ export class Map {
 
     isTooCloseFromOneFurniture(x, y, size) {
         let furnitures = this.createFurnitures();
-        x = x - size;
-        y = y - size;
+        x = x - size / 2;
+        y = y - size / 2;
         for(let f of furnitures){
             // TODO
-            // if (x + size > f.x && 
-            //     x < f.x + f.width &&
-            //     y + size > f.y + size/4 &&
-            //     y < f.y + f.height - size/2
-            //     && f.id != FURNITURE_TYPE.CARPET){
-            //         return f;
-            // }
+            if (x + size > f.x && 
+                x < f.x + f.width &&
+                y + size > f.y + size/4 &&
+                y < f.y + f.height - size/2
+                && f.id != FURNITURE_TYPE.CARPET){
+                    return f;
+            }
         }
         return null;
     }
