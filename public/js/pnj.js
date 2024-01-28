@@ -32,7 +32,6 @@ export class PNJ extends Entity {
         this.time = 0;
         this.startTime = Date.now() - delay;
         this.step = 0;
-        this.alive = true;
     }
 
 

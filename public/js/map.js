@@ -123,6 +123,10 @@ export class Map {
         return this.playerStart[this.player.role];
     }
 
+    getRoomFor(x,y) {
+        return this.rooms[Math.floor(y / TILE_SIDE)][Math.floor(x / TILE_SIDE)];
+    }
+
     /** Adversary update (propagation to dedicated object) */
     updateAdversary(x, y, vecX, vecY) {
         this.adversary.updateAdversary(x,y,vecX,vecY);
@@ -155,7 +159,7 @@ export class Map {
 
         const characters = this.PNJs.filter((c) => this.player.sees(c.x, c.y));
         characters.push(this.player);
-        characters.sort(function(c1,c2) { return c1.y - c2.y; })
+        characters.sort(function(c1,c2) { return (c1.y - (c1.alive ? 0 : c1.size)) - (c2.y - (c2.alive ? 0 : c2.size)); })
         const charWithDialog = [];
         for (let c of characters) {
             c.render(ctx);

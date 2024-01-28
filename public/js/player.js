@@ -92,33 +92,7 @@ export class Player extends Entity {
     }
 
     render(ctx) {
-        super.render(ctx);
-        // let size = 48;
-        // let frame = this.animation[this.frame];
-        // let col = frame % 3;
-        // let row = Math.floor(frame / 3);
-
-        // ctx.drawImage(
-        //     this.sprite, 
-        //     col * size, 
-        //     row * size, 
-        //     size, 
-        //     size, 
-        //     this.x - size/2,
-        //     this.y -size/2,
-        //     size, 
-        //     size
-        // );
-        
-        // if (false)      // field of view (not yet finished)
-        // for (let w of this.FOV) {
-        //     ctx.beginPath();
-        //     ctx.moveTo(w[0],w[1]);
-        //     ctx.lineTo(w[2],w[3]);
-        //     ctx.closePath();
-        //     ctx.stroke();
-        // }
-        
+        super.render(ctx);        
     }
 
     renderDialog(ctx) {
@@ -130,7 +104,7 @@ export class Player extends Entity {
 
     /** Check if the object/character at position(x,y) is seen by the player */
     sees(x,y) {
-        return true;
+        return this.map.getRoomFor(this.x, this.y) == this.map.getRoomFor(x,y);
     }
 
     /** 
