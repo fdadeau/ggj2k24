@@ -8,10 +8,19 @@ module.exports = { generate };
 function generate() {
     const walls = WALLS_FLOORS;
     const furnitures = FURNITURES;
-    const PNJs = [PNJ_0,PNJ_1, PNJ_2, PNJ_3, PNJ_4 , PNJ_5 ];
+    const PNJs = [PNJ_0 ,PNJ_1, PNJ_2, PNJ_3, PNJ_4 , PNJ_5 ];
+
+    // Attributing random jokes to PNJs
+    let availableJokes = JOKES.jokes.slice();
+    PNJs.forEach(pnj => {
+        pnj.dialog = availableJokes.splice(Math.floor(Math.random() * availableJokes.length), 1)[0];
+    });
+
+    const killerJoke = availableJokes.splice(Math.floor(Math.random() * availableJokes.length), 1)[0];
+
     //const start = { police: {x: 90, y: 90 }, killer: { x: 1100, y: 650 } };
     const start = { police: {x: 600, y: 900 }, killer: { x: 600, y: 900 } };
-    return { walls, furnitures, PNJs, start, rooms };
+    return { walls, furnitures, PNJs, start, rooms, killerJoke };
 } 
 
 const TILE_SIDE = 128;
@@ -82,6 +91,7 @@ const TILE_TYPE = {
 let WALLS_FLOORS = [];
 let FURNITURES = [];
 let DISPLAY_WALLS = [];
+const JOKES = require("./public/assets/json/jokes.json");
 for (let i = 0; i < TILES.length; i++) {
     for (let j = 0; j < TILES.length; j++) {
         FURNITURES.push([TILE_SIDE * j, TILE_SIDE * i, TILE_SIDE, TILE_SIDE, FURNITURES_MAP[i][j]]) // [x, y, width, length, tyles_type, furniture_type]
@@ -214,17 +224,7 @@ const PNJ_0 = {
         [WAIT, {x: 1810, y: 142, vecX: 0, vecY: 1}, 2000],
         [WALK, {xs: 1810, ys: 142, xd: 160, yd: 142}, 10000]
     ],
-    dialog: [        [
-                [0, "Vous voulez un whisky ?", 1600],
-                [1, "Juste un doigt.", 1600],
-                [0, "Vous ne voulez pas un whisky d'abord ?", 2000]
-            ],
-            [
-                [0, "Baba et babi sont sur un bateau", 1600],
-                [1, "Babi bêle ? ", 1600],
-                [0, "et baba cool ! ", 2000]
-            ]
-    ]
+    dialog: []
 }
 
 
@@ -235,17 +235,7 @@ const PNJ_1 = {
         [WAIT, {x: 160, y: 140, vecX: 1, vecY: 0}, 3000],
         [WALK, {xs: 160, ys: 140, xd: 1800, yd: 140}, 8000]
     ],
-    dialog: [        [
-                [0, "Vous voulez un whisky ?", 1600],
-                [1, "Juste un doigt.", 1600],
-                [0, "Vous ne voulez pas un whisky d'abord ?", 2000]
-            ],
-            [
-                [0, "Baba et babi sont sur un bateau", 1600],
-                [1, "Babi bêle ? ", 1600],
-                [0, "et baba cool ! ", 2000]
-            ]
-    ]
+    dialog: []
 }
 
 randomWAIT = [0, 1000, 2000, 6000, 8000, 10000];
@@ -267,17 +257,7 @@ const PNJ_2 = {
 
         [WALK, {xs: 1800, ys: 140, xd: 180, yd: 140}, 6000]//gauche
     ],
-    dialog: [        [
-                [0, "Vous voulez un whisky ?", 1600],
-                [1, "Juste un doigt.", 1600],
-                [0, "Vous ne voulez pas un whisky d'abord ?", 2000]
-            ],
-            [
-                [0, "Baba et babi sont sur un bateau", 1600],
-                [1, "Babi bêle ? ", 1600],
-                [0, "et baba cool ! ", 2000]
-            ]
-    ]
+    dialog: []
 }
 
 
@@ -297,17 +277,7 @@ const PNJ_3 = {
 
         [WALK, {xs: 180, ys: 1020, xd: 180, yd: 120}, 6000]//haut
     ],
-    dialog: [        [
-                [0, "Vous voulez un whisky ?", 1600],
-                [1, "Juste un doigt.", 1600],
-                [0, "Vous ne voulez pas un whisky d'abord ?", 2000]
-            ],
-            [
-                [0, "Baba et babi sont sur un bateau", 1600],
-                [1, "Babi bêle ? ", 1600],
-                [0, "et baba cool ! ", 2000]
-            ]
-    ]
+    dialog: []
 }
 
 const PNJ_4 = { //visite piece centre
@@ -344,17 +314,7 @@ const PNJ_4 = { //visite piece centre
         [WALK, {xs: 830, ys: 1010, xd: 180, yd: 1010}, 10000],//gauche 2
         [WAIT, {x: 180, y: 1010, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]]
     ],
-    dialog: [        [
-                [0, "Vous voulez un whisky ?", 1600],
-                [1, "Juste un doigt.", 1600],
-                [0, "Vous ne voulez pas un whisky d'abord ?", 2000]
-            ],
-            [
-                [0, "2Baba et babi sont sur un bateau", 1600],
-                [1, "2Babi bêle ? ", 1600],
-                [0, "2et baba cool ! ", 2000]
-            ]
-    ]
+    dialog: []
 }
 
 
@@ -396,17 +356,7 @@ const PNJ_5 = { //visite piece centre avec scenar salle de bain
         [WALK, {xs: 835, ys: 1015, xd: 185, yd: 1015}, 10000],//gauche 2
         [WAIT, {x: 185, y: 1015, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]]
     ],
-    dialog: [        [
-                [0, "Vous voulez un whisky ?", 1600],
-                [1, "Juste un doigt.", 1600],
-                [0, "Vous ne voulez pas un whisky d'abord ?", 2000]
-            ],
-            [
-                [0, "2Baba et babi sont sur un bateau", 1600],
-                [1, "2Babi bêle ? ", 1600],
-                [0, "2et baba cool ! ", 2000]
-            ]
-    ]
+    dialog: []
 }
 
 

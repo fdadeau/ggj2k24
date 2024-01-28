@@ -28,7 +28,7 @@ export class PNJ extends Entity {
             obj.endTime = t;
             return obj;
         });
-        this.dialog = new Dialog(dialog[1]);
+        this.dialog = new Dialog(dialog);
         this.time = 0;
         this.startTime = Date.now() - delay;
         this.step = 0;
@@ -154,13 +154,11 @@ export class PNJ extends Entity {
 
 export class Adversary extends Entity {
 
-    constructor(x,y,vecX,vecY,size,role,map) {
+    constructor(x,y,vecX,vecY,size,role,map, dialog) {
         super(x,y,vecX,vecY,size);
         this.role = role;
         this.map = map;
-        this.dialog = (role == "police") ? 
-            new Dialog([[0,"Ecoutez laissez la police faire son travail.", 1000],[0,"Dès que nous aurons de plus amples informations,", 1000],[0,"vous en serez les premiers informés.",1000]]) :
-            new Dialog([[0,"Tu veux un whisky ?",1000]]);
+        this.dialog = new Dialog(dialog);
         this.oldVecX;
         this.oldVecY;
     }
