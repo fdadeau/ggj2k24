@@ -98,8 +98,9 @@ class GUI {
 
     start() {
         this.state = STATE.TITLE_SCREEN;
-        if(!audio.audioIsPlaying("theme")){
-            audio.playMusic("theme", 1); 
+        if(!audio.audioIsPlaying("theme_sing")){
+            // TODO : reactivate
+            //**audio.playMusic("theme_sing", 0.5); 
         }
     }
 
@@ -140,8 +141,8 @@ class GUI {
     renderTitleScreen(ctx) {
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, WIDTH, HEIGHT);
-        ctx.drawImage(data["home_shiny"],16, 26, 768, 448);
-        ctx.drawImage(data["title"],WIDTH / 2 - 280/2, HEIGHT/2 - 80 * 0.75, 280, 80);
+        ctx.drawImage(data["home_shiny_scene"],16, 26, 768, 448);
+        ctx.drawImage(data["title"],WIDTH / 2 - 280/2, HEIGHT/2 - 80/2, 280, 80);
         ctx.drawImage(data["logoGGJ"], WIDTH - 100, HEIGHT - 110, 80, 80);
         for (let b in this.buttons) {
           this.buttons[b].render(ctx);
@@ -209,7 +210,7 @@ class GUI {
     renderControls(ctx){
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, WIDTH, HEIGHT);
-        ctx.drawImage(data["home"],16, 26, 768, 448);
+        ctx.drawImage(data["home_scene"],16, 26, 768, 448);
         ctx.drawImage(data["carpet"], 100, 50, 600, 400);
         ctx.fillStyle = '#ffd728';
         ctx.font = "bold small-caps 25px HotelMadriz";
@@ -233,7 +234,7 @@ class GUI {
     renderCredits(ctx){
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, WIDTH, HEIGHT);
-        ctx.drawImage(data["home"],16, 26, 768, 448);
+        ctx.drawImage(data["home_scene"],16, 26, 768, 448);
         ctx.drawImage(data["carpet"], 100, 50, 600, 400);
         ctx.fillStyle = '#ffd728';
         ctx.font = "bold small-caps 25px HotelMadriz";

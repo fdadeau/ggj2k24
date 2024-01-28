@@ -12,10 +12,10 @@ const data = {
     "question": "./assets/images/question.png",
     "trap": "./assets/images/trap.png",
     "carpet": "./assets/images/carpet.png",
-    "arrest": "./assets/images/arrest.png",
-    "kill": "./assets/images/kill.png",
-    "home": "./assets/images/home.png",
-    "home_shiny": "./assets/images/home_shiny.png",
+    "arrest_scene": "./assets/images/arrest.png",
+    "kill_scene": "./assets/images/kill.png",
+    "home_scene": "./assets/images/home.png",
+    "home_shiny_scene": "./assets/images/home_shiny.png",
     "title": "./assets/images/title.png",
     
     // tiles textures
@@ -66,12 +66,31 @@ const data = {
     "groom-pink-spritesheet": "./assets/spritesheets/groom_pink_spritesheet.png",
     "groom-blue-spritesheet": "./assets/spritesheets/groom_blue_spritesheet.png",
     "groom-red-spritesheet": "./assets/spritesheets/groom_red_spritesheet.png",
+
     "default-spritesheet": "./assets/spritesheets/default_spritesheet.png",
 
+    "chad-spritesheet": "./assets/spritesheets/chad_spritesheet.png",
+
+    "madame-blue-spritesheet": "./assets/spritesheets/madame_blue_spritesheet.png",
+    "madame-pink-spritesheet": "./assets/spritesheets/madame_pink_spritesheet.png",
+    "madame-yellow-spritesheet": "./assets/spritesheets/madame_yellow_spritesheet.png",
+
+    "costume-brown-spritesheet": "./assets/spritesheets/costume_brown_spritesheet.png",
+    "costume-green-spritesheet": "./assets/spritesheets/costume_green_spritesheet.png",
+
+
     // music 
+    "theme": "./assets/sounds/theme.m4a",
+    "theme_sing": "./assets/sounds/theme_sing.m4a",
 
     // sound effects
-    "theme": "./assets/sounds/theme.m4a",
+    "kill": "./assets/sounds/kill.m4a",
+    "die": "./assets/sounds/die.mp3",
+    "trap_sound": "./assets/sounds/trap.m4a",
+    "footsteps": "./assets/sounds/footsteps.m4a",
+    "speak1": "./assets/sounds/speak1.m4a",
+    "speak2": "./assets/sounds/speak2.m4a",
+    
 }
 
 export default data; 

@@ -5,6 +5,7 @@ import { Entity } from "./entity.js";
 import { Adversary, Dialog } from "./pnj.js";
 
 import { FRAME_DELAY } from "./gui.js";
+import { audio } from "./audio.js";
 
 const SPEED = 0.2;
 
@@ -16,10 +17,10 @@ export const INTERACTION_TIMER = 5000;
 
 export const END_GAME_STATE = {"WIN": 1, "LOSE": -1, "RUNNING": 0};
 
-export const KILL_FRONT = [12,13,12];
-export const KILL_RIGHT = [15,16,15];
-export const KILL_LEFT = [18,19,18];
-export const KILL_BACK = [21,22,21];
+export const KILL_FRONT = [12,13,12,13,12,13];
+export const KILL_RIGHT = [15,16,15,16,15,16];
+export const KILL_LEFT = [18,19,18,19,18,19];
+export const KILL_BACK = [21,22,21,22,21,22];
 
 export class Player extends Entity {
 
@@ -54,6 +55,8 @@ export class Player extends Entity {
         this.sprite = data[skin];
         this.animation = this.whichAnimation();
         this.switchAfterKill = null;
+
+        audio.playSound("footsteps",1,1,true);
     }
 
     update(dt) {
@@ -73,6 +76,19 @@ export class Player extends Entity {
         if (wall == null) {
             this.x = newX;
             this.y = newY;
+            if(this.vecX != 0 || this.vecY != 0){
+                if(!audio.audioIsPlaying(1)){
+                    audio.resume(1);
+                }
+            }else{
+                if(audio.audioIsPlaying(1)){
+                    audio.pause(1);
+                }
+            }
+        }else{
+            if(audio.audioIsPlaying(1)){
+                audio.pause(1);
+            }
         }
 
         if(this.timeToInteract > 0){
@@ -119,6 +135,9 @@ export class Player extends Entity {
             this.setOrientationToFace(this.closestPNJ.pnj.x, this.closestPNJ.pnj.y);
             this.setAnimation(this.whichAnimation());
             this.timeToInteract = INTERACTION_TIMER;
+            if(audio.audioIsPlaying(1)){
+                audio.pause(1);
+            }
         }
     }
 
@@ -194,11 +213,13 @@ export class Player extends Entity {
      */
     kill(){
         if(this.talkingTo != null){
+            audio.playSound("kill",2,1,false);
             this.setAnimation(
                 this.whichKillAnimation()
             );
             if(this.talkingTo instanceof Adversary){
-                this.endGame = END_GAME_STATE.LOSE;
+                this.endAfterThis = END_GAME_STATE.LOSE;
+                this.talkingTo.die();
             }else{
                 this.switchAfterKill = {
                     to: this.talkingTo,
@@ -226,11 +247,14 @@ export class Player extends Entity {
      */
     arrest(){
         if(this.talkingTo != null){
+            this.dialog.end();
+            audio.playSound("trap_sound",6,1,false);
             if(this.talkingTo instanceof Adversary){
-                this.endGame = END_GAME_STATE.WIN;
+                this.talkingTo.arrest(this, END_GAME_STATE.WIN);
             }else{
-                this.endGame = END_GAME_STATE.LOSE;
-            }  
+                this.talkingTo.arrest(this, END_GAME_STATE.LOSE);
+            }
+            console.log("arrested");
         }
     }
 
