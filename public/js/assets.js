@@ -86,7 +86,7 @@ const data = {
     // sound effects
     "kill": "./assets/sounds/kill.m4a",
     "die": "./assets/sounds/die.mp3",
-    "trap_sound": "./assets/sounds/trap.m4a",
+    "trap_sound": "./assets/sounds/trap.mp3",
     "footsteps": "./assets/sounds/footsteps.m4a",
     "speak1": "./assets/sounds/speak1.m4a",
     "speak2": "./assets/sounds/speak2.m4a",

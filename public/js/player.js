@@ -22,6 +22,11 @@ export const KILL_RIGHT = [15,16,15,16,15,16];
 export const KILL_LEFT = [18,19,18,19,18,19];
 export const KILL_BACK = [21,22,21,22,21,22];
 
+export const ARREST_FRONT = [1,1,1,1,1,1,1];
+export const ARREST_LEFT = [4,4,4,4,4,4,4];
+export const ARREST_RIGHT = [7,7,7,7,7,7,7];
+export const ARREST_BACK = [10,10,10,10,10,10,10];
+
 export class Player extends Entity {
 
     constructor(role, map, skin) {
@@ -237,9 +242,19 @@ export class Player extends Entity {
             return KILL_LEFT;
         }else if(this.orientation.y == 1){
             return KILL_FRONT;
-        }else if(this.orientation.y == -1){
-            return KILL_BACK;
         }
+        return KILL_BACK;
+    }
+
+    whichArrestAnimation(){
+        if(this.orientation.x == 1){
+            return ARREST_RIGHT;
+        }else if(this.orientation.x == -1){
+            return ARREST_LEFT;
+        }else if(this.orientation.y == 1){
+            return ARREST_FRONT;
+        }
+        return ARREST_BACK;
     }
 
     /**
@@ -249,6 +264,9 @@ export class Player extends Entity {
         if(this.talkingTo != null){
             this.dialog.end();
             audio.playSound("trap_sound",6,1,false);
+            this.setAnimation(
+                this.whichArrestAnimation()
+            );
             if(this.talkingTo instanceof Adversary){
                 this.talkingTo.arrest(this, END_GAME_STATE.WIN);
             }else{

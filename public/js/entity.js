@@ -4,7 +4,7 @@ import { audio } from "./audio.js";
 
 import { FRAME_DELAY } from "./gui.js";
 
-import { KILL_BACK, KILL_FRONT, KILL_LEFT, KILL_RIGHT } from "./player.js";
+import { KILL_BACK, ARREST_BACK, ARREST_FRONT, ARREST_LEFT, ARREST_RIGHT, KILL_FRONT, KILL_LEFT, KILL_RIGHT } from "./player.js";
 
 const SPEED = 0.2;
 
@@ -153,6 +153,7 @@ export class Entity {
         }
         this.dialog.end();
         this.alive = false;
+        audio.playSound("die", 42, 0.5, false);
         this.setAnimation(
             this.whichAnimation()
         );
@@ -227,8 +228,9 @@ export class Entity {
             }
 
             if(this.frame+1 == this.animation.length && this.animation == ARRESTED){
-                console.log("ARRESTED", this);
+                //audio.playSound("die", 42, 0.5, false);
                 this.arrestedBy.endGame = this.endAfterThis;
+                console.log(this.arrestedBy)
             }
             this.frameDelay = FRAME_DELAY;
             this.frame = (this.frame + 1) % this.animation.length;
