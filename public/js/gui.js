@@ -216,7 +216,11 @@ class GUI {
         ctx.fillStyle = '#ffd728';
         ctx.font = "bold small-caps 25px arial";
         ctx.fillText('Concept', 320, 160);
-        ctx.fillText('Controls', 320, 330);
+        ctx.fillText('Inspector : Arrest the murderer !', 160, 200);
+        ctx.fillText('Murderer : Kill without being caught !', 160, 240);
+        ctx.fillText('Controls', 320, 280);
+        ctx.fillText('Arrows to move', 180, 320);
+        ctx.fillText('Space to use an object', 180, 360);
 
         this.closeButton.render(ctx);
     }
