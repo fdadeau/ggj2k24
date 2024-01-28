@@ -68,7 +68,18 @@ const FURNITURE_TYPE = {
     WC_LEFT: 23,
     WC_RIGHT: 24,
     CARPET: 25,
-}
+    PIANO_LEFT: 26,
+    PIANO_RIGHT: 27,
+    SOFA_GREEN_CAT: 28,
+    SOFA_RED_CAT_1: 29,
+    SOFA_RED_CAT_2: 30,
+    RABBIT: 31,
+
+    ROOM_VERTICAL_DOOR_LEFT: 32,
+    ROOM_VERTICAL_DOOR_RIGHT: 33,
+    BATHROOM_VERTICAL_DOOR_LEFT: 34,
+    BATHROOM_VERTICAL_DOOR_RIGHT: 35,
+};
 
 export class Map {
 
@@ -91,7 +102,6 @@ export class Map {
         // Giving a random skin to each PNJ
         for (let p in this.PNJs) {
             let skin = skins[Math.floor(Math.random() * skins.length)];
-            console.log("skin", skin);
             skins = skins.filter(s => s != skin);
             this.PNJs[p].sprite = data[skin];
             if(skins.length == 0){
@@ -152,18 +162,16 @@ export class Map {
             this.renderTiles(ctx, w);
         }
 
-        for (let w of this.furnitures) {
-            this.renderFurnitures(ctx, w);
-        }
-
+        const furnitures = this.createFurnitures();
         const characters = this.PNJs.filter((c) => this.player.sees(c.x, c.y));
+        characters.push(...furnitures);
         characters.push(this.player);
         characters.sort(function(c1,c2) { return (c1.y - (c1.alive ? 0 : c1.size)) - (c2.y - (c2.alive ? 0 : c2.size)); })
         const charWithDialog = [];
         for (let c of characters) {
             c.render(ctx);
             // small dot to indicate closest PNJ
-            if (this.player.closestPNJ && this.player.closestPNJ.pnj == c && c.isAvailable()) {
+            if (c instanceof PNJ && this.player.closestPNJ && this.player.closestPNJ.pnj == c && c.isAvailable()) {
                 ctx.strokeStyle = "black";
                 ctx.beginPath();
                 ctx.lineWidth = 1;
@@ -289,15 +297,20 @@ export class Map {
                 ctx.fillStyle = '#6d2a02';
                 break;
             case TILE_TYPE.ROOM_VERTICAL_DOOR: // 13
+                ctx.fillStyle = '#96502e';
+                break;
             case TILE_TYPE.BAR_VERTICAL_DOOR: // 14
+                ctx.fillStyle = '#772b09';
+                break;
             case TILE_TYPE.CORRIDOR_VERTICAL_DOOR: // 15
-                ctx.fillStyle = '#6d2a02';
+                tile_img = data['planks_floor'];
+                ctx.fillStyle = '#916023';
                 break;
             case TILE_TYPE.BATHROOM_HORIZONTAL_DOOR: // 16
-                ctx.fillStyle = '#10585d';
+                ctx.fillStyle = '#7fb9bd';
                 break;
             case TILE_TYPE.BATHROOM_VERTICAL_DOOR: // 17
-                ctx.fillStyle = '#10585d';
+                ctx.fillStyle = '#7fb9bd';
                 break;
         }
 
@@ -308,6 +321,16 @@ export class Map {
         }
     }
 
+    createFurnitures() {
+        let furnitures_objects = [];
+        for (let f of this.furnitures) {
+            if (f[2] != FURNITURE_TYPE.NONE) {
+                furnitures_objects.push(new Furniture(f[0], f[1], f[2]));
+            }
+        }
+        return furnitures_objects;
+    }
+
     renderFurnitures(ctx, w) {
         let furniture = this.getFurniture(w);
         if (furniture != null) {
@@ -315,192 +338,18 @@ export class Map {
         }
     }
 
-    getFurniture(w) {
-        let x = w[0];
-        let y = w[1];
-        let furniture_img = null;
-        let width = null;
-        let height = null;
-
-        switch (w[4]) {
-            case FURNITURE_TYPE.NONE: // -1
-                return null;
-            case FURNITURE_TYPE.SINK_FRONT: // 0
-                furniture_img =  data['sink_front'];
-                width = 24;
-                height = 33;
-                x = x + TILE_SIDE / 2 - width;
-                y = y - TILE_SIDE / 4;
-                break;
-            case FURNITURE_TYPE.SINK_LEFT: // 1
-                furniture_img =  data['sink_left'];
-                width = 14;
-                height = 30;
-                x = x + TILE_SIDE - width * 2;
-                break;
-            case FURNITURE_TYPE.SINK_RIGHT: // 2
-                furniture_img =  data['sink_right'];
-                width = 14;
-                height = 30;
-                break;
-            case FURNITURE_TYPE.TUB: // 3
-                furniture_img =  data['tub'];
-                width = 62;
-                height = 28;
-                x = x + TILE_SIDE / 2 - width;
-                y = y - TILE_SIDE / 4;
-                break;
-            case FURNITURE_TYPE.BED_FRONT: // 4
-                furniture_img =  data['bed_front'];
-                width = 46;
-                height = 62;
-                x = x + TILE_SIDE / 2 - width;
-                y = y - TILE_SIDE / 4;
-                break;
-            case FURNITURE_TYPE.BED_LEFT: // 5
-                furniture_img =  data['bed_left'];
-                width = 57;
-                height = 41;
-                x = x + TILE_SIDE - width * 2;
-                break;
-            case FURNITURE_TYPE.BED_RIGHT: // 6
-                furniture_img =  data['bed_right'];
-                width = 57;
-                height = 41;
-                break;
-            case FURNITURE_TYPE.PLANT_1: // 7
-                furniture_img =  data['plant_1'];
-                width = 13;
-                height = 28;
-                x = x + TILE_SIDE / 2 - width;
-                y = y - TILE_SIDE / 4;
-                break;
-            case FURNITURE_TYPE.PLANT_2: // 8
-                furniture_img =  data['plant_2'];
-                width = 25;
-                height = 28;
-                x = x + TILE_SIDE / 2 - width;
-                y = y - TILE_SIDE / 4;
-                break;
-            case FURNITURE_TYPE.PLANT_3: // 9
-                furniture_img =  data['plant_3'];
-                width = 17;
-                height = 30;
-                x = x + TILE_SIDE / 2 - width;
-                y = y - TILE_SIDE / 4;
-                break;
-            case FURNITURE_TYPE.SOFA_BLUE_FRONT: // 10
-                furniture_img =  data['sofa_blue_front'];
-                width = 50;
-                height = 32;
-                x = x + TILE_SIDE / 2 - width;
-                y = y - TILE_SIDE / 4;
-                break;
-            case FURNITURE_TYPE.SOFA_BLUE_LEFT: // 11
-                furniture_img =  data['sofa_blue_left'];
-                width = 20;
-                height = 53;
-                x = x + TILE_SIDE - width * 2;
-                break;
-            case FURNITURE_TYPE.SOFA_BLUE_RIGHT: // 12
-                furniture_img =  data['sofa_blue_right'];
-                width = 20;
-                height = 53;
-                break;
-            case FURNITURE_TYPE.SOFA_GREEN_FRONT: // 13
-                furniture_img =  data['sofa_green_front'];
-                width = 50;
-                height = 32;
-                x = x + TILE_SIDE / 2 - width;
-                y = y + TILE_SIDE / 2;
-                break;
-            case FURNITURE_TYPE.SOFA_GREEN_LEFT: // 14
-                furniture_img =  data['sofa_green_left'];
-                width = 20;
-                height = 53;
-                x = x + TILE_SIDE - width * 2;
-                break;
-            case FURNITURE_TYPE.SOFA_GREEN_RIGHT: // 15
-                furniture_img =  data['sofa_green_right'];
-                width = 20;
-                height = 53;
-                break;
-            case FURNITURE_TYPE.SOFA_RED_FRONT: // 16
-                furniture_img =  data['sofa_red_front'];
-                width = 50;
-                height = 32;
-                x = x + TILE_SIDE / 2 - width;
-                y = y - TILE_SIDE / 4;
-                break;
-            case FURNITURE_TYPE.SOFA_RED_LEFT: // 17
-                furniture_img =  data['sofa_red_left'];
-                width = 20;
-                height = 53;
-                x = x + TILE_SIDE - width * 2;
-                break;
-            case FURNITURE_TYPE.SOFA_RED_RIGHT: // 18
-                furniture_img =  data['sofa_red_right'];
-                width = 20;
-                height = 53;
-                break;
-            case FURNITURE_TYPE.CHEVALET: // 19
-                furniture_img = data['chevalet'];
-                width = 64;
-                height = 64;
-                x = x + TILE_SIDE / 2 - width;
-                y = y - TILE_SIDE * 0.75;
-                break;
-            case FURNITURE_TYPE.ROUND_TABLE: // 20
-                furniture_img = data['round_table'];
-                width = 18;
-                height = 22;
-                x = x + TILE_SIDE / 2 - width;
-                y = y - TILE_SIDE / 4;
-                break;
-            case FURNITURE_TYPE.BAR: // 21
-                furniture_img = data['bar'];
-                width = 64;
-                height = 37;
-                x = x + TILE_SIDE / 2 - width;
-                break;
-            case FURNITURE_TYPE.WC_FRONT: // 22
-                furniture_img = data['wc_front'];
-                width = 18;
-                height = 31;
-                x = x + TILE_SIDE / 2 - width;
-                y = y - TILE_SIDE / 4;
-                break;
-            case FURNITURE_TYPE.WC_LEFT: // 23
-                furniture_img = data['wc_left'];
-                width = 24;
-                height = 30;
-                x = x + TILE_SIDE - width * 2;
-                break;
-            case FURNITURE_TYPE.WC_RIGHT: // 24
-                furniture_img = data['wc_right'];
-                width = 24;
-                height = 30;
-                break;
-            case FURNITURE_TYPE.CARPET: // 25
-                furniture_img = data['carpet'];
-                width = 64;
-                height = 32;
-                x = x + TILE_SIDE - width * 2;
-                break;
-        }
-        return {img: furniture_img, x: x, y: y, width: width, height: height};
-    }
-
     isTooCloseFromOneFurniture(x, y, size) {
-        for(let f of this.furnitures){
-            let furniture = this.getFurniture(f);
-            if(furniture !== null &&
-                x + size > furniture.x && 
-                x < furniture.x + furniture.width + TILE_SIDE / 4 &&
-                y + size > furniture.y &&
-                y < furniture.y + furniture.height &&
-                f[4] != FURNITURE_TYPE.CARPET){
-                    return furniture;
+        let furnitures = this.createFurnitures();
+        x = x - size / 2;
+        y = y - size / 2;
+        for(let f of furnitures){
+            // TODO
+            if (x + size > f.x && 
+                x < f.x + f.width &&
+                y + size > f.y + size/4 &&
+                y < f.y + f.height - size/2
+                && f.id != FURNITURE_TYPE.CARPET){
+                    return f;
             }
         }
         return null;
@@ -524,7 +373,7 @@ export class Map {
         } 
 
         // Check collision with furnitures
-        return this.isTooCloseFromOneFurniture(x, y, size);
+        return this.isTooCloseFromOneFurniture(x, y, size * 2);
     }
 
 
@@ -534,3 +383,67 @@ export class Map {
     }
 }
 
+class Furniture {
+
+    constructor(x, y, id) {
+        this.id = id;
+        this.name = this.getFurnitureNameByID(id);
+        this.img = data[this.name];
+        this.width = this.img.width;
+        this.height = this.img.height;
+        let split = this.name.split('_');
+        this.position = split[split.length - 1];
+
+        switch(this.position) {
+            case 'left':
+                this.x = x + TILE_SIDE - this.width * 2;
+                this.y = y;
+                break;
+            case 'right':
+                this.x = x;
+                this.y = y;
+                break;
+            case 'front':
+            default:
+                this.x = x + TILE_SIDE / 2 - this.width;
+                if (this.name.includes("green")) {
+                    this.y = y + TILE_SIDE / 2;
+                } else if (this.name.includes("door")) { 
+                    this.y = y;
+                } else if (this.name == 'chevalet') {
+                    this.y = y - TILE_SIDE * 0.75;
+                } else if (this.name == 'bar') {
+                    this.y = y;
+                } else if (this.name == 'rabbit') {
+                    this.y = y + TILE_SIDE / 2;
+                } else { 
+                    this.y = y - TILE_SIDE / 4;
+                }
+        }
+    }
+
+    getFurnitureNameByID(id) {
+        for (const furniture_name in FURNITURE_TYPE) {
+            if (FURNITURE_TYPE[furniture_name] === id) {
+                return furniture_name.toLowerCase();
+            }
+        }
+        return false;
+    }
+
+    render(ctx) {
+        // ctx.fillStyle = '#f00';
+        // ctx.fillRect(this.x, this.y, this.width * 2, this.height * 2)
+        ctx.drawImage(
+            this.img, 
+            this.x, 
+            this.y, 
+            this.width * 2, 
+            this.height * 2, 
+            // this.x - this.width/2,
+            // this.y -this.height/2,
+            // this.width * 1.5, 
+            // this.height * 1.5
+        );
+    }
+}
