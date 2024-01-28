@@ -12,7 +12,90 @@
         ],
         [
             [0, "Tires sur mon doigt...", 1600],
-            [1, "PROUT !", 1600]
+            [1, "...", 1600],
+            [0, "PROUT !", 1600]
+        ],
+        [
+            [0, "Que dit-on à une banane qui fête son anniversaire ?", 1600],
+            [1, "Je sais pas..", 1600],
+            [0, "Bananniversaire !", 1600]
+        ],
+        [
+            [0, "Quel fruit est assez fort pour couper des arbres ?", 1600],
+            [1, "Je sais pas.. La pomme ?", 1600],
+            [0, "Eh non, c'est le citron ! Parce que scie-tronc", 1600]
+        ],
+        [
+            [0, "Quels sont les arbres les plus en forme ?", 1600],
+            [1, "Les bonsaïs ?", 1600],
+            [0, "Les pêchers, parce qu'ils ont la pêche !", 1600]
+        ],
+        [
+            [0, "Pourquoi les cochons sont-ils heureux ?", 1600],
+            [1, "Aucune idée..", 1600],
+            [0, "Parce qu'ils voient la vie en rose !", 1600]
+        ],
+        [
+            [0, "Quel animal est toujours bien habillé ?", 1600],
+            [1, "Je sais pas ?", 1600],
+            [0, "La taupe modèle ! Parce que ça sonne comme top modèle..", 1600]
+        ],
+        [
+            [0, "Que dit un chat quand il est surpris ?", 1600],
+            [1, "Euh.. Je donne ma langue au chat.", 1600],
+            [0, "Cha alors !", 1600]
+        ],
+        [
+            [0, "Pourquoi les pommes sont-elles sucrées ?", 1600],
+            [1, "Parce que ce sont des fruits ?", 1600],
+            [0, "Parce que si elles étaient salées, ça serait beaucoup moins bon !", 1600]
+        ],
+        [
+            [0, "Pourquoi ne faut-il jamais raconter de blague à un ballon ?", 1600],
+            [1, "Ne me dis pas que c'est..", 1600],
+            [0, "Car il pourrait éclater de rire ! Haha", 1600]
+        ],
+        [
+            [0, "Tu veux que je te raconte une blaque ?", 1600],
+            [1, "Non..", 1600],
+            [0, "Un chêne veut tricoter un pull.", 1600],
+            [0, "Il se penche vers un sapin et lui demande :", 1600],
+            [0, "Tu peux me prêter une aiguille ?", 1600]
+        ],
+        [
+            [0, "Deux oeufs sont sur une poêle", 1600],
+            [1, "Et ?", 1600],
+            [0, "L'un deux dit 'Ouah, il fait chaud ici !'", 1600],
+            [0, "Et l'autre répond 'AAAH, UN OEUF QUI PARLE !!", 1600] 
+        ],
+        [
+            [0, "Qu’est-ce qu’un homme avec une mitraillette dans un champ de blé ?", 1600],
+            [1, "Un américain ?", 1600],
+            [0, "Un céréale killer !", 1600]
+        ],
+        [
+            [0, "Que dit la mère d'un geek quand il est l'heure de manger ?", 1600],
+            [1, "Viens manger ?", 1600],
+            [0, "Alt Tab.", 1600]
+        ],
+        [
+            [0, "Savez-vous qui est Bob Marlex ?", 1600],
+            [1, "Non ? C'est qui ?", 1600],
+            [0, "C'est un chanteur de regex !", 1600]
+        ],
+        [
+            [0, "Quand je suis content, je commit !", 1600]
+        ],
+        [
+            [0, "C'est l'histoire d'un administrateur qui configure ses variables d'environnement.", 1600],
+            [0, "Et là....", 1600],
+            [0, "PATH le chemin !", 1600]
+        ],
+        [
+            [0, "Pourquoi est ce qu'un clavier français a deux fois plus de touches qu'un clavier américain ?", 1600],
+            [1, "Je sais pas.", 1600],
+            [0, "Parce qu'un clavier 'AZERTY' en vaut deux", 1600]
         ]
     ]
+    
 }
