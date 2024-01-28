@@ -8,7 +8,7 @@ module.exports = { generate };
 function generate() {
     const walls = WALLS_FLOORS;
     const furnitures = FURNITURES;
-    const PNJs = [PNJ_0 ,PNJ_1, PNJ_2, PNJ_3, PNJ_4 , PNJ_5, PNJ_6 ];
+    const PNJs = [PNJ_0 ,PNJ_1, PNJ_2, PNJ_3, PNJ_4 , PNJ_5, PNJ_6, PNJ_7 ];
 
     // Attributing random jokes to PNJs
     let availableJokes = JOKES.jokes.slice();
@@ -236,7 +236,7 @@ const PNJ_1 = {
     dialog: []
 }
 
-randomWAIT = [0, 10, 100, 1000, 2000, 6000, 8000, 10000];
+randomWAIT = [0, 10, 100, 300, 1000, 2000, 6000, 10000];
 
 
 const PNJ_2 = { 
@@ -281,6 +281,8 @@ const PNJ_3 = {
 
 const PNJ_4 = { //visite piece centre
     scenario: [
+
+        [WAIT, {x: 180, y: 1010, vecX: -1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
         [WALK, {xs: 180, ys: 1010, xd: 920, yd: 1010}, 4035],//droite 1  done
         [WAIT, {x: 920, y: 1010, vecX: 1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
         [WALK, {xs: 920, ys: 1010, xd: 1800, yd: 1010}, 4796],//droite 2 done
@@ -310,8 +312,7 @@ const PNJ_4 = { //visite piece centre
         [WALK, {xs: 830, ys: 550, xd: 830, yd: 1010}, 2507],//gauche 2 done
         [WAIT, {x: 830, y: 1010, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
 
-        [WALK, {xs: 830, ys: 1010, xd: 180, yd: 1010}, 981],//gauche 2 done
-        [WAIT, {x: 180, y: 1010, vecX: -1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]]
+        [WALK, {xs: 830, ys: 1010, xd: 180, yd: 3545}, ]//gauche 2 done
     ],
     dialog: []
 }
@@ -362,16 +363,16 @@ const PNJ_5 = { //visite piece centre avec scenar salle de bain
 
 const PNJ_6 = { //visite piece bas
     scenario: [
-        [WALK, {xs: 400, ys: 1015, xd: 950, yd: 1015}, 2915],//droite 1
+        [WALK, {xs: 400, ys: 1015, xd: 950, yd: 1015}, 2925],//droite 1
         [WAIT, {x: 950, y: 1015, vecX: 1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]] ,
 
-        [WALK, {xs: 950, ys: 1015, xd: 950, yd: 1550}, 2943],//couloir vers bas 1
+        [WALK, {xs: 950, ys: 1015, xd: 950, yd: 1550}, 2953],//couloir vers bas 1
         [WAIT, {x: 950, y: 1550, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]] ,
 
-        [WALK, {xs: 950, ys: 1550, xd: 350, yd: 1550}, 3300],// bas 1 vers piece gauche
-        [WAIT, {x: 350, y: 1550, vecX: -1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]] ,
+        [WALK, {xs: 950, ys: 1550, xd: 410, yd: 1550}, 3320],// bas 1 vers piece gauche
+        [WAIT, {x: 410, y: 1550, vecX: -1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]] ,
 
-        [WALK, {xs: 350, ys: 1550, xd: 1255, yd: 1550}, 4932],// piece gauche vers droite
+        [WALK, {xs: 410, ys: 1550, xd: 1255, yd: 1550}, 4942],// piece gauche vers droite
         [WAIT, {x: 1255, y: 1550, vecX: 1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]], 
 
         [WALK, {xs: 1255, ys: 1550, xd: 1255, yd: 1650}, 545],// piece  droite vers bas
@@ -410,6 +411,47 @@ const PNJ_6 = { //visite piece bas
     ],
     dialog: []
 }
+
+
+
+
+const PNJ_7 = { //visite que piece bas
+    scenario: [
+
+        [WALK, {xs: 970, ys: 1550, xd: 400, yd: 1550}, 3140],// bas 1 vers piece gauche
+        [WAIT, {x: 400, y: 1550, vecX: -1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]] ,
+
+        [WALK, {xs: 400, ys: 1550, xd: 400, yd: 1850}, 1640],// piece gauche bas
+        [WAIT, {x: 400, y: 1850, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]] ,
+        
+
+        [WALK, {xs: 400, ys: 1850, xd: 400, yd: 1555}, 1610],// piece gauche haut
+        [WAIT, {x: 400, y: 1555, vecX: 0, vecY: -1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]] ,
+
+
+        [WALK, {xs: 400, ys: 1555, xd: 1425, yd: 1555}, 5640],// piece gauche vers droite
+        [WAIT, {x: 1425, y: 1555, vecX: 1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]], 
+
+        [WALK, {xs: 1425, ys: 1555, xd: 1425, yd: 1650}, 545],// piece  droite vers bas
+        [WAIT, {x: 1425, y: 1650, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]], 
+
+        [WALK, {xs: 1425, ys: 1650, xd: 1715, yd: 1650}, 2452],// piece  droite vers piece droite droite
+        [WAIT, {x: 1715, y: 1650, vecX: 1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]] ,
+
+        [WALK, {xs: 1715, ys: 1650, xd: 1210, yd: 1650}, 2667],// piece  droite droite vers piece droite
+        [WAIT, {x: 1210, y: 1650, vecX: -1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]] ,
+
+        [WALK, {xs: 1210, ys: 1650, xd: 1210, yd: 1550}, 440],// piece  droite vers haut
+        [WAIT, {x: 1210, y: 1550, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]] ,
+
+        [WALK, {xs: 1210, ys: 1550, xd: 970, yd: 1550}, 1595],// piece  droite vers couloir vert : bas -> haut
+        [WAIT, {x: 970, y: 1550, vecX: -1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+    ],
+    dialog: []
+}
+
+
 
 
 
