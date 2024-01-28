@@ -7,7 +7,17 @@ import { WIDTH, HEIGHT } from "./app.js";
 
 import { Player } from "./player.js";
 import { Map } from "./map.js";
-export const SKINS = ["groom-pink-spritesheet", "groom-blue-spritesheet", "groom-red-spritesheet"];
+export const SKINS = [
+    "groom-pink-spritesheet", 
+    "groom-blue-spritesheet", 
+    "groom-red-spritesheet",
+    "chad-spritesheet",
+    "madame-blue-spritesheet",
+    "madame-pink-spritesheet",
+    "madame-yellow-spritesheet",
+    "costume-brown-spritesheet",
+    "costume-green-spritesheet"
+];
 
 export class Game {
 
