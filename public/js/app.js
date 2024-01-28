@@ -35,6 +35,9 @@ document.addEventListener("DOMContentLoaded", function() {
     socket.on("newgame", function({level,role,delay}) {
         gui.newGame(level, role, delay);
     });
+    socket.on("startGame", function() {
+        gui.startGameFromServer(0);
+    });
     socket.on("playerMove", function(data) {
         //console.log("playerMove", data)
         gui.updateAdversary(data);
@@ -145,8 +148,13 @@ document.addEventListener("DOMContentLoaded", function() {
             socket.emit("exit");
             return;
         }
-        if(r == "interaction"){
+        if (r == "interaction"){
             gui.game.player.interact();
+            return;
+        }
+        if (r == "ready") {
+            socket.emit("ready");
+            return;
         }
     });
     document.addEventListener("dblclick", function(e) {

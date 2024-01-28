@@ -52,20 +52,31 @@ class GUI {
 
         this.closeButton = new Button("X", WIDTH*.95, HEIGHT*.05, 64, 64, false, false);
 
+        this.readyButton = new Button("Ready!", WIDTH*0.5, HEIGHT*0.75, 180, 60, true, "HotelMadriz")
+
         this.credits = false;
         this.controls = false;
     };
 
     /**
-     * Launched when recieved from 
+     * Launched when recieved from server
      * @param {Object} level Level description 
      * @param {string} role "police", "killer"
      * @param {number} delay the delay w.r.t. the start 
      */
     newGame(level, role, delay) {
         this.game = new Game(level, role, delay);
+        this.state = STATE.WAITING_BEFORE_START;
+        this.ready = false;
+    }
+    /**
+     * Launched when recieved top from server
+     */
+    startGameFromServer(delay) {
+        // TODO integrate delay
         this.state = STATE.RUNNING;
     }
+
     /**
      * Called when connection to the other player has been lost.
      */
@@ -133,7 +144,7 @@ class GUI {
         }
         if (this.state == STATE.RUNNING && this.game !== null) {
             this.game.update(dt);
-            this.debug = JSON.stringify({x: this.game.map.adversary.x, y: this.game.map.adversary.y, vx: this.game.map.adversary.vecX, vy: this.game.map.adversary.vecY, role: this.game.player.role});
+            // this.debug = JSON.stringify({x: this.game.map.adversary.x, y: this.game.map.adversary.y, vx: this.game.map.adversary.vecX, vy: this.game.map.adversary.vecY, role: this.game.player.role});
         }
     }
 
@@ -145,6 +156,24 @@ class GUI {
         ctx.drawImage(data["logoGGJ"], WIDTH - 100, HEIGHT - 110, 80, 80);
         for (let b in this.buttons) {
           this.buttons[b].render(ctx);
+        }
+    }
+
+    renderWaitingScreen(ctx) {
+        ctx.font = "bold small-caps 25px HotelMadriz";
+        ctx.textAlign = "center";
+        ctx.fillText("You play the role of the " + this.game.player.role, WIDTH/2, HEIGHT*0.3);
+        ctx.save();
+        ctx.translate(WIDTH/2, HEIGHT/2);
+        //ctx.translate(-this.game.player.x, -this.game.player.y);
+        this.game.player.render(ctx);
+        ctx.restore();
+        const whatToDo = this.game.player.role == "killer" ? 
+            "Stab victims with Morteau sausage. Don't get caught.": 
+            "Discover who is the killer and arrest him. Don't be mistaken."
+        ctx.fillText(whatToDo, WIDTH/2, HEIGHT*0.6)
+        if (!this.ready) {
+            this.readyButton.render(ctx);
         }
     }
 
@@ -299,6 +328,9 @@ class GUI {
                 }
                 this.renderTitleScreen(ctx);
                 break;
+            case STATE.WAITING_BEFORE_START:
+                this.renderWaitingScreen(ctx);
+                break;
             case STATE.CONNECTION_LOST:
                 this.renderConnectionLost(ctx);
                 break;
@@ -368,6 +400,12 @@ class GUI {
                 if(this.closeButton.isAt(x,y)){
                     this.credits = false;
                     this.controls = false;
+                }
+                break;
+            case STATE.WAITING_BEFORE_START:
+                if (this.readyButton.isAt(x,y) && !this.ready) {
+                    this.ready = true;
+                    return "ready";
                 }
                 break;
             case STATE.CONNECTION_LOST:
