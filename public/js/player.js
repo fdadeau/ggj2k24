@@ -268,21 +268,25 @@ export class Player extends Entity {
         switch (COMMANDS[key.code]) {
             case UP:
                 this.vecY = this.orientation.y = -1;
-                this.orientation.x = this.vecX;
+                //this.orientation.x = this.vecX;
+                this.vecX = this.orientation.x = 0;
                 //this.setAnimation(WALK_BACK);
                 break;
             case DOWN: 
                 this.vecY = this.orientation.y = 1;
-                this.orientation.x = this.vecX;
+                //this.orientation.x = this.vecX;
+                this.vecX = this.orientation.x = 0;
                 //this.setAnimation(WALK_FRONT);
                 break;
             case LEFT: 
                 this.vecX = this.orientation.x = -1;
-                this.orientation.y = this.vecY;
+                //this.orientation.y = this.vecY;
+                this.vecY = this.orientation.y = 0;
                 break;
             case RIGHT: 
                 this.vecX = this.orientation.x = 1;
-                this.orientation.y = this.vecY;
+                //this.orientation.y = this.vecY;
+                this.vecY = this.orientation.y = 0;
                 break;
             case TALK:
                 const notTalkingBefore = this.talkingTo === null;
