@@ -9,6 +9,7 @@ import { Player } from "./player.js";
 import { Entity } from "./entity.js";
 
 import { FRAME_DELAY } from "./gui.js";
+import { audio } from "./audio.js";
 
 const WALK = "walk", WAIT = "wait", TALK = "talk";
 
@@ -28,27 +29,19 @@ export class PNJ extends Entity {
             obj.endTime = t;
             return obj;
         });
-        this.dialog = new Dialog(dialog[1]);
+        this.dialog = new Dialog(dialog);
         this.time = 0;
         this.startTime = Date.now() - delay;
         this.step = 0;
+        this.alive = true;
+        this.arrestedBy = null;
     }
 
-
-    die() {
-        if (this.talkingTo !== null) {
-            this.talkingTo.talkingTo = null;
-            this.talkingTo = null;
-        }
-        this.dialog.end();
-        this.alive = false;
-        this.setAnimation(
-            this.whichAnimation()
-        );
-    }
 
     update(dt) {
-        if (!this.alive) {
+        // Updating animation
+        this.updateAnimation(dt);
+        if (!this.alive || this.arrestedBy != null) {
             return;
         }
         // case 1: taking to someone
@@ -112,8 +105,6 @@ export class PNJ extends Entity {
                 this.setAnimation(this.whichAnimation());
                 break;
         }
-        // Updating animation
-        this.updateAnimation(dt);
     }
 
     /**
@@ -153,13 +144,11 @@ export class PNJ extends Entity {
 
 export class Adversary extends Entity {
 
-    constructor(x,y,vecX,vecY,size,role,map) {
+    constructor(x,y,vecX,vecY,size,role,map, dialog) {
         super(x,y,vecX,vecY,size);
         this.role = role;
         this.map = map;
-        this.dialog = (role == "police") ? 
-            new Dialog([[0,"Ecoutez laissez la police faire son travail.", 1000],[0,"Dès que nous aurons de plus amples informations,", 1000],[0,"vous en serez les premiers informés.",1000]]) :
-            new Dialog([[0,"Tu veux un whisky ?",1000]]);
+        this.dialog = new Dialog(dialog);
         this.oldVecX;
         this.oldVecY;
     }
@@ -214,7 +203,6 @@ export class Adversary extends Entity {
         if (this.animation != newAnim) {
             this.setAnimation(newAnim);
         }
-        //console.log({orientation: this.orientation})
     }
 
     updateAdversaryTalk(x,y,id,px,py) {
@@ -265,6 +253,10 @@ export class Dialog {
             endTime += t[2]
             return { who: t[0], what: t[1], duration: t[2], endTime };
         });
+        audio.playSound("speak1",4,0.5,true);
+        audio.playSound("speak2",5,1,true);
+        audio.pause(4);
+        audio.pause(5);
     }
 
     update(dt) {
@@ -272,10 +264,27 @@ export class Dialog {
             return;
         }
         this.time = Date.now() - this.t0;
+        if(this.texts[this.state].who == 0){
+            if(audio.audioIsPlaying(4)){
+                audio.pause(4);
+            }
+            if(!audio.audioIsPlaying(5)){
+                audio.resume(5);
+            }
+        }else{
+            if(audio.audioIsPlaying(5)){
+                audio.pause(5);
+            }
+            if(!audio.audioIsPlaying(4)){
+                audio.resume(4);
+            }
+        }
         if (this.time >= this.texts[this.state].endTime) {
             this.state++;
             if (this.state >= this.texts.length) {
                 this.state = -1;
+                audio.pause(4);
+                audio.pause(5);
             }
         }
     }
@@ -292,11 +301,20 @@ export class Dialog {
         if (this.state < 0) {
             this.t0 = Date.now();
             this.state = 0; 
+            if(this.texts[this.state] && this.texts[this.state].who == 0){
+                audio.pause(4);
+                audio.resume(5);
+            }else{
+                audio.pause(5);
+                audio.resume(4);
+            }
         }
     }
 
     end() {
         this.state = -1;
+        audio.pause(4);
+        audio.pause(5);
     }
 
     render(ctx, x0, y0, x1, y1, showtext) {

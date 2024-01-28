@@ -109,8 +109,9 @@ class GUI {
 
     start() {
         this.state = STATE.TITLE_SCREEN;
-        if(!audio.audioIsPlaying("theme")){
-            audio.playMusic("theme", 1); 
+        if(!audio.audioIsPlaying("theme_sing")){
+            // TODO : reactivate
+            //**audio.playMusic("theme_sing", 0.5); 
         }
     }
 
@@ -151,8 +152,8 @@ class GUI {
     renderTitleScreen(ctx) {
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, WIDTH, HEIGHT);
-        ctx.drawImage(data["home_shiny"],16, 26, 768, 448);
-        ctx.drawImage(data["title"],WIDTH / 2 - 280/2, HEIGHT/2 - 80 * 0.75, 280, 80);
+        ctx.drawImage(data["home_shiny_scene"],16, 26, 768, 448);
+        ctx.drawImage(data["title"],WIDTH / 2 - 280/2, HEIGHT/2 - 80/2, 280, 80);
         ctx.drawImage(data["logoGGJ"], WIDTH - 100, HEIGHT - 110, 80, 80);
         for (let b in this.buttons) {
           this.buttons[b].render(ctx);
@@ -202,50 +203,53 @@ class GUI {
     }
 
     renderVictory(ctx) {
-        ctx.fillStyle = "black";
-        ctx.fillRect(0, 0, WIDTH, HEIGHT);
-        if(this.winner == "police" && this.game.player.role == "police"){
-            ctx.drawImage(data["arrest"],16, 26, 768, 448);
+        if(!this.endScreen){
+            const zoomFactor = 1.75;
+            ctx.scale(zoomFactor, zoomFactor);
+            ctx.translate(-200,-125);
+            this.game.render(ctx);
+            ctx.font = "bold small-caps 60px HotelMadriz";
+            ctx.fillStyle = "white";
+            ctx.textAlign = "center";
+            ctx.fillText("Victoire", WIDTH/2+20, HEIGHT/2+HEIGHT/4);
         }
-        if(this.winner == "killer" && this.game.player.role == "killer"){
-            ctx.drawImage(data["kill"],16, 26, 768, 448);
-        }
-        ctx.font = "24px arial";
-        ctx.fillStyle = "white";
-        ctx.textAlign = "center";
-        ctx.fillText("Victoire !", WIDTH/2+20, HEIGHT/2);
-        for (let b in this.buttons) {
-          this.buttons[b].render(ctx);
-        }
+        this.endScreen = true;
     }
 
     renderLose(ctx) {
-        ctx.fillStyle = "black";
-        ctx.fillRect(0, 0, WIDTH, HEIGHT);
-        if(this.winner == "police" && this.game.player.role == "killer"){
-            ctx.drawImage(data["arrest"],16, 26, 768, 448);
+        if(!this.endScreen){
+            const zoomFactor = 1.75;
+            ctx.scale(zoomFactor, zoomFactor);
+            ctx.translate(-200,-125);
+            this.game.render(ctx);
+            ctx.font = "bold small-caps 60px HotelMadriz";
+            ctx.fillStyle = "white";
+            ctx.textAlign = "center";
+            ctx.fillText("Defaite", WIDTH/2+20, HEIGHT/2+HEIGHT/4);
         }
-        if(this.winner == "killer" && this.game.player.role == "police"){
-            ctx.drawImage(data["kill"],16, 26, 768, 448);
-        }
-        ctx.font = "24px arial";
-        ctx.fillStyle = "white";
-        ctx.textAlign = "center";
-        ctx.fillText("Défaite...", WIDTH/2+20, HEIGHT/2);
-        for (let b in this.buttons) {
-          this.buttons[b].render(ctx);
-        }
+        this.endScreen = true;
     }
 
     renderControls(ctx){
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, WIDTH, HEIGHT);
-        ctx.drawImage(data["home"],16, 26, 768, 448);
+        ctx.drawImage(data["home_scene"],16, 26, 768, 448);
         ctx.drawImage(data["carpet"], 100, 50, 600, 400);
         ctx.fillStyle = '#ffd728';
-        ctx.font = "bold small-caps 25px arial";
+        ctx.font = "bold small-caps 25px HotelMadriz";
         ctx.fillText('Concept', 320, 160);
-        ctx.fillText('Controls', 320, 330);
+        ctx.fillStyle = '#fff';
+        ctx.font = "bold small-caps 20px HotelMadriz";
+        ctx.fillText('Inspector :  Arrest the murderer', 160, 200);
+        ctx.fillText('Murderer :   Kill without being caught', 160, 240);
+        ctx.fillStyle = '#ffd728';
+        ctx.font = "bold small-caps 25px HotelMadriz";
+
+        ctx.fillText('Controls', 320, 280);
+        ctx.fillStyle = '#fff';
+        ctx.font = "bold small-caps 20px HotelMadriz";
+        ctx.fillText('Arrows to move', 180, 320);
+        ctx.fillText('Space to use an object', 180, 360);
 
         this.closeButton.render(ctx);
     }
@@ -253,7 +257,7 @@ class GUI {
     renderCredits(ctx){
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, WIDTH, HEIGHT);
-        ctx.drawImage(data["home"],16, 26, 768, 448);
+        ctx.drawImage(data["home_scene"],16, 26, 768, 448);
         ctx.drawImage(data["carpet"], 100, 50, 600, 400);
         ctx.fillStyle = '#ffd728';
         ctx.font = "bold small-caps 25px HotelMadriz";
@@ -310,7 +314,9 @@ class GUI {
      * @param {CanvasRenderingContext2D} ctx Drawing area
      */
     render(ctx) {
-        ctx.clearRect(0, 0, WIDTH, HEIGHT)
+        if(!(this.state == STATE.VICTORY || this.state == STATE.LOSE)){
+            ctx.clearRect(0, 0, WIDTH, HEIGHT);
+        }
         ctx.font = "10px arial";
         ctx.textAlign = "left";
         ctx.fillStyle = "black";
@@ -337,7 +343,9 @@ class GUI {
             case STATE.RUNNING:
                 this.game.render(ctx);
                 // Rendering the interaction button
-                this.interactionButton.render(ctx);
+                if(this.game.player.closestPNJ != null){
+                    this.interactionButton.render(ctx);
+                }
                 break;
             case STATE.VICTORY:
                 this.renderVictory(ctx);

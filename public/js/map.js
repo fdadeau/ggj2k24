@@ -85,10 +85,9 @@ export class Map {
         /** 
          * @type {Adversary}
          */
-        this.adversary = new Adversary(0,0,0,0,20,adversaryRole,this);
+        this.adversary = new Adversary(0,0,0,0,20,adversaryRole,this, level.killerJoke);
         /** @type {Entity[]} */
         this.PNJs = [this.adversary, ...level.PNJs.map(p => new PNJ(p.scenario, p.dialog, delay))];
-
         // Giving a random skin to each PNJ
         for (let p in this.PNJs) {
             let skin = skins[Math.floor(Math.random() * skins.length)];
@@ -168,14 +167,14 @@ export class Map {
                 ctx.strokeStyle = "black";
                 ctx.beginPath();
                 ctx.lineWidth = 1;
-                ctx.roundRect(c.x-20, c.y-50, 40, 20, [10]);
+                ctx.roundRect(c.x-10, c.y-50, 40, 20, [10]);
                 ctx.stroke();
                 ctx.fillStyle = "white";
                 ctx.fill();
                 ctx.closePath();
                 ctx.font = "bold 30px serif";
                 ctx.fillStyle = "black";
-                ctx.fillText("...",c.x-11, c.y-37);
+                ctx.fillText("...",c.x-1, c.y-37);
                 /*
                 ctx.beginPath();
                 ctx.arc(c.x, c.y - c.size - 15, 5, 0, 2*Math.PI);
