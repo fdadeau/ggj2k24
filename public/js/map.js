@@ -68,6 +68,12 @@ const FURNITURE_TYPE = {
     WC_LEFT: 23,
     WC_RIGHT: 24,
     CARPET: 25,
+    PIANO_LEFT: 26,
+    PIANO_RIGHT: 27,
+    SOFA_GREEN_CAT: 28,
+    SOFA_RED_CAT_1: 29,
+    SOFA_RED_CAT_2: 30,
+    RABBIT: 31
 };
 
 export class Map {
@@ -352,6 +358,8 @@ class Furniture {
                     this.y = y - TILE_SIDE * 0.75;
                 } else if (this.name == 'bar') {
                     this.y = y;
+                } else if (this.name == 'rabbit') {
+                    this.y = y + TILE_SIDE / 2;
                 } else { 
                     this.y = y - TILE_SIDE / 4;
                 }
@@ -368,8 +376,8 @@ class Furniture {
     }
 
     render(ctx) {
-        ctx.fillStyle = '#f00';
-        ctx.fillRect(this.x, this.y, this.width * 2, this.height * 2)
+        // ctx.fillStyle = '#f00';
+        // ctx.fillRect(this.x, this.y, this.width * 2, this.height * 2)
         ctx.drawImage(
             this.img, 
             this.x, 

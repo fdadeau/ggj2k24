@@ -52,16 +52,22 @@ const data = {
     "sofa_green_front": "./assets/images/furnitures/sofa_green_front.png",
     "sofa_green_left": "./assets/images/furnitures/sofa_green_left.png",
     "sofa_green_right": "./assets/images/furnitures/sofa_green_right.png",
+    "sofa_green_cat": "./assets/images/furnitures/sofa_green_cat.png",
     "sofa_red_front": "./assets/images/furnitures/sofa_red_front.png",
     "sofa_red_left": "./assets/images/furnitures/sofa_red_left.png",
     "sofa_red_right": "./assets/images/furnitures/sofa_red_right.png",
+    "sofa_red_cat_1": "./assets/images/furnitures/sofa_red_cat_1.png",
+    "sofa_red_cat_2": "./assets/images/furnitures/sofa_red_cat_2.png",
     "chevalet": "./assets/images/furnitures/chevalet.png",
     "round_table": "./assets/images/furnitures/round_table.png",
     "bar": "./assets/images/furnitures/bar.png",
     "wc_front": "./assets/images/furnitures/wc_front.png",
     "wc_left": "./assets/images/furnitures/wc_left.png",
     "wc_right": "./assets/images/furnitures/wc_right.png",
-
+    "piano_left": "./assets/images/furnitures/piano_left.png",
+    "piano_right": "./assets/images/furnitures/piano_right.png",
+    "rabbit": "./assets/images/furnitures/rabbit.png",
+    
     // spritesheets
     "groom-pink-spritesheet": "./assets/spritesheets/groom_pink_spritesheet.png",
     "groom-blue-spritesheet": "./assets/spritesheets/groom_blue_spritesheet.png",
