@@ -37,6 +37,7 @@ export class PNJ extends Entity {
         this.arrestedBy = null;
     }
 
+
     update(dt) {
         // Updating animation
         this.updateAnimation(dt);

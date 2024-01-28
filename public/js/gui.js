@@ -42,15 +42,15 @@ class GUI {
 
         /** buttons */
         this.buttons = {
-            "CREATE": new Button("Create game", WIDTH*0.35, HEIGHT*0.7, 140, 40, true),
-            "JOIN": new Button("Join game", WIDTH*0.65, HEIGHT*0.7, 140, 40, true),
-            "CREDITS": new Button("Credits", WIDTH*0.35, HEIGHT*0.84, 140, 40, true),
-            "CONTROLS": new Button("Rules", WIDTH*0.65, HEIGHT*0.84, 140, 40, true)
+            "CREATE": new Button("Create Game", WIDTH*0.35, HEIGHT*0.7, 180, 60, true, "HotelMadriz"),
+            "JOIN": new Button("Join Game", WIDTH*0.65, HEIGHT*0.7, 180, 60, true, "HotelMadriz"),
+            "CREDITS": new Button("Credits", WIDTH*0.35, HEIGHT*0.84, 180, 60, true, "HotelMadriz"),
+            "CONTROLS": new Button("Rules", WIDTH*0.65, HEIGHT*0.84, 180, 60, true, "HotelMadriz")
         }
 
         this.interactionButton = new InteractionButton("", WIDTH*.95, HEIGHT*.93, 64, 64, this);
 
-        this.closeButton = new Button("X", WIDTH*.95, HEIGHT*.05, 32, 32, false);
+        this.closeButton = new Button("X", WIDTH*.95, HEIGHT*.05, 64, 64, false, false);
 
         this.credits = false;
         this.controls = false;
@@ -143,6 +143,7 @@ class GUI {
         ctx.fillRect(0, 0, WIDTH, HEIGHT);
         ctx.drawImage(data["home_shiny_scene"],16, 26, 768, 448);
         ctx.drawImage(data["title"],WIDTH / 2 - 280/2, HEIGHT/2 - 80/2, 280, 80);
+        ctx.drawImage(data["logoGGJ"], WIDTH - 100, HEIGHT - 110, 80, 80);
         for (let b in this.buttons) {
           this.buttons[b].render(ctx);
         }
@@ -172,40 +173,38 @@ class GUI {
         }
     }
 
+    zoomIn(ctx) {
+
+  
+
+      }
+
     renderVictory(ctx) {
-        ctx.fillStyle = "black";
-        ctx.fillRect(0, 0, WIDTH, HEIGHT);
-        if(this.winner == "police" && this.game.player.role == "police"){
-            ctx.drawImage(data["arrest_scene"],16, 26, 768, 448);
+        if(!this.endScreen){
+            const zoomFactor = 1.75;
+            ctx.scale(zoomFactor, zoomFactor);
+            ctx.translate(-200,-125);
+            this.game.render(ctx);
+            ctx.font = "bold small-caps 60px HotelMadriz";
+            ctx.fillStyle = "white";
+            ctx.textAlign = "center";
+            ctx.fillText("Victoire", WIDTH/2+20, HEIGHT/2+HEIGHT/4);
         }
-        if(this.winner == "killer" && this.game.player.role == "killer"){
-            ctx.drawImage(data["kill_scene"],16, 26, 768, 448);
-        }
-        ctx.font = "24px arial";
-        ctx.fillStyle = "white";
-        ctx.textAlign = "center";
-        ctx.fillText("Victoire !", WIDTH/2+20, HEIGHT/2);
-        for (let b in this.buttons) {
-          this.buttons[b].render(ctx);
-        }
+        this.endScreen = true;
     }
 
     renderLose(ctx) {
-        ctx.fillStyle = "black";
-        ctx.fillRect(0, 0, WIDTH, HEIGHT);
-        if(this.winner == "police" && this.game.player.role == "killer"){
-            ctx.drawImage(data["arrest_scene"],16, 26, 768, 448);
+        if(!this.endScreen){
+            const zoomFactor = 1.75;
+            ctx.scale(zoomFactor, zoomFactor);
+            ctx.translate(-200,-125);
+            this.game.render(ctx);
+            ctx.font = "bold small-caps 60px HotelMadriz";
+            ctx.fillStyle = "white";
+            ctx.textAlign = "center";
+            ctx.fillText("Defaite", WIDTH/2+20, HEIGHT/2+HEIGHT/4);
         }
-        if(this.winner == "killer" && this.game.player.role == "police"){
-            ctx.drawImage(data["kill_scene"],16, 26, 768, 448);
-        }
-        ctx.font = "24px arial";
-        ctx.fillStyle = "white";
-        ctx.textAlign = "center";
-        ctx.fillText("Défaite...", WIDTH/2+20, HEIGHT/2);
-        for (let b in this.buttons) {
-          this.buttons[b].render(ctx);
-        }
+        this.endScreen = true;
     }
 
     renderControls(ctx){
@@ -214,9 +213,20 @@ class GUI {
         ctx.drawImage(data["home_scene"],16, 26, 768, 448);
         ctx.drawImage(data["carpet"], 100, 50, 600, 400);
         ctx.fillStyle = '#ffd728';
-        ctx.font = "bold small-caps 25px arial"
+        ctx.font = "bold small-caps 25px HotelMadriz";
         ctx.fillText('Concept', 320, 160);
-        ctx.fillText('Controls', 320, 330);
+        ctx.fillStyle = '#fff';
+        ctx.font = "bold small-caps 20px HotelMadriz";
+        ctx.fillText('Inspector :  Arrest the murderer', 160, 200);
+        ctx.fillText('Murderer :   Kill without being caught', 160, 240);
+        ctx.fillStyle = '#ffd728';
+        ctx.font = "bold small-caps 25px HotelMadriz";
+
+        ctx.fillText('Controls', 320, 280);
+        ctx.fillStyle = '#fff';
+        ctx.font = "bold small-caps 20px HotelMadriz";
+        ctx.fillText('Arrows to move', 180, 320);
+        ctx.fillText('Space to use an object', 180, 360);
 
         this.closeButton.render(ctx);
     }
@@ -227,39 +237,51 @@ class GUI {
         ctx.drawImage(data["home_scene"],16, 26, 768, 448);
         ctx.drawImage(data["carpet"], 100, 50, 600, 400);
         ctx.fillStyle = '#ffd728';
-        ctx.font = "bold small-caps 25px arial"
+        ctx.font = "bold small-caps 25px HotelMadriz";
         ctx.fillText('Coding', 170, 160);
-        ctx.fillStyle = '#000';
-        ctx.font = "bold small-caps 20px arial"
+        ctx.fillStyle = '#fff';
+        ctx.font = "bold small-caps 20px HotelMadriz";
         ctx.fillText('Fred Dadeau', 170, 200);
-        ctx.fillText('Robin Grappe', 170, 230);
-        ctx.fillText('Tayeb Hakkar', 170, 260);
-
-
-        ctx.fillStyle = '#ffd728';
-        ctx.font = "bold small-caps 25px arial"
-        ctx.fillText('Music', 490, 160);
-        ctx.fillStyle = '#000';
-        ctx.font = "bold small-caps 20px arial"
-        ctx.fillText('Raphaël Dadeau', 490, 200);
-        // TODO + bruiteurs
+        ctx.fillText('Dorine Tabary', 170, 230);
+        ctx.fillText('Robin Grappe', 170, 260);
+        ctx.fillText('Tayeb Hakkar', 170, 290);
 
         ctx.fillStyle = '#ffd728';
-        ctx.font = "bold small-caps 25px arial"
-        ctx.fillText('Game Art', 330, 160);
-        ctx.fillStyle = '#000';
-        ctx.font = "bold small-caps 20px arial"
-        ctx.fillText('Marie-Almina', 330, 200);
-        ctx.fillText('Gindre', 330, 230);
-        ctx.fillText('Éléa Jacquin', 330, 260);
+        ctx.font = "bold small-caps 25px HotelMadriz";
+        ctx.fillText('Game Art', 320, 160);
+        ctx.fillStyle = '#fff';
+        ctx.font = "bold small-caps 20px HotelMadriz";
+        ctx.fillText('Marie-Almina', 320, 200);
+        ctx.fillText('Gindre', 320, 230);
+        ctx.fillText('Éléa Jacquin', 320, 260);
+        ctx.font = "bold small-caps 20px arial";
+        ctx.fillText('-', 380, 200);
 
         ctx.fillStyle = '#ffd728';
-        ctx.font = "bold small-caps 25px arial"
-        ctx.fillText('Thanks to :', 320, 330);
-        ctx.fillStyle = '#000';
-        ctx.font = "bold small-caps 20px arial"
-        ctx.fillText('All Besançon participants', 250, 360);
-        ctx.fillText('for their jokes', 320, 390);
+        ctx.font = "bold small-caps 25px HotelMadriz";
+        ctx.fillText('Sound Effects', 470, 160);
+        ctx.fillStyle = '#fff';
+        ctx.font = "bold small-caps 20px HotelMadriz";
+        ctx.fillText('Marie Almina Gindre', 470, 200);
+        ctx.fillText('Robin Grappe', 470, 230);
+        ctx.fillText('Tayeb Hakkar', 470, 260);
+        ctx.fillText('Éléa Jacquin', 470, 290);
+
+        ctx.fillStyle = '#ffd728';
+        ctx.font = "bold small-caps 25px HotelMadriz";
+        ctx.fillText('Music', 200, 330);
+        ctx.fillStyle = '#fff';
+        ctx.font = "bold small-caps 20px HotelMadriz";
+        ctx.fillText('Raphaël Dadeau', 200, 360);
+        ctx.fillText('Lancelot Vega', 200, 390);
+
+        ctx.fillStyle = '#ffd728';
+        ctx.font = "bold small-caps 25px HotelMadriz";
+        ctx.fillText('Thanks to :', 380, 330);
+        ctx.fillStyle = '#fff';
+        ctx.font = "bold small-caps 20px HotelMadriz";
+        ctx.fillText('All Besancon participants', 380, 360);
+        ctx.fillText('for their jokes', 380, 390);
 
         this.closeButton.render(ctx);
     }
@@ -269,7 +291,9 @@ class GUI {
      * @param {CanvasRenderingContext2D} ctx Drawing area
      */
     render(ctx) {
-        ctx.clearRect(0, 0, WIDTH, HEIGHT)
+        if(!(this.state == STATE.VICTORY || this.state == STATE.LOSE)){
+            ctx.clearRect(0, 0, WIDTH, HEIGHT);
+        }
         ctx.font = "10px arial";
         ctx.textAlign = "left";
         ctx.fillStyle = "black";
@@ -293,7 +317,9 @@ class GUI {
             case STATE.RUNNING:
                 this.game.render(ctx);
                 // Rendering the interaction button
-                this.interactionButton.render(ctx);
+                if(this.game.player.closestPNJ != null){
+                    this.interactionButton.render(ctx);
+                }
                 break;
             case STATE.VICTORY:
                 this.renderVictory(ctx);
@@ -341,16 +367,16 @@ class GUI {
         this.debug = x+","+y;
         switch(this.state){
             case STATE.TITLE_SCREEN:
-                if (this.buttons["CREATE"].isAt(x,y)) {
+                if (this.buttons["CREATE"].isAt(x,y) && ! this.credits && ! this.controls) {
                     return "create";
                 }
-                if (this.buttons["JOIN"].isAt(x,y)) {
+                if (this.buttons["JOIN"].isAt(x,y) && ! this.credits && ! this.controls) {
                     return "join";
                 }
-                if (this.buttons["CREDITS"].isAt(x,y)) {
+                if (this.buttons["CREDITS"].isAt(x,y) && ! this.controls) {
                     this.credits = true;
                 }
-                if (this.buttons["CONTROLS"].isAt(x,y)) {
+                if (this.buttons["CONTROLS"].isAt(x,y) && ! this.credits) {
                     this.controls = true;
                 }
                 if(this.closeButton.isAt(x,y)){
@@ -422,7 +448,7 @@ class GUI {
  */
 class Button {
 
-    constructor(txt, x, y, w, h, background) {
+    constructor(txt, x, y, w, h, background, font) {
         this.x = x;
         this.y = y;
         this.txt = txt;
@@ -432,6 +458,7 @@ class Button {
         this.x0 = x - w/2 - this.padding / 2;
         this.y0 = y - h/2 - this.padding / 2; 
         this.background = background;
+        this.font = font;
     }
 
     render(ctx) {
@@ -448,9 +475,14 @@ class Button {
         */
         ctx.verticalAlign = "middle";
         ctx.textAlign = "center";
-        ctx.font = `${this.height/2}px arial`;
+        if (this.font == false) {
+            ctx.font = `${this.height/2}px Arial`;
+        } else {
+            ctx.font = `${this.height/2}px ` + this.font;
+        }
+        
         if(this.background){
-            ctx.drawImage(data["carpet"], this.x0, this.y0, this.width + this.padding, this.height+this.padding/2);
+            ctx.drawImage(data["carpet"], this.x0, this.y0, this.width + this.padding, this.height+this.padding/16);
         }
         ctx.fillStyle = "white";
         ctx.fillText(this.txt, this.x, this.y);

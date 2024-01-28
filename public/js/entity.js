@@ -55,6 +55,8 @@ export class Entity {
         this.frameDelay = FRAME_DELAY;
         /** @type {Image} spritesheet used for the entity */
         this.sprite = data["groom-pink-spritesheet"];
+
+        this.alive = true;
     }
 
     update(dt) {

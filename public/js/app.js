@@ -30,7 +30,6 @@ document.addEventListener("DOMContentLoaded", function() {
     // start preload
     preload(onLoad).catch(onError);
 
-
     const socket = io();//('http://localhost:5500');
 
     socket.on("newgame", function({level,role,delay}) {
@@ -67,17 +66,25 @@ document.addEventListener("DOMContentLoaded", function() {
      */
     function onLoad(current, total) {
         CXT.clearRect(0, 0, WIDTH, HEIGHT);
+        CXT.fillStyle = '#000';
+        CXT.fillRect(0, 0, WIDTH, HEIGHT);
+        CXT.fillStyle = '#fff';
+        CXT.font = "bold small-caps 40px HotelMadriz";
         // loading not yet completed
         if (current < total) {
-            CXT.fillText(`Loading resources... (${(current / total) / 100 | 0}%)`, WIDTH / 2, HEIGHT * 0.5);
+            CXT.fillText(`Loading resources...`, WIDTH * 0.4, HEIGHT * 0.5);
+            CXT.font = "bold small-caps 40px arial";
+            CXT.fillText(`(${(current / total) / 100 | 0}%)`, WIDTH * 0.75, HEIGHT * 0.5);
             return;
         }
         // loading complete!
         loaded = true;
+        CXT.font = "bold small-caps 40px HotelMadriz";
         CXT.imageSmoothingEnabled = true;
-        CXT.drawImage(data["logoGGJ"], WIDTH - 130, HEIGHT - 130, 120, 120)
+        // CXT.drawImage(data["logoGGJ"], WIDTH - 130, HEIGHT - 130, 120, 120)
         CXT.imageSmoothingEnabled = false;
-        CXT.fillText(`Resources loaded. Click to start game.`, WIDTH / 2, HEIGHT * 0.5);
+        CXT.fillText(`Resources loaded.`, WIDTH / 2, HEIGHT * 0.4);
+        CXT.fillText(`Click to start game.`, WIDTH / 2, HEIGHT * 0.6);
     }
     function onError(err) {
         CXT.clearRect(0, 0, WIDTH, HEIGHT);
