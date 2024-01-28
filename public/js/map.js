@@ -91,7 +91,6 @@ export class Map {
         // Giving a random skin to each PNJ
         for (let p in this.PNJs) {
             let skin = skins[Math.floor(Math.random() * skins.length)];
-            console.log("skin", skin);
             skins = skins.filter(s => s != skin);
             this.PNJs[p].sprite = data[skin];
             if(skins.length == 0){
@@ -280,16 +279,18 @@ export class Map {
     }
 
     isTooCloseFromOneFurniture(x, y, size) {
-        for(let f of this.furnitures){
-            let furniture = this.getFurniture(f);
-            if(furniture !== null &&
-                x + size > furniture.x && 
-                x < furniture.x + furniture.width + TILE_SIDE / 4 &&
-                y + size > furniture.y &&
-                y < furniture.y + furniture.height &&
-                f[4] != FURNITURE_TYPE.CARPET){
-                    return furniture;
-            }
+        let furnitures = this.createFurnitures();
+        x = x - size;
+        y = y - size;
+        for(let f of furnitures){
+            // TODO
+            // if (x + size > f.x && 
+            //     x < f.x + f.width &&
+            //     y + size > f.y + size/4 &&
+            //     y < f.y + f.height - size/2
+            //     && f.id != FURNITURE_TYPE.CARPET){
+            //         return f;
+            // }
         }
         return null;
     }
@@ -312,7 +313,7 @@ export class Map {
         } 
 
         // Check collision with furnitures
-        return null;//this.isTooCloseFromOneFurniture(x, y, size);
+        return this.isTooCloseFromOneFurniture(x, y, size * 2);
     }
 
 
@@ -347,7 +348,11 @@ class Furniture {
                 this.x = x + TILE_SIDE / 2 - this.width;
                 if (this.name.includes("green")) {
                     this.y = y + TILE_SIDE / 2;
-                } else {
+                } else if (this.name == 'chevalet') {
+                    this.y = y - TILE_SIDE * 0.75;
+                } else if (this.name == 'bar') {
+                    this.y = y;
+                } else { 
                     this.y = y - TILE_SIDE / 4;
                 }
         }
@@ -363,6 +368,8 @@ class Furniture {
     }
 
     render(ctx) {
+        ctx.fillStyle = '#f00';
+        ctx.fillRect(this.x, this.y, this.width * 2, this.height * 2)
         ctx.drawImage(
             this.img, 
             this.x, 
