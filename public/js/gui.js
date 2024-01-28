@@ -214,11 +214,18 @@ class GUI {
         ctx.drawImage(data["home"],16, 26, 768, 448);
         ctx.drawImage(data["carpet"], 100, 50, 600, 400);
         ctx.fillStyle = '#ffd728';
-        ctx.font = "bold small-caps 25px arial";
+        ctx.font = "bold small-caps 25px HotelMadriz";
         ctx.fillText('Concept', 320, 160);
-        ctx.fillText('Inspector : Arrest the murderer !', 160, 200);
-        ctx.fillText('Murderer : Kill without being caught !', 160, 240);
+        ctx.fillStyle = '#fff';
+        ctx.font = "bold small-caps 20px HotelMadriz";
+        ctx.fillText('Inspector :  Arrest the murderer', 160, 200);
+        ctx.fillText('Murderer :   Kill without being caught', 160, 240);
+        ctx.fillStyle = '#ffd728';
+        ctx.font = "bold small-caps 25px HotelMadriz";
+
         ctx.fillText('Controls', 320, 280);
+        ctx.fillStyle = '#fff';
+        ctx.font = "bold small-caps 20px HotelMadriz";
         ctx.fillText('Arrows to move', 180, 320);
         ctx.fillText('Space to use an object', 180, 360);
 
