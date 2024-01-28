@@ -229,38 +229,49 @@ class GUI {
         ctx.fillStyle = '#ffd728';
         ctx.font = "bold small-caps 25px HotelMadriz";
         ctx.fillText('Coding', 170, 160);
-        ctx.fillStyle = '#000';
-        ctx.font = "bold small-caps 20px arial"
+        ctx.fillStyle = '#fff';
+        ctx.font = "bold small-caps 20px HotelMadriz";
         ctx.fillText('Fred Dadeau', 170, 200);
         ctx.fillText('Dorine Tabary', 170, 230);
         ctx.fillText('Robin Grappe', 170, 260);
         ctx.fillText('Tayeb Hakkar', 170, 290);
 
-
         ctx.fillStyle = '#ffd728';
         ctx.font = "bold small-caps 25px HotelMadriz";
-        ctx.fillText('Music', 490, 160);
-        ctx.fillStyle = '#000';
-        ctx.font = "bold small-caps 20px arial"
-        ctx.fillText('Raphaël Dadeau', 490, 200);
-        // TODO + bruiteurs
-
-        ctx.fillStyle = '#ffd728';
-        ctx.font = "bold small-caps 25px HotelMadriz";
-        ctx.fillText('Game Art', 330, 160);
-        ctx.fillStyle = '#000';
-        ctx.font = "bold small-caps 20px arial"
-        ctx.fillText('Marie-Almina', 330, 200);
-        ctx.fillText('Gindre', 330, 230);
-        ctx.fillText('Éléa Jacquin', 330, 260);
-
-        ctx.fillStyle = '#ffd728';
-        ctx.font = "bold small-caps 25px HotelMadriz";
-        ctx.fillText('Thanks to :', 320, 330);
-        ctx.fillStyle = '#000';
+        ctx.fillText('Game Art', 320, 160);
+        ctx.fillStyle = '#fff';
+        ctx.font = "bold small-caps 20px HotelMadriz";
+        ctx.fillText('Marie-Almina', 320, 200);
+        ctx.fillText('Gindre', 320, 230);
+        ctx.fillText('Éléa Jacquin', 320, 260);
         ctx.font = "bold small-caps 20px arial";
-        ctx.fillText('All Besançon participants', 250, 360);
-        ctx.fillText('for their jokes', 320, 390);
+        ctx.fillText('-', 380, 200);
+
+        ctx.fillStyle = '#ffd728';
+        ctx.font = "bold small-caps 25px HotelMadriz";
+        ctx.fillText('Sound Effects', 470, 160);
+        ctx.fillStyle = '#fff';
+        ctx.font = "bold small-caps 20px HotelMadriz";
+        ctx.fillText('Marie Almina Gindre', 470, 200);
+        ctx.fillText('Robin Grappe', 470, 230);
+        ctx.fillText('Tayeb Hakkar', 470, 260);
+        ctx.fillText('Éléa Jacquin', 470, 290);
+
+        ctx.fillStyle = '#ffd728';
+        ctx.font = "bold small-caps 25px HotelMadriz";
+        ctx.fillText('Music', 200, 330);
+        ctx.fillStyle = '#fff';
+        ctx.font = "bold small-caps 20px HotelMadriz";
+        ctx.fillText('Raphaël Dadeau', 200, 360);
+        ctx.fillText('Lancelot Vega', 200, 390);
+
+        ctx.fillStyle = '#ffd728';
+        ctx.font = "bold small-caps 25px HotelMadriz";
+        ctx.fillText('Thanks to :', 380, 330);
+        ctx.fillStyle = '#fff';
+        ctx.font = "bold small-caps 20px HotelMadriz";
+        ctx.fillText('All Besancon participants', 380, 360);
+        ctx.fillText('for their jokes', 380, 390);
 
         this.closeButton.render(ctx);
     }
