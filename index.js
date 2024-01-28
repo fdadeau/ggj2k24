@@ -53,12 +53,28 @@ io.on('connection', (socket) => {
             currentGame = "#" + (Math.random() * 899999 + 100000 | 0);
         }
         while (rooms[currentGame]);
-        rooms[currentGame] = { adversary: {}, level: levels.generate(), t0: Date.now(), roles: {"police": null, "killer": null} };
+        rooms[currentGame] = { adversary: {}, ready: null, level: levels.generate(), t0: Date.now(), roles: {"police": null, "killer": null} };
         const role = (Math.random() < 0.5) ? "police" : "killer";
         rooms[currentGame].roles[role] = socket.id;
         games[socket.id] = currentGame;
         console.log("Player " + socket.id + " created game " + currentGame + " ("+ role+")");
         socket.emit("newgame", { level: rooms[currentGame].level, role, delay: 0 });
+    });
+
+
+    socket.on("ready", () => {
+        let currentGame = games[socket.id];
+        if (currentGame && rooms[currentGame] && rooms[currentGame].ready !== socket.id) {
+            if (rooms[currentGame].ready == null) {
+                rooms[currentGame].ready = socket.id;
+                rooms[currentGame].t0 = Date.now();
+                socket.emit("startGame")    // TODO remove to synchronize players
+            }
+            else {  // TODO FIX THIS
+                socket.to(rooms[currentGame].roles.killer).emit("startGame");
+                socket.to(rooms[currentGame].roles.police).emit("startGame");
+            }
+        }
     });
 
     // Rejoindre une salle de jeu
