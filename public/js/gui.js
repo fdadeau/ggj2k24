@@ -411,7 +411,7 @@ class GUI {
     touchEnd() {
         if (!this.game) return;
         this.lastKey = null;
-        return this.game.keyup()
+        return this.game.keyup();
     }
 }
 

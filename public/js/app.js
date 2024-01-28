@@ -176,6 +176,9 @@ document.addEventListener("DOMContentLoaded", function() {
         let c = gui.touchStart(x,y);
         if (c) {
             manette.setAttribute("class",c.klass);
+            if (c.move) {
+                socket.emit("playerMove",c.move);  
+            }
         }
     });
     manette.addEventListener("touchmove", function (e) {
@@ -184,11 +187,17 @@ document.addEventListener("DOMContentLoaded", function() {
         let c = gui.touchMove(x,y);
         if (c) {
             manette.setAttribute("class",c.klass);
+            if (c.move) {
+                socket.emit("playerMove",c.move);  
+            }
         }
     });
     manette.addEventListener("touchend", function(e) {
-        gui.touchEnd();
+        let c = gui.touchEnd();
         manette.setAttribute("class","");
+        if (c.move) {
+            socket.emit("playerMove",c.move);  
+        }
     });
 
 
