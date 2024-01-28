@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function() {
     preload(onLoad).catch(onError);
 
 
-    const socket = io('http://localhost:5500');
+    const socket = io();//('http://localhost:5500');
 
     socket.on("newgame", function({level,role,delay}) {
         gui.newGame(level, role, delay);
@@ -167,6 +167,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
+    
 
     const manette = document.getElementById("manette");
     const manetteBB = manette.getBoundingClientRect();
@@ -195,7 +196,7 @@ document.addEventListener("DOMContentLoaded", function() {
     manette.addEventListener("touchend", function(e) {
         let c = gui.touchEnd();
         manette.setAttribute("class","");
-        if (c.move) {
+        if (c && c.move) {
             socket.emit("playerMove",c.move);  
         }
     });

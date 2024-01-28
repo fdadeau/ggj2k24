@@ -9,7 +9,6 @@ const io = socketIO(server);
 
 const PORT = 5500;
 
-
 app.use(express.static('public'));
 
 // detault game page 

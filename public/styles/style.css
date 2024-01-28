@@ -71,7 +71,7 @@ canvas:fullscreen {
 
 #manette {
 	position: fixed; 
-	display: block;
+	display: none;
 	bottom: 10px;
 	left: 10px;
 	width: 20vh;
@@ -81,21 +81,47 @@ canvas:fullscreen {
 	box-shadow: 2px 2px 2px #000;
 }
 
-.mobile #manette {
-	display: block;
+@media only screen and (hover: none) and (pointer: coarse){
+	#manette {
+		display: block;
+	}	
 }
-
+@media only screen and (hover: none) and (pointer: coarse) and (orientation:portrait) {
+	body > * {
+		display: none;
+	}
+	body {
+		font-size: 5vh;
+		text-align: center;
+		font-family: arial;
+		color: white;
+		line-height: 1.2;
+		background-color: #000;
+	}
+	body:before {
+		content: 'Please turn device to play game';
+		display: block;
+		transform: translate(-50%,-50%);
+		position: absolute;
+		left: 50%;
+		top: 50%;
+	}
+	#manette {
+		display: none;
+	}
+}
+	
 #manette.ArrowUp:before {
-	top: 20%;
+	top: 25%;
 }
 #manette.ArrowDown:before {
-	top: 80%;
+	top: 75%;
 }
 #manette.ArrowLeft:before {
-	left: 20%;
+	left: 25%;
 }
 #manette.ArrowRight:before {
-	left: 80%;
+	left: 75%;
 }
 
 #manette:before {
