@@ -29,11 +29,11 @@ const data = {
     "room_horizontal_door": "./assets/images/doors/room_horizontal_door.png",
     "bar_horizontal_door": "./assets/images/doors/bar_horizontal_door.png",
     "corridor_horizontal_door": "./assets/images/doors/corridor_horizontal_door.png",
-    //"room_vertical_door": "./assets/images/doors/room_vertical_door.png",
-    //"bar_vertical_door": "./assets/images/doors/bar_vertical_door.png",
-    //"corridor_vertical_door": "./assets/images/doors/corridor_vertical_door.png",
+    "room_vertical_door_left": "./assets/images/doors/room_vertical_door_left.png",
+    "room_vertical_door_right": "./assets/images/doors/room_vertical_door_right.png",
     "bathroom_horizontal_door": "./assets/images/doors/bathroom_horizontal_door.png",
-    //"bathroom_vertical_door": "./assets/images/doors/bathroom_vertical_door.png"
+    "bathroom_vertical_door_left": "./assets/images/doors/bathroom_vertical_door_left.png",
+    "bathroom_vertical_door_right": "./assets/images/doors/bathroom_vertical_door_right.png",
 
     // furnitures textures
     "sink_front": "./assets/images/furnitures/sink_front.png",

@@ -73,7 +73,12 @@ const FURNITURE_TYPE = {
     SOFA_GREEN_CAT: 28,
     SOFA_RED_CAT_1: 29,
     SOFA_RED_CAT_2: 30,
-    RABBIT: 31
+    RABBIT: 31,
+
+    ROOM_VERTICAL_DOOR_LEFT: 32,
+    ROOM_VERTICAL_DOOR_RIGHT: 33,
+    BATHROOM_VERTICAL_DOOR_LEFT: 34,
+    BATHROOM_VERTICAL_DOOR_RIGHT: 35,
 };
 
 export class Map {
@@ -248,15 +253,20 @@ export class Map {
                 ctx.fillStyle = '#6d2a02';
                 break;
             case TILE_TYPE.ROOM_VERTICAL_DOOR: // 13
+                ctx.fillStyle = '#96502e';
+                break;
             case TILE_TYPE.BAR_VERTICAL_DOOR: // 14
+                ctx.fillStyle = '#772b09';
+                break;
             case TILE_TYPE.CORRIDOR_VERTICAL_DOOR: // 15
-                ctx.fillStyle = '#6d2a02';
+                tile_img = data['planks_floor'];
+                ctx.fillStyle = '#916023';
                 break;
             case TILE_TYPE.BATHROOM_HORIZONTAL_DOOR: // 16
-                ctx.fillStyle = '#10585d';
+                ctx.fillStyle = '#7fb9bd';
                 break;
             case TILE_TYPE.BATHROOM_VERTICAL_DOOR: // 17
-                ctx.fillStyle = '#10585d';
+                ctx.fillStyle = '#7fb9bd';
                 break;
         }
 
@@ -354,6 +364,8 @@ class Furniture {
                 this.x = x + TILE_SIDE / 2 - this.width;
                 if (this.name.includes("green")) {
                     this.y = y + TILE_SIDE / 2;
+                } else if (this.name.includes("door")) { 
+                    this.y = y;
                 } else if (this.name == 'chevalet') {
                     this.y = y - TILE_SIDE * 0.75;
                 } else if (this.name == 'bar') {
