@@ -173,12 +173,6 @@ class GUI {
         }
     }
 
-    zoomIn(ctx) {
-
-  
-
-      }
-
     renderVictory(ctx) {
         if(!this.endScreen){
             const zoomFactor = 1.75;
