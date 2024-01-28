@@ -73,6 +73,7 @@ canvas:fullscreen {
 }
 
 #manette {
+	box-sizing: border-box;
 	position: fixed; 
 	display: none;
 	bottom: 10px;

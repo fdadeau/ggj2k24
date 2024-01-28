@@ -75,6 +75,7 @@ export class Map {
     constructor(level, delay, adversaryRole, skins) {
         // sort walls 
         this.walls = level.walls;//.map(e => e[0] > e[2] ? [e[2],e[1],e[0],e[3]] : e).map(e => e[1] > e[3] ? [e[0],e[3],e[2],e[1]] : e);
+        this.rooms = level.rooms;
         this.furnitures = level.furnitures;
         /** @todo compute these values from walls data from level */
         this.topLeft = [20, 20];
@@ -182,8 +183,48 @@ export class Map {
                 charWithDialog.push(c);
             }
         }
+        
+        // redraw tiles to hide other rooms
+        this.renderTiles2(ctx);
+        
         for(let c of charWithDialog) {
             c.renderDialog(ctx);
+        }
+
+    }
+
+    renderTiles2(ctx) {
+        this.playerRoom = null;
+        let i0 = Math.floor(this.player.y / TILE_SIDE);
+        let j0 = Math.floor(this.player.x / TILE_SIDE);
+        let room = this.rooms[i0][j0];
+        if (room && room.S && this.player.orientation.y > 0) {
+            this.playerRoom = room.S;
+        }
+        else if (room && room.N && this.player.orientation.y < 0) {
+            this.playerRoom = room.N;
+        }
+        else if (room && room.E && this.player.orientation.x > 0) {
+            this.playerRoom = room.E;
+        }
+        else if (room && room.O && this.player.orientation.x < 0) {
+            this.playerRoom = room.O;
+        }
+        else if (room !== null) {
+            this.playerRoom = room;
+        }
+        ctx.fillStyle = "rgba(0,0,0,0.9)";
+        ctx.fillText("Player room = " + this.playerRoom, this.player.x, this.player.y - 20);
+        for (let i=0; i < this.rooms.length; i++) {
+            for (let j=0; j < this.rooms[i].length; j++) {
+                if (!(this.rooms[i][j] == this.playerRoom || this.rooms[i][j] !== null && (this.rooms[i][j].N == this.playerRoom || this.rooms[i][j].S == this.playerRoom || this.rooms[i][j].E == this.playerRoom || this.rooms[i][j].O == this.playerRoom))) {
+                    ctx.fillRect(j*TILE_SIDE,i*TILE_SIDE,TILE_SIDE+1,TILE_SIDE+1);
+                }
+                if (i == i0 && j == j0 && (typeof this.rooms[i][j] === "object")) {
+                    console.log(this.walls[i][j])
+                    this.renderTiles(ctx, this.walls[i][j])
+                }
+            }
         }
     }
 
