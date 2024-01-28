@@ -305,7 +305,9 @@ class GUI {
             case STATE.RUNNING:
                 this.game.render(ctx);
                 // Rendering the interaction button
-                this.interactionButton.render(ctx);
+                if(this.game.player.closestPNJ != null){
+                    this.interactionButton.render(ctx);
+                }
                 break;
             case STATE.VICTORY:
                 this.renderVictory(ctx);
