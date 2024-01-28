@@ -8,7 +8,7 @@ module.exports = { generate };
 function generate() {
     const walls = WALLS_FLOORS;
     const furnitures = FURNITURES;
-    const PNJs = [PNJ_0];
+    const PNJs = [PNJ_0,PNJ_1, PNJ_2, PNJ_3, PNJ_4 , PNJ_5 ];
     //const start = { police: {x: 90, y: 90 }, killer: { x: 1100, y: 650 } };
     const start = { police: {x: 600, y: 900 }, killer: { x: 600, y: 900 } };
     return { walls, furnitures, PNJs, start };
@@ -78,10 +78,10 @@ const WALK = "walk", WAIT = "wait";
 
 const PNJ_0 = { 
     scenario: [
-        [WAIT, {x: 80, y: 140, vecX: 1, vecY: 0}, 1000],
-        [WALK, {xs: 80, ys: 140, xd: 1100, yd: 140}, 8000],
-        [WAIT, {x: 1100, y: 140, vecX: 0, vecY: 1}, 2000],
-        [WALK, {xs: 1100, ys: 140, xd: 80, yd: 140}, 10000]
+        [WAIT, {x: 160, y: 142, vecX: 1, vecY: 0}, 1000],
+        [WALK, {xs: 160, ys: 142, xd: 1810, yd: 142}, 9000],
+        [WAIT, {x: 1810, y: 142, vecX: 0, vecY: 1}, 2000],
+        [WALK, {xs: 1810, ys: 142, xd: 160, yd: 142}, 10000]
     ],
     dialog: [        [
                 [0, "Vous voulez un whisky ?", 1600],
@@ -92,6 +92,188 @@ const PNJ_0 = {
                 [0, "Baba et babi sont sur un bateau", 1600],
                 [1, "Babi bêle ? ", 1600],
                 [0, "et baba cool ! ", 2000]
+            ]
+    ]
+}
+
+
+const PNJ_1 = { 
+    scenario: [
+        [WAIT, {x: 1800, y: 140, vecX: 0, vecY: 1}, 2000],
+        [WALK, {xs: 1800, ys: 140, xd: 160, yd: 140}, 12000],
+        [WAIT, {x: 160, y: 140, vecX: 1, vecY: 0}, 3000],
+        [WALK, {xs: 160, ys: 140, xd: 1800, yd: 140}, 8000]
+    ],
+    dialog: [        [
+                [0, "Vous voulez un whisky ?", 1600],
+                [1, "Juste un doigt.", 1600],
+                [0, "Vous ne voulez pas un whisky d'abord ?", 2000]
+            ],
+            [
+                [0, "Baba et babi sont sur un bateau", 1600],
+                [1, "Babi bêle ? ", 1600],
+                [0, "et baba cool ! ", 2000]
+            ]
+    ]
+}
+
+randomWAIT = [0, 1000, 2000, 6000, 8000, 10000];
+
+
+const PNJ_2 = { 
+    scenario: [
+        [WAIT, {x: 180, y: 140, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+        [WALK, {xs: 180, ys: 140, xd: 180, yd: 1020}, 7000],//descend
+        [WAIT, {x: 180, y: 1020, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+        
+        [WALK, {xs: 180, ys: 1020, xd: 920, yd: 1020}, 8000],//droite 1
+        [WAIT, {x: 920, y: 1020, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+        [WALK, {xs: 920, ys: 1020, xd: 1800, yd: 1020}, 8000],//droite 2
+        [WAIT, {x: 1800, y: 1020, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {xs: 1800, ys: 1020, xd: 1800, yd: 140}, 10000],//haut
+        [WAIT, {x: 1800, y: 140, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {xs: 1800, ys: 140, xd: 180, yd: 140}, 6000]//gauche
+    ],
+    dialog: [        [
+                [0, "Vous voulez un whisky ?", 1600],
+                [1, "Juste un doigt.", 1600],
+                [0, "Vous ne voulez pas un whisky d'abord ?", 2000]
+            ],
+            [
+                [0, "Baba et babi sont sur un bateau", 1600],
+                [1, "Babi bêle ? ", 1600],
+                [0, "et baba cool ! ", 2000]
+            ]
+    ]
+}
+
+
+const PNJ_3 = { 
+    scenario: [
+        [WAIT, {x: 180, y: 120, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+        [WALK, {xs: 180, ys: 120, xd: 1800, yd: 120}, 7000],//droite
+        [WAIT, {x: 1800, y: 120, vecX: 0, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+        
+        [WALK, {xs: 1800, ys: 120, xd: 1800, yd: 1020}, 8000],//bas
+        [WAIT, {x: 1800, y: 1020, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+        [WALK, {xs: 1800, ys: 1020, xd: 855, yd: 1020}, 8000],//gauche 1
+        [WAIT, {x: 855, y: 1020, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {xs: 855, ys: 1020, xd: 180, yd: 1020}, 10000],//gauche 2
+        [WAIT, {x: 180, y: 1020, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {xs: 180, ys: 1020, xd: 180, yd: 120}, 6000]//haut
+    ],
+    dialog: [        [
+                [0, "Vous voulez un whisky ?", 1600],
+                [1, "Juste un doigt.", 1600],
+                [0, "Vous ne voulez pas un whisky d'abord ?", 2000]
+            ],
+            [
+                [0, "Baba et babi sont sur un bateau", 1600],
+                [1, "Babi bêle ? ", 1600],
+                [0, "et baba cool ! ", 2000]
+            ]
+    ]
+}
+
+const PNJ_4 = { //visite piece centre
+    scenario: [
+        [WALK, {xs: 180, ys: 1010, xd: 920, yd: 1010}, 8000],//droite 1
+        [WAIT, {x: 920, y: 1010, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+        [WALK, {xs: 920, ys: 1010, xd: 1800, yd: 1010}, 8000],//droite 2
+        [WAIT, {x: 1800, y: 1010, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+        
+        [WALK, {xs: 1800, ys: 1010, xd: 830, yd: 1010}, 8000],//gauche 1
+        [WAIT, {x: 830, y: 1010, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {xs: 830, ys: 1010, xd: 830, yd: 550}, 8000],//piece 1a
+        [WAIT, {x: 830, y: 550, vecX: 0, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {xs: 830, ys: 550, xd: 750, yd: 550}, 1000],//piece 1a gauche a
+        [WAIT, {x: 750, y: 550, vecX: 1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {xs: 750, ys: 550, xd: 1350, yd: 550}, 6000],//piece 1a gauche b 
+        [WAIT, {x: 1350, y: 550, vecX: 0, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {xs: 1350, ys: 550, xd: 835, yd: 550}, 6000],//piece 2 droite 
+        [WAIT, {x: 835, y: 550, vecX: 0, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {xs: 835, ys: 550, xd: 950, yd: 550}, 1000],//piece 1a gauche b 
+        [WAIT, {x: 950, y: 550, vecX: 1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {xs: 950, ys: 550, xd: 830, yd: 550}, 1000],//piece 1b retour 
+        [WAIT, {x: 830, y: 550, vecX: 1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {xs: 830, ys: 550, xd: 830, yd: 1010}, 10000],//gauche 2
+        [WAIT, {x: 830, y: 1010, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {xs: 830, ys: 1010, xd: 180, yd: 1010}, 10000],//gauche 2
+        [WAIT, {x: 180, y: 1010, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]]
+    ],
+    dialog: [        [
+                [0, "Vous voulez un whisky ?", 1600],
+                [1, "Juste un doigt.", 1600],
+                [0, "Vous ne voulez pas un whisky d'abord ?", 2000]
+            ],
+            [
+                [0, "2Baba et babi sont sur un bateau", 1600],
+                [1, "2Babi bêle ? ", 1600],
+                [0, "2et baba cool ! ", 2000]
+            ]
+    ]
+}
+
+
+
+const PNJ_5 = { //visite piece centre avec scenar salle de bain
+    scenario: [
+        [WALK, {xs: 185, ys: 1015, xd: 925, yd: 1015}, 7000],//droite 1
+        [WAIT, {x: 925, y: 1015, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+        [WALK, {xs: 925, ys: 1015, xd: 1805, yd: 1015}, 8000],//droite 2
+        [WAIT, {x: 1805, y: 1015, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+        
+        [WALK, {xs: 1805, ys: 1015, xd: 835, yd: 1015}, 8000],//gauche 1
+        [WAIT, {x: 835, y: 1015, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {xs: 835, ys: 1015, xd: 835, yd: 540}, 8000],//piece 1a
+        [WAIT, {x: 835, y: 540, vecX: 0, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {xs: 835, ys: 540, xd: 1355, yd: 540}, 7000],//piece 1 vers piece 2
+        [WAIT, {x: 1355, y: 540, vecX: 0, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {xs: 1355, ys: 540, xd: 1355, yd: 612}, 1000],//piece 2a haut
+        [WAIT, {x: 1355, y: 612, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {xs: 1355, ys: 612, xd: 1355, yd: 422}, 1000],//piece 2a bas 1
+        [WAIT, {x: 1355, y: 422, vecX: 0, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {xs: 1355, ys: 422, xd: 1355, yd: 555}, 2000],//piece 2b haut
+        [WAIT, {x: 1355, y: 555, vecX: 0, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {xs: 1355, ys: 555, xd: 835, yd: 555}, 7000],//piece 2 vers piece 1
+        [WAIT, {x: 835, y: 555, vecX: 0, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {xs: 835, ys: 555, xd: 955, yd: 555}, 1000],//piece 1a gauche b 
+        [WAIT, {x: 955, y: 555, vecX: 1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {xs: 955, ys: 555, xd: 835, yd: 555}, 1000],//piece 1b retour 
+        [WAIT, {x: 835, y: 555, vecX: 1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {xs: 835, ys: 1015, xd: 185, yd: 1015}, 10000],//gauche 2
+        [WAIT, {x: 185, y: 1015, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]]
+    ],
+    dialog: [        [
+                [0, "Vous voulez un whisky ?", 1600],
+                [1, "Juste un doigt.", 1600],
+                [0, "Vous ne voulez pas un whisky d'abord ?", 2000]
+            ],
+            [
+                [0, "2Baba et babi sont sur un bateau", 1600],
+                [1, "2Babi bêle ? ", 1600],
+                [0, "2et baba cool ! ", 2000]
             ]
     ]
 }
