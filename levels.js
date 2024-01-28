@@ -385,7 +385,7 @@ const PNJ_6 = { //visite piece bas
         [WAIT, {x: 1220, y: 1650, vecX: -1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]] ,
 
         [WALK, {xs: 1220, ys: 1650, xd: 1220, yd: 1570}, 440],// piece  droite vers haut
-        [WAIT, {x: 1220, y: 1570, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]] ,
+        [WAIT, {x: 1220, y: 1570, vecX: 0, vecY: -1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]] ,
 
         [WALK, {xs: 1220, ys: 1570, xd: 930, yd: 1570}, 1595],// piece  droite vers couloir vert : bas -> haut
         [WAIT, {x: 930, y: 1570, vecX: -1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
@@ -442,7 +442,7 @@ const PNJ_7 = { //visite que piece bas
         [WAIT, {x: 1210, y: 1650, vecX: -1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]] ,
 
         [WALK, {xs: 1210, ys: 1650, xd: 1210, yd: 1550}, 440],// piece  droite vers haut
-        [WAIT, {x: 1210, y: 1550, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]] ,
+        [WAIT, {x: 1210, y: 1550, vecX: 0, vecY: -1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]] ,
 
         [WALK, {xs: 1210, ys: 1550, xd: 970, yd: 1550}, 1595],// piece  droite vers couloir vert : bas -> haut
         [WAIT, {x: 970, y: 1550, vecX: -1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
