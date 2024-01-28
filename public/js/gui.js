@@ -353,16 +353,16 @@ class GUI {
         this.debug = x+","+y;
         switch(this.state){
             case STATE.TITLE_SCREEN:
-                if (this.buttons["CREATE"].isAt(x,y)) {
+                if (this.buttons["CREATE"].isAt(x,y) && ! this.credits && ! this.controls) {
                     return "create";
                 }
-                if (this.buttons["JOIN"].isAt(x,y)) {
+                if (this.buttons["JOIN"].isAt(x,y) && ! this.credits && ! this.controls) {
                     return "join";
                 }
-                if (this.buttons["CREDITS"].isAt(x,y)) {
+                if (this.buttons["CREDITS"].isAt(x,y) && ! this.controls) {
                     this.credits = true;
                 }
-                if (this.buttons["CONTROLS"].isAt(x,y)) {
+                if (this.buttons["CONTROLS"].isAt(x,y) && ! this.credits) {
                     this.controls = true;
                 }
                 if(this.closeButton.isAt(x,y)){
