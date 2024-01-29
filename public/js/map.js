@@ -348,7 +348,7 @@ export class Map {
                 x < f.x + f.width &&
                 y + size > f.y + size/4 &&
                 y < f.y + f.height - size/2
-                && f.id != FURNITURE_TYPE.CARPET){
+                && f.id != FURNITURE_TYPE.CARPET && (f.id < FURNITURE_TYPE.ROOM_VERTICAL_DOOR_LEFT || f.id > FURNITURE_TYPE.BATHROOM_VERTICAL_DOOR_RIGHT)){
                     return f;
             }
         }
