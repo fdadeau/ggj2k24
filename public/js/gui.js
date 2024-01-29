@@ -8,7 +8,7 @@ import { Game } from "./game.js";
 
 import data from "./assets.js";
 
-import { INTERACTION_TIMER } from "./player.js";
+import { END_GAME_STATE, INTERACTION_TIMER } from "./player.js";
 
 import { audio } from "./audio.js";
 
@@ -145,8 +145,19 @@ class GUI {
         }
         if (this.state == STATE.RUNNING && this.game !== null) {
             this.game.update(dt);
-            // this.debug = JSON.stringify({x: this.game.map.adversary.x, y: this.game.map.adversary.y, vx: this.game.map.adversary.vecX, vy: this.game.map.adversary.vecY, role: this.game.player.role});
+
+            if (this.game.player.endGame !== END_GAME_STATE.RUNNING) {
+                //console.log("endGame", gui.game.player.endGame);
+                if (this.game.player.endGame === END_GAME_STATE.WIN) {
+                    this.win(this.game.player.role);
+                    return { gameover: { winner: this.game.player.role }};
+                }
+                let winner = this.game.player.role == "police" ? "killer" : "police";
+                this.lose(winner);
+                return { gameover: { winner: winner } };
+            }
         }
+        
     }
 
     renderTitleScreen(ctx) {
@@ -345,10 +356,7 @@ class GUI {
                 break;
             case STATE.RUNNING:
                 this.game.render(ctx);
-                // Rendering the interaction button
-                if(this.game.player.closestPNJ != null){
-                    this.interactionButton.render(ctx);
-                }
+                this.interactionButton.render(ctx, this.game.getPlayerInteraction());
                 break;
             case STATE.VICTORY:
                 this.renderVictory(ctx);
@@ -424,10 +432,9 @@ class GUI {
                 this.state = STATE.TITLE_SCREEN;
                 break;
             case STATE.RUNNING:
-                if(this.interactionButton.isAt(x,y)){
-                    console.log("clic sur interaction");
-                    return "interaction";
-                }
+                if (this.interactionButton.isAt(x,y)) {
+                    return this.keydown({code: "Space"});
+                } 
                 break;
         }
     }
@@ -534,8 +541,10 @@ class InteractionButton extends Button {
         this.gui = gui;
     }
 
-    render(ctx) {
-        if(!this.gui.game.player.isAvailable() && this.gui.game.player.timeToInteract < INTERACTION_TIMER){
+    render(ctx, what) {
+        if (!what) return;
+
+        if(what.wait){
             // Draw the timer
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.width/2, 0, 2*Math.PI);
@@ -544,21 +553,19 @@ class InteractionButton extends Button {
             ctx.closePath();
             ctx.beginPath();    
             ctx.moveTo(this.x, this.y);
-            ctx.arc(this.x, this.y, this.width/2, 0, 2*Math.PI*this.gui.game.player.timeToInteract/INTERACTION_TIMER);
+            ctx.arc(this.x, this.y, this.width/2, 0, 2*Math.PI*what.wait.current/what.wait.total);
             ctx.fillStyle = "rgba(255,255,255,0.5)";
             ctx.fill();
-        }else{
-            if(this.gui.game.player.talkingTo == null){
-                ctx.drawImage(data["question"], this.x0, this.y0);
-            }else{
-                if(this.gui.game.player.role == "killer"){;
-                    ctx.drawImage(data["saussage"], this.x0, this.y0);
-                }else{
-                    ctx.drawImage(data["trap"], this.x0, this.y0);
-                }
-            }
+            return;
+        }
+        if (what.action === "stab") {
+            ctx.drawImage(data["saussage"], this.x0, this.y0);
+            return;
+        } 
+        if (what.action === "arrest") {
+            ctx.drawImage(data["trap"], this.x0, this.y0);
+            return;
         }
     }
 }
-
 export default GUI;

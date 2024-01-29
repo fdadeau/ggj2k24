@@ -2,8 +2,7 @@ import { preload, data } from "./loader.js";
 
 export const WIDTH = 800, HEIGHT = 500;     // should be a ratio of 16/10
 
-import GUI, { STATE } from "./gui.js";
-import {END_GAME_STATE} from "./player.js";
+import GUI from "./gui.js";
 
 /**
  *  Application 
@@ -102,18 +101,10 @@ document.addEventListener("DOMContentLoaded", function() {
     function mainloop() {
         requestAnimationFrame(mainloop);
         let now = Date.now();
-        gui.update(now - lastUpdate);
+        let r = gui.update(now - lastUpdate);
         // Check if the game ended (depending on player actions)
-        if(gui.state ==  STATE.RUNNING && gui.game !== null && gui.game.player.endGame !== END_GAME_STATE.RUNNING){
-            console.log("endGame", gui.game.player.endGame);
-            if(gui.game.player.endGame === END_GAME_STATE.WIN){
-                socket.emit("endGame",{winner:gui.game.player.role});
-                gui.win(gui.game.player.role);
-            }else{
-                let winner = gui.game.player.role == "police" ? "killer" : "police";
-                gui.lose(winner);
-                socket.emit("endGame",{winner:winner});
-            }
+        if (r && r.gameover) {
+            socket.emit("endGame",{ winner: r.gameover.winner });
         }
         gui.render(CXT);
         lastUpdate = now;
@@ -148,8 +139,8 @@ document.addEventListener("DOMContentLoaded", function() {
             socket.emit("exit");
             return;
         }
-        if (r == "interaction"){
-            gui.game.player.interact();
+        if (r && r.talk) {
+            socket.emit("playerTalk",r.talk);
             return;
         }
         if (r == "ready") {
@@ -182,7 +173,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    
+   
 
     const manette = document.getElementById("manette");
     const manetteBB = manette.getBoundingClientRect();

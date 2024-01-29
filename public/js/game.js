@@ -28,7 +28,6 @@ export class Game {
         // Removing the skin from the list of available skins
         availableSkins = availableSkins.filter(s => s != skin);
 
-
         // Create the map
         this.map = new Map(level, delay, role == "police" ? "killer" : "police", availableSkins);
         this.player = new Player(role, this.map, skin);
@@ -44,7 +43,6 @@ export class Game {
         this.map.update(dt);
         this.player.update(dt);
         this.updateViewport();
-        //this.player.computeFOV(this.viewport);
     }
 
     /**
@@ -80,6 +78,10 @@ export class Game {
         else if (this.player.y + HEIGHT / 2 > this.map.boundaries[1]) {
             this.viewport.y = this.map.boundaries[1] - HEIGHT;
         }
+    }
+
+    getPlayerInteraction() {
+        return this.player.getInteraction(); 
     }
 
     /**

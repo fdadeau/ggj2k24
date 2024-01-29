@@ -6,6 +6,7 @@ import { Adversary, Dialog } from "./pnj.js";
 
 import { FRAME_DELAY } from "./gui.js";
 import { audio } from "./audio.js";
+import { WIDTH, HEIGHT } from "./app.js";
 
 const SPEED = 0.2;
 
@@ -113,7 +114,7 @@ export class Player extends Entity {
     }
 
     render(ctx) {
-        super.render(ctx);        
+        super.render(ctx);       
     }
 
     renderDialog(ctx) {
@@ -126,6 +127,16 @@ export class Player extends Entity {
     /** Check if the object/character at position(x,y) is seen by the player */
     sees(x,y) {
         return this.map.getRoomFor(this.x, this.y) == this.map.getRoomFor(x,y);
+    }
+
+    getInteraction() {
+        if (!this.isAvailable() && this.timeToInteract < INTERACTION_TIMER) {
+            return { wait: { current: this.timeToInteract, total: INTERACTION_TIMER } };
+        }
+        if (this.closestPNJ != null && this.talkingTo != null) {
+            return { action: this.role == "killer" ? "stab" : "arrest" };
+        }
+        return null;
     }
 
     /** 
