@@ -161,37 +161,6 @@ export class Player extends Entity {
         return this.timeToInteract <= 0;
     }
 
-    /**
-     * Computes the field of vision (FOV) of the player (not finished)
-     * @param {Object} viewport { x, y, w, h } rectangle description of the viewport
-     */
-    computeFOV(viewport) {
-        const wallsInViewport = this.map.computeWallsInViewport(viewport);
-        
-        const vStart = { x: this.orientation.x - 3 * this.orientation.y, y: this.orientation.y + 3 * this.orientation.x };
-        const vEnd =   { x: this.orientation.x + 3 * this.orientation.y, y: this.orientation.y - 3 * this.orientation.x };
-
-        const angles = {};
-        wallsInViewport.forEach(([w0,w1,w2,w3]) => {
-            angles[`${w0},${w1}`] = {x: w0, y: w1};
-            angles[`${w2},${w3}`] = {x: w2, y: w3};
-        });
-        angles["vp1"] = { x: viewport.x, y: viewport.y };
-        angles["vp2"] = { x: viewport.x + viewport.w, y: viewport.y };
-        angles["vp3"] = { x: viewport.x + viewport.w, y: viewport.y + viewport.h };
-        angles["vp4"] = { x: viewport.x, y: viewport.y + viewport.h };
-        
-
-        this.FOV = [];
-        for (let a in angles) {
-            if (isInFieldOfView(this, this.orientation, Math.PI*4/5, angles[a])) {
-               this.FOV.push([this.x, this.y, angles[a].x, angles[a].y]);
-            }
-        }
-        
-        this.FOV.push([this.x, this.y, this.x + 50*vStart.x, this.y + 50*vStart.y]);
-        this.FOV.push([this.x, this.y, this.x + 50*vEnd.x, this.y + 50*vEnd.y]);
-    }
 
     /**
      * Interact with the closest PNJ
@@ -334,33 +303,21 @@ export class Player extends Entity {
                 case UP: 
                     if (this.vecY < 0) {
                         this.vecY = 0;
-                        if (this.orientation.x != 0) {
-                            this.orientation.y = 0;
-                        }
                     }
                     break;
                 case DOWN:
                     if (this.vecY > 0) {
                         this.vecY = 0
-                        if (this.orientation.x != 0) {
-                            this.orientation.y = 0;
-                        }
                     }
                     break;
                 case LEFT: 
                     if (this.vecX < 0) {
                         this.vecX = 0;
-                        if (this.orientation.y != 0) {
-                            this.orientation.x = 0;
-                        }
                     }
                     break;
                 case RIGHT: 
                     if (this.vecX > 0) {
                         this.vecX = 0;
-                        if (this.orientation.y != 0) {
-                            this.orientation.x = 0;
-                        }
                     }
                     break;
             }
@@ -375,52 +332,4 @@ export class Player extends Entity {
         }
     }
 
-}
-
-
-function isInFieldOfView(startPoint, direction, fieldOfViewAngle, targetPoint) {
-    const angleToTarget = Math.atan2(targetPoint.y - startPoint.y, targetPoint.x - startPoint.x);
-    const angleDifference = Math.abs(normalizeAngle(angleToTarget - Math.atan2(direction.y, direction.x)));
-
-    // Vérifier si l'angle entre la direction et le point cible est dans le champ de vision
-    return angleDifference <= fieldOfViewAngle / 2;
-}
-
-// Fonction pour normaliser un angle entre -π et π
-function normalizeAngle(angle) {
-    while (angle > Math.PI) {
-        angle -= 2 * Math.PI;
-    }
-    while (angle < -Math.PI) {
-        angle += 2 * Math.PI;
-    }
-    return angle;
-}
-
-function raySegmentIntersection(rayStart, rayDirection, segmentStart, segmentEnd) {
-    const rayEnd = {
-        x: rayStart.x + rayDirection.x,
-        y: rayStart.y + rayDirection.y
-    };
-
-    const den = (segmentEnd.y - segmentStart.y) * (rayEnd.x - rayStart.x) - (segmentEnd.x - segmentStart.x) * (rayEnd.y - rayStart.y);
-
-    if (den === 0) {
-        // Les segments sont parallèles ou colinéaires
-        return null;
-    }
-
-    const ua = ((segmentEnd.x - segmentStart.x) * (rayStart.y - segmentStart.y) - (segmentEnd.y - segmentStart.y) * (rayStart.x - segmentStart.x)) / den;
-    const ub = ((rayEnd.x - rayStart.x) * (rayStart.y - segmentStart.y) - (rayEnd.y - rayStart.y) * (rayStart.x - segmentStart.x)) / den;
-
-    if (ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1) {
-        // Il y a une intersection
-        const intersectionX = segmentStart.x + ua * (segmentEnd.x - segmentStart.x);
-        const intersectionY = segmentStart.y + ua * (segmentEnd.y - segmentStart.y);
-
-        return { x: intersectionX, y: intersectionY };
-    } else {
-        // Pas d'intersection
-        return null;
-    }
 }

@@ -71,8 +71,8 @@ io.on('connection', (socket) => {
                 socket.emit("startGame")    // TODO remove to synchronize players
             }
             else {  // TODO FIX THIS
-                socket.to(rooms[currentGame].roles.killer).emit("startGame");
-                socket.to(rooms[currentGame].roles.police).emit("startGame");
+                socket.to(rooms[currentGame].adversary[socket.id]).emit("startGame");
+                socket.emit("startGame");
             }
         }
     });

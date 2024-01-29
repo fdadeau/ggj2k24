@@ -177,7 +177,7 @@ class GUI {
             this.readyButton.render(ctx);
         }
         else {
-            ctx.fillText("Waiting for your opponent.")
+            ctx.fillText("Waiting for your opponent.", WIDTH/2, HEIGHT*0.8)
         }
     }
 
