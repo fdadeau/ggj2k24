@@ -133,7 +133,7 @@ export class Map {
     }
 
     getRoomFor(x,y) {
-        return this.rooms[Math.floor(y / TILE_SIDE)][Math.floor(x / TILE_SIDE)];
+        return this.rooms[Math.floor(y / TILE_SIDE)] ? this.rooms[Math.floor(y / TILE_SIDE)][Math.floor(x / TILE_SIDE)] : null;
     }
 
     /** Adversary update (propagation to dedicated object) */

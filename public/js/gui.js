@@ -171,10 +171,13 @@ class GUI {
         ctx.restore();
         const whatToDo = this.game.player.role == "killer" ? 
             "Stab victims with Morteau sausage. Don't get caught.": 
-            "Discover who is the killer and arrest him. Don't be mistaken."
+            "Discover who is the killer and arrest him. You have one chance only."
         ctx.fillText(whatToDo, WIDTH/2, HEIGHT*0.6)
         if (!this.ready) {
             this.readyButton.render(ctx);
+        }
+        else {
+            ctx.fillText("Waiting for your opponent.")
         }
     }
 
