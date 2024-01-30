@@ -5,8 +5,6 @@ import { Adversary, PNJ } from "./pnj.js";
 
 import { hitboxCollision, distanceSQ } from "./geometry.js";
 
-import { SKINS } from "./game.js";
-
 import { data } from "./loader.js";
 
 const WALL_THICKNESS = 20;
@@ -83,7 +81,7 @@ const FURNITURE_TYPE = {
 
 export class Map {
 
-    constructor(level, delay, adversaryRole, skins) {
+    constructor(level, delay, adversaryRole) {
         // sort walls 
         this.walls = level.walls;//.map(e => e[0] > e[2] ? [e[2],e[1],e[0],e[3]] : e).map(e => e[1] > e[3] ? [e[0],e[3],e[2],e[1]] : e);
         this.rooms = level.rooms;
@@ -98,16 +96,8 @@ export class Map {
          */
         this.adversary = new Adversary(0,0,0,0,20,adversaryRole,this, level.killerJoke);
         /** @type {Entity[]} */
-        this.PNJs = [this.adversary, ...level.PNJs.map(p => new PNJ(p.scenario, p.dialog, delay))];
-        // Giving a random skin to each PNJ
-        for (let p in this.PNJs) {
-            let skin = skins[Math.floor(Math.random() * skins.length)];
-            skins = skins.filter(s => s != skin);
-            this.PNJs[p].sprite = data[skin];
-            if(skins.length == 0){
-                skins = SKINS;
-            }
-        }
+        this.PNJs = [this.adversary, ...level.PNJs.map(p => new PNJ(p.scenario, p.dialog, delay, p.skin))];
+        this.adversary.sprite = data[adversaryRole == "police" ? level.policeSkin : level.killerSkin];
     }
 
     update(dt) {
