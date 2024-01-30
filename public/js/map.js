@@ -166,7 +166,11 @@ export class Map {
         const characters = this.PNJs.filter((c) => this.player.sees(c.x, c.y));
         characters.push(...furnitures);
         characters.push(this.player);
-        characters.sort(function(c1,c2) { return (c1.y - (c1.alive ? 0 : c1.size)) - (c2.y - (c2.alive ? 0 : c2.size)); })
+        characters.sort(function(c1,c2) { return (c1.id == FURNITURE_TYPE.CARPET ? -1 :
+                                                (c2.id == FURNITURE_TYPE.CARPET ? 1 :
+                                                (c1.y - (c1.alive ? 0 : (c1.size ?? 0))) -
+                                                (c2.y - (c2.alive ? 0 : (c2.size ?? 0)))));
+        });
         const charWithDialog = [];
         for (let c of characters) {
             c.render(ctx);
@@ -347,7 +351,7 @@ export class Map {
             if (x + size > f.x && 
                 x < f.x + f.width * 2 &&
                 y + size * 2 > f.y + size * 1.25 &&
-                y < f.y + f.height * 2 - size * 1.25
+                y < f.y + f.height * 2 - size * 1.5
                 && f.id != FURNITURE_TYPE.CARPET && (f.id < FURNITURE_TYPE.RABBIT || f.id > FURNITURE_TYPE.BATHROOM_VERTICAL_DOOR_RIGHT)){
                     return f;
             }
@@ -365,7 +369,7 @@ export class Map {
             if (x + size > wall[0] && 
                 x < wall[0] + wall[2] &&
                 y + size > wall[1] &&
-                y < wall[1] + wall[3] - (wall[4] == TILE_TYPE.OUTSIDE_WALL ? 0 : size) &&
+                y < wall[1] + wall[3] - (wall[4] == TILE_TYPE.OUTSIDE_WALL ? 0 : size * 1.5) &&
                 (
                     (wall[4] >= TILE_TYPE.OUTSIDE_WALL 
                         && wall[4] <= TILE_TYPE.CORRIDOR_WALL) || 
