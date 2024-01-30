@@ -7,6 +7,7 @@ import { Adversary, Dialog } from "./pnj.js";
 import { FRAME_DELAY } from "./gui.js";
 import { audio } from "./audio.js";
 import { WIDTH, HEIGHT } from "./app.js";
+import { Map } from "./map.js";
 
 const SPEED = 0.2;
 
@@ -28,6 +29,7 @@ export const ARREST_LEFT = [4,4,4,4,4,4,4];
 export const ARREST_RIGHT = [7,7,7,7,7,7,7];
 export const ARREST_BACK = [10,10,10,10,10,10,10];
 
+
 export class Player extends Entity {
 
     constructor(role, map, skin) {
@@ -40,8 +42,6 @@ export class Player extends Entity {
         const {x, y} = map.getPlayerStart(this);
         this.x = x;
         this.y = y;
-        // segments defining the field of vision
-        this.FOV = [];
         /** @type {Object} entity (PNJ or adversary) that is the closest { pnj, distance } */
         this.closestPNJ = null;
         /** @type {Entity} entity the player is currently talking to (null if none) */

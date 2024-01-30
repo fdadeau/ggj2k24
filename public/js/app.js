@@ -49,10 +49,10 @@ document.addEventListener("DOMContentLoaded", function() {
         gui.updateAdversaryTalk(data);
     });
     socket.on("noSuchGame", function() {
-        gui.writeInfo("No available game", 2000);
+        gui.writeInfo("No available game", 1000);
     });
     socket.on("gameIsFull", function() {
-        gui.writeInfo("Game is full", 2000);
+        gui.writeInfo("Game is full", 1000);
     });
     socket.on("endGame", function({winner}) {
         console.log("endGame", winner);

@@ -8,10 +8,10 @@ import { KILL_BACK, ARREST_BACK, ARREST_FRONT, ARREST_LEFT, ARREST_RIGHT, KILL_F
 
 const SPEED = 0.2;
 
-const WALK_FRONT = [0,2];
-const WALK_LEFT = [3,5];
-const WALK_RIGHT = [6,8];
-const WALK_BACK = [9,11];
+const WALK_FRONT = [0,1,2,1];
+const WALK_LEFT = [3,4,5,4];
+const WALK_RIGHT = [6,7,8,7];
+const WALK_BACK = [9,10,11,10];
 const IDLE_FRONT = [1];
 const IDLE_LEFT = [4];
 const IDLE_RIGHT = [7];
@@ -25,8 +25,14 @@ const DIE_BACK = [10,10,10,10,10,10,10];
 
 const ARRESTED = [17,17,17,17,17,17,17,17,17,17];
 
+const SPRITE_W = 48, SPRITE_H = 72;
+
 /**
- * Abstract class for entities
+ * Abstract class for entities (PNJ, Player, Adversary) 
+ * All are considered equally, but: 
+ *    - PNJs follow their own scenarios
+ *    - Player is controlled by the user
+ *    - Adversary is controlled through messages received by the socket
  */
 export class Entity {
 
@@ -105,6 +111,11 @@ export class Entity {
             size * 1.5, 
             size * 1.5
         );
+
+        // draw hitbox
+        ctx.strokeStyle = "red";
+        ctx.strokeRect(this.x - this.size/2, this.y - this.size/2, this.size, this.size);
+        ctx.strokeRect(this.x-1, this.y-1, 3, 3);
     }
 
     isAvailable() {
@@ -113,6 +124,10 @@ export class Entity {
 
     setSprite(s) {
         this.sprite = s;
+    }
+
+    collidesWith(x,y,w,h) {
+        
     }
 
     /**
@@ -147,6 +162,7 @@ export class Entity {
     }
 
     die() {
+
         if (this.talkingTo !== null) {
             this.talkingTo.talkingTo = null;
             this.talkingTo = null;
