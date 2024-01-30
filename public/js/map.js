@@ -5,8 +5,6 @@ import { Adversary, PNJ } from "./pnj.js";
 
 import { hitboxCollision, distanceSQ } from "./geometry.js";
 
-import { SKINS } from "./game.js";
-
 import { data } from "./loader.js";
 
 const WALL_THICKNESS = 20;
@@ -83,7 +81,7 @@ const FURNITURE_TYPE = {
 
 export class Map {
 
-    constructor(level, delay, adversaryRole, skins) {
+    constructor(level, delay, adversaryRole) {
         // sort walls 
         this.walls = level.walls;//.map(e => e[0] > e[2] ? [e[2],e[1],e[0],e[3]] : e).map(e => e[1] > e[3] ? [e[0],e[3],e[2],e[1]] : e);
         this.rooms = level.rooms;
@@ -98,16 +96,8 @@ export class Map {
          */
         this.adversary = new Adversary(0,0,0,0,20,adversaryRole,this, level.killerJoke);
         /** @type {Entity[]} */
-        this.PNJs = [this.adversary, ...level.PNJs.map(p => new PNJ(p.scenario, p.dialog, delay))];
-        // Giving a random skin to each PNJ
-        for (let p in this.PNJs) {
-            let skin = skins[Math.floor(Math.random() * skins.length)];
-            skins = skins.filter(s => s != skin);
-            this.PNJs[p].sprite = data[skin];
-            if(skins.length == 0){
-                skins = SKINS;
-            }
-        }
+        this.PNJs = [this.adversary, ...level.PNJs.map(p => new PNJ(p.scenario, p.dialog, delay, p.skin))];
+        this.adversary.sprite = data[adversaryRole == "police" ? level.policeSkin : level.killerSkin];
     }
 
     update(dt) {
@@ -166,7 +156,11 @@ export class Map {
         const characters = this.PNJs.filter((c) => this.player.sees(c.x, c.y));
         characters.push(...furnitures);
         characters.push(this.player);
-        characters.sort(function(c1,c2) { return (c1.y - (c1.alive ? 0 : c1.size)) - (c2.y - (c2.alive ? 0 : c2.size)); })
+        characters.sort(function(c1,c2) { return (c1.id == FURNITURE_TYPE.CARPET ? -1 :
+                                                (c2.id == FURNITURE_TYPE.CARPET ? 1 :
+                                                (c1.y - (c1.alive ? 0 : (c1.size ?? 0))) -
+                                                (c2.y - (c2.alive ? 0 : (c2.size ?? 0)))));
+        });
         const charWithDialog = [];
         for (let c of characters) {
             c.render(ctx);
@@ -229,7 +223,7 @@ export class Map {
         for (let i=0; i < this.rooms.length; i++) {
             for (let j=0; j < this.rooms[i].length; j++) {
                 if (!(this.rooms[i][j] == this.playerRoom || this.rooms[i][j] !== null && (this.rooms[i][j].N == this.playerRoom || this.rooms[i][j].S == this.playerRoom || this.rooms[i][j].E == this.playerRoom || this.rooms[i][j].O == this.playerRoom))) {
-                    ctx.fillRect(j*TILE_SIDE,i*TILE_SIDE,TILE_SIDE+1,TILE_SIDE+1);
+                    ctx.fillRect(j*TILE_SIDE,i*TILE_SIDE,TILE_SIDE,TILE_SIDE);
                 }
                 if (i == i0 && j == j0 && (typeof this.rooms[i][j] === "object")) {
                     //console.log(this.walls[i][j])
@@ -340,15 +334,15 @@ export class Map {
 
     isTooCloseFromOneFurniture(x, y, size) {
         let furnitures = this.createFurnitures();
-        x = x - size / 2;
-        y = y - size / 2;
+        let sprite_space = TILE_SIDE - 96.6;
+        x = x - size + sprite_space;
+        y = y - size + sprite_space;
         for(let f of furnitures){
-            // TODO
             if (x + size > f.x && 
-                x < f.x + f.width &&
-                y + size > f.y + size/4 &&
-                y < f.y + f.height - size/2
-                && f.id != FURNITURE_TYPE.CARPET && (f.id < FURNITURE_TYPE.ROOM_VERTICAL_DOOR_LEFT || f.id > FURNITURE_TYPE.BATHROOM_VERTICAL_DOOR_RIGHT)){
+                x < f.x + f.width * 2 &&
+                y + size * 2 > f.y + size * 1.25 &&
+                y < f.y + f.height * 2 - size * 1.5
+                && f.id != FURNITURE_TYPE.CARPET && (f.id < FURNITURE_TYPE.RABBIT || f.id > FURNITURE_TYPE.BATHROOM_VERTICAL_DOOR_RIGHT)){
                     return f;
             }
         }
@@ -357,12 +351,15 @@ export class Map {
 
     isTooCloseFromOneWall(x, y, size) {
         size = size * 2;
+        let sprite_space = TILE_SIDE - 96.6;
+        x = x - size + sprite_space;
+        y = y - size + sprite_space;
         // Check collision with walls
         for (let wall of this.walls) {
-            if (x + size > wall[0] + TILE_SIDE / 16 && 
-                x < wall[0] + wall[2] + TILE_SIDE / 16 &&
-                y + size > wall[1] - TILE_SIDE / 16 &&
-                y < wall[1] + wall[3] - TILE_SIDE / 4 &&
+            if (x + size > wall[0] && 
+                x < wall[0] + wall[2] &&
+                y + size > wall[1] &&
+                y < wall[1] + wall[3] - (wall[4] == TILE_TYPE.OUTSIDE_WALL ? 0 : size * 1.5) &&
                 (
                     (wall[4] >= TILE_TYPE.OUTSIDE_WALL 
                         && wall[4] <= TILE_TYPE.CORRIDOR_WALL) || 
@@ -373,7 +370,7 @@ export class Map {
         } 
 
         // Check collision with furnitures
-        return this.isTooCloseFromOneFurniture(x, y, size * 2);
+        return this.isTooCloseFromOneFurniture(x, y, size);
     }
 
 
@@ -406,16 +403,12 @@ class Furniture {
             case 'front':
             default:
                 this.x = x + TILE_SIDE / 2 - this.width;
-                if (this.name.includes("green")) {
+                if (this.name.includes("green") || this.name == 'rabbit') {
                     this.y = y + TILE_SIDE / 2;
-                } else if (this.name.includes("door")) { 
+                } else if (this.name.includes("door") || this.name == 'bar') { 
                     this.y = y;
                 } else if (this.name == 'chevalet') {
                     this.y = y - TILE_SIDE * 0.75;
-                } else if (this.name == 'bar') {
-                    this.y = y;
-                } else if (this.name == 'rabbit') {
-                    this.y = y + TILE_SIDE / 2;
                 } else { 
                     this.y = y - TILE_SIDE / 4;
                 }
@@ -432,18 +425,12 @@ class Furniture {
     }
 
     render(ctx) {
-        // ctx.fillStyle = '#f00';
-        // ctx.fillRect(this.x, this.y, this.width * 2, this.height * 2)
         ctx.drawImage(
             this.img, 
             this.x, 
             this.y, 
             this.width * 2, 
             this.height * 2, 
-            // this.x - this.width/2,
-            // this.y -this.height/2,
-            // this.width * 1.5, 
-            // this.height * 1.5
         );
     }
 }

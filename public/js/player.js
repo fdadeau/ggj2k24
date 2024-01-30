@@ -114,7 +114,7 @@ export class Player extends Entity {
     }
 
     render(ctx) {
-        super.render(ctx);       
+        super.render(ctx);
     }
 
     renderDialog(ctx) {

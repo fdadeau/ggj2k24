@@ -17,7 +17,7 @@ const SPEED = 0.2;
 
 export class PNJ extends Entity {
 
-    constructor(scenario, dialog, delay) {
+    constructor(scenario, dialog, delay, skin) {
         super(0,0,0,0,20);
         let t = 0;
         // scenario of the character
@@ -35,6 +35,7 @@ export class PNJ extends Entity {
         this.step = 0;
         this.alive = true;
         this.arrestedBy = null;
+        this.sprite = data[skin];
     }
 
 

@@ -12,17 +12,45 @@ function generate() {
 
     // Attributing random jokes to PNJs
     let availableJokes = JOKES.jokes.slice();
+    let availableSkin = SKINS.slice();
     PNJs.forEach(pnj => {
+        // Adding a random joke to the PNJ
         pnj.dialog = availableJokes.splice(Math.floor(Math.random() * availableJokes.length), 1)[0];
+        // Adding a random skin to the PNJ
+        pnj.skin = availableSkin.splice(Math.floor(Math.random() * availableSkin.length), 1);
+        if(availableSkin.length == 0){
+            availableSkin = SKINS.slice();
+        }
     });
 
+    if(availableSkin.length <= 1){
+        availableSkin = SKINS.slice();
+    }
+
+    console.log("available skin: ", availableSkin);
+    const policeSkin = availableSkin.splice(Math.floor(Math.random() * availableSkin.length), 1)[0];
+    const killerSkin = availableSkin.splice(Math.floor(Math.random() * availableSkin.length), 1)[0];
     const killerJoke = availableJokes.splice(Math.floor(Math.random() * availableJokes.length), 1)[0];
     //const start = { police: {x: 90, y: 90 }, killer: { x: 1100, y: 650 } };
     const start = { police: {x: 600, y: 900 }, killer: { x: 600, y: 900 } };
-    return { walls, furnitures, PNJs, start, rooms, killerJoke };
+
+    return { walls, furnitures, PNJs, start, rooms, killerJoke, policeSkin, killerSkin };
 } 
 
+const SKINS = [
+    "groom-pink-spritesheet", 
+    "groom-blue-spritesheet", 
+    "groom-red-spritesheet",
+    "chad-spritesheet",
+    "madame-blue-spritesheet",
+    "madame-pink-spritesheet",
+    "madame-yellow-spritesheet",
+    "costume-brown-spritesheet",
+    "costume-green-spritesheet"
+];
+
 const TILE_SIDE = 128;
+
 
 const TILES = [
     [5, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 5],
