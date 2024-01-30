@@ -52,7 +52,7 @@ class GUI {
 
         this.closeButton = new Button("X", WIDTH*.95, HEIGHT*.05, 64, 64, false, false);
 
-        this.readyButton = new Button("Ready!", WIDTH*0.5, HEIGHT*0.75, 180, 60, true, "HotelMadriz")
+        this.readyButton = new Button("Ready", WIDTH*0.5, HEIGHT*0.75, 180, 60, true, "HotelMadriz")
 
         this.credits = false;
         this.controls = false;
@@ -174,16 +174,23 @@ class GUI {
     renderWaitingScreen(ctx) {
         ctx.font = "bold small-caps 25px HotelMadriz";
         ctx.textAlign = "center";
-        ctx.fillText("You play the role of the " + this.game.player.role, WIDTH/2, HEIGHT*0.3);
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, WIDTH, HEIGHT);
+        ctx.fillStyle = "white";
+        ctx.fillText("You play the role of the ", WIDTH * 0.45, HEIGHT*0.2); //  + this.game.player.role
+        ctx.fillStyle = (this.game.player.role == "police") ? "blue" : "red";
+        ctx.fillText(this.game.player.role, WIDTH * 0.69, HEIGHT*0.2);
+        ctx.fillStyle = "white";
         ctx.save();
         ctx.translate(WIDTH/2, HEIGHT/2);
         //ctx.translate(-this.game.player.x, -this.game.player.y);
         this.game.player.render(ctx);
         ctx.restore();
         const whatToDo = this.game.player.role == "killer" ? 
-            "Stab victims with Morteau sausage. Don't get caught.": 
-            "Discover who is the killer and arrest him. You have one chance only."
-        ctx.fillText(whatToDo, WIDTH/2, HEIGHT*0.6)
+            ["Stab victims with Morteau sausage.", "Don't get caught."]: 
+            ["Discover who is the killer and arrest him.", "You have one chance only."];
+        ctx.fillText(whatToDo[0], WIDTH/2, HEIGHT*0.4);
+        ctx.fillText(whatToDo[1], WIDTH/2, HEIGHT*0.5);
         if (!this.ready) {
             this.readyButton.render(ctx);
         }
