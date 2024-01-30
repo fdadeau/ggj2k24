@@ -98,12 +98,12 @@ export class Map {
          */
         this.adversary = new Adversary(0,0,0,0,20,adversaryRole,this, level.killerJoke);
         /** @type {Entity[]} */
-        this.PNJs = [this.adversary, ...level.PNJs.map(p => new PNJ(p.scenario, p.dialog, delay))];
+        this.PNJs = [this.adversary, ...level.PNJs.map(p => new PNJ(p.scenario, p.dialog, delay, p.skin ?? false))];
         // Giving a random skin to each PNJ
         for (let p in this.PNJs) {
             let skin = skins[Math.floor(Math.random() * skins.length)];
             skins = skins.filter(s => s != skin);
-            this.PNJs[p].sprite = data[skin];
+            this.PNJs[p].sprite = (this.PNJs[p].skin ? data[this.PNJs[p].skin] : data[skin]);
             if(skins.length == 0){
                 skins = SKINS;
             }

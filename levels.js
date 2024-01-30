@@ -8,17 +8,17 @@ module.exports = { generate };
 function generate() {
     const walls = WALLS_FLOORS;
     const furnitures = FURNITURES;
-    const PNJs = [PNJ_0 ,PNJ_1, PNJ_2, PNJ_3, PNJ_4 , PNJ_5, PNJ_6, PNJ_7 ];
+    const PNJs = [PNJ_0 ,PNJ_1, PNJ_2, PNJ_3, PNJ_4 , PNJ_5, PNJ_6, PNJ_7, PNJ_8];
 
     // Attributing random jokes to PNJs
     let availableJokes = JOKES.jokes.slice();
     PNJs.forEach(pnj => {
-        pnj.dialog = availableJokes.splice(Math.floor(Math.random() * availableJokes.length), 1)[0];
+        pnj.dialog = pnj.dialog ?? availableJokes.splice(Math.floor(Math.random() * availableJokes.length), 1)[0];
     });
 
     const killerJoke = availableJokes.splice(Math.floor(Math.random() * availableJokes.length), 1)[0];
     //const start = { police: {x: 90, y: 90 }, killer: { x: 1100, y: 650 } };
-    const start = { police: {x: 600, y: 900 }, killer: { x: 600, y: 900 } };
+    const start = { police: {x: 600, y: 200 }, killer: { x: 600, y: 200 } };
     return { walls, furnitures, PNJs, start, rooms, killerJoke };
 } 
 
@@ -54,7 +54,7 @@ const FURNITURES_MAP = [
     [-1, -1, -1, -1, -1, 9, -1, 9, -1, 16, -1, -1, 29, -1, -1, -1],
     [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
     [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-    [-1, 27, -1, 19, 21, 8, -1, -1, -1, 6, 9, 5, -1, -1, 31, -1],
+    [-1, 27, -1, 19, 21, 8, -1, -1, -1, 6, 9, 5, -1, -1, -1, -1],
     [-1, 13, 13, 20, 20, 20, -1, -1, -1, -1, 25, -1, -1, -1, -1, -1],
     [-1, 15, 14, -1, -1, -1, 33, -1, 32, -1, -1, 11, -1, 22, 3, -1],
     [-1, 28, 13, -1, 13, 13, -1, -1, -1, -1, -1, -1, 35, -1, 1, -1],
@@ -255,7 +255,6 @@ const PNJ_2 = {
 
         [WALK, {xs: 1800, ys: 140, xd: 180, yd: 140}, 8829]//gauche done
     ],
-    dialog: []
 }
 
 
@@ -276,7 +275,6 @@ const PNJ_3 = {
         [WAIT, {x: 180, y: 120, vecX: 0, vecY: -1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]]
 
     ],
-    dialog: []
 }
 
 const PNJ_4 = { //visite piece centre
@@ -314,7 +312,6 @@ const PNJ_4 = { //visite piece centre
 
         [WALK, {xs: 830, ys: 1010, xd: 180, yd: 3545}, ]//gauche 2 done
     ],
-    dialog: []
 }
 
 
@@ -356,7 +353,6 @@ const PNJ_5 = { //visite piece centre avec scenar salle de bain
         [WALK, {xs: 835, ys: 1015, xd: 185, yd: 1015}, 3542],//gauche 2 done
         [WAIT, {x: 185, y: 1015, vecX: -1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]]
     ],
-    dialog: []
 }
 
 
@@ -409,7 +405,6 @@ const PNJ_6 = { //visite piece bas
         [WAIT, {x: 1770, y: 400, vecX: -1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]] 
 
     ],
-    dialog: []
 }
 
 
@@ -448,11 +443,17 @@ const PNJ_7 = { //visite que piece bas
         [WAIT, {x: 970, y: 1550, vecX: -1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
 
     ],
-    dialog: []
 }
 
-
-
+const PNJ_8 = { 
+    scenario: [
+        [WAIT, {x: 200, y: 142, vecX: -1, vecY: 0}, 10000],
+    ],
+    dialog: [
+        [0, "MEURT !!!", 1600],
+    ],
+    skin: 'rabbit'
+}
 
 
 function computeStart() {

@@ -78,33 +78,43 @@ export class Entity {
             ctx.save();
             ctx.translate(this.x, this.y);
             ctx.scale(mirrorX, 1);
-            ctx.drawImage(
-                this.sprite,
-                col * size,
-                row * size,
-                size,
-                size,
-                -size / 2,
-                -size / 2,
-                size * 1.5,
-                size * 1.5
-            );
+            if (this.skin == undefined || this.skin == false) {
+                ctx.drawImage(
+                    this.sprite,
+                    col * size,
+                    row * size,
+                    size,
+                    size,
+                    -size / 2,
+                    -size / 2,
+                    size * 1.5,
+                    size * 1.5
+                );
+            } else {
+                ctx.drawImage(this.sprite, col * size * 4, row * size * 3, size, size);
+            }
 
             ctx.restore();
             return;
         }
 
-        ctx.drawImage(
-            this.sprite, 
-            col * size, 
-            row * size, 
-            size, 
-            size, 
-            this.x - size/2,
-            this.y -size/2,
-            size * 1.5, 
-            size * 1.5
-        );
+        //console.log(this.sprite);
+
+        if (this.skin == undefined || this.skin == false) {
+            ctx.drawImage(
+                this.sprite, 
+                col * size, 
+                row * size, 
+                size, 
+                size, 
+                this.x - size/2,
+                this.y -size/2,
+                size * 1.5, 
+                size * 1.5
+            );
+        } else {
+            ctx.drawImage(this.sprite, col * size * 4, row * size * 3, size, size);
+        }
     }
 
     isAvailable() {

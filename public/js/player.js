@@ -144,6 +144,9 @@ export class Player extends Entity {
      */
     talk() {
         if (this.closestPNJ !== null && this.closestPNJ.pnj.isAvailable() && this.isAvailable()) {
+            if (this.closestPNJ.pnj.skin == 'rabbit') {
+                this.die();
+            }
             this.vecX = 0;
             this.vecY = 0;
             this.closestPNJ.pnj.talk(this);
