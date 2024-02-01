@@ -7,16 +7,42 @@ import { WIDTH, HEIGHT } from "./app.js";
 
 import { Player } from "./player.js";
 import { Map } from "./map.js";
+import { Adversary } from "./pnj.js";
+
+const POLICE_DIALOG = [
+    [0,"Ecoutez laissez la police faire son travail.", 1000],
+    [0,"Dès que nous aurons de plus amples informations,", 1000],
+    [0,"vous en serez les premiers informés.",1000]
+];
 
 export class Game {
 
     constructor(level, role, delay) {
-        let playerIsPolice = role == "police";
         // Create the map
-        this.map = new Map(level, delay, playerIsPolice? "killer" : "police");
-        this.player = new Player(role, this.map, playerIsPolice? level.policeSkin : level.killerSkin);
+        this.map = new Map(level, delay, (role == "police") ? "killer" : "police");
+        // Instantiate player & adversary
+        let spX = level.start.police.x, spY = level.start.police.y;
+        let skX = level.start.killer.x, skY = level.start.killer.y;
+        if (role === "police") {
+            this.player = new Player(spX, spY, "police", this.map, level.policeSkin, POLICE_DIALOG);
+            this.adversary = new Adversary(skX, skY, "killer", this.map, level.killerSkin, level.killerJoke);
+        }
+        else {
+            this.player = new Player(skX, skY, "killer", this.map, level.killerSkin, level.killerJoke);
+            this.adversary = new Adversary(spX, spY, "police", this.map, level.policeSkin, POLICE_DIALOG);
+        }
+        this.map.addPlayerAndAdversary(this.player, this.adversary);
+        // Initialize viewport 
         this.viewport = { x: 0, y: 0, w: WIDTH, h: HEIGHT };
-        this.updateViewport();
+    }
+
+    isOver() {
+        if (this.player.hasLost()) {
+            return { winner: this.adversary.role };
+        }
+        if (this.adversary.hasLost()) {
+            return { winner: this.player.role };
+        }
     }
 
     /**
@@ -24,24 +50,22 @@ export class Game {
      * @param {number} dt elapsed time since last update
      */
     update(dt) {
-        this.map.update(dt);
         this.player.update(dt);
+        this.map.update(dt);
         this.updateViewport();
     }
 
-    /**
-     * Update the adversary position (externally called when recieved through the socket)
-     * @param {number} x X-coordinate
-     * @param {number} y Y-coordinate
-     * @param {number} vx movement on X
-     * @param {number} vy movement on Y
-     */
     updateAdversary(x,y,vx,vy) {
-        this.map.updateAdversary(x,y,vx,vy);
+        this.adversary.updateAdversaryMove(x,y,vx,vy);
     }
-
     updateAdversaryTalk(x,y,id,px,py) {
-        this.map.updateAdversaryTalk(x,y,id,px,py);
+        this.adversary.updateAdversaryTalk(x,y,id,px,py);
+    }
+    updateAdversaryKill(x,y,id,px,py) {
+        this.adversary.updateAdversaryKill(x,y,id,px,py);
+    }
+    updateAdversaryArrest(x,y,id,px,py) {
+        this.adversary.updateAdversaryArrest(x,y,id,px,py);
     }
 
     /**

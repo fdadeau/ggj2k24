@@ -8,11 +8,8 @@ import { Game } from "./game.js";
 
 import data from "./assets.js";
 
-import { END_GAME_STATE, INTERACTION_TIMER } from "./player.js";
-
 import { audio } from "./audio.js";
 
-export const FRAME_DELAY = 100;
 
 export const STATE = { 
     LOADING: -999,                
@@ -97,6 +94,16 @@ class GUI {
             this.game.updateAdversaryTalk(data.x, data.y, data.pnjId, data.pnjX, data.pnjY);
         }
     }
+    updateAdversaryKill(data) {
+        if (this.game) {
+            this.game.updateAdversaryKill(data.x, data.y, data.id, data.px, data.py);
+        }
+    }
+    updateAdversaryArrest(data) {
+        if (this.game) {
+            this.game.updateAdversaryArrest(data.x, data.y, data.id, data.px, data.py);
+        }
+    }
 
     /**
      * Displays the message on the screen
@@ -145,6 +152,7 @@ class GUI {
         }
         if (this.state == STATE.RUNNING && this.game !== null) {
             this.game.update(dt);
+            return this.game.isOver();
 
             if (this.game.player.endGame !== END_GAME_STATE.RUNNING) {
                 //console.log("endGame", gui.game.player.endGame);

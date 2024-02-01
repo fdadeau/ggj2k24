@@ -81,68 +81,64 @@ const FURNITURE_TYPE = {
 
 export class Map {
 
-    constructor(level, delay, adversaryRole) {
+    constructor(level, delay) {
         // sort walls 
         this.walls = level.walls;//.map(e => e[0] > e[2] ? [e[2],e[1],e[0],e[3]] : e).map(e => e[1] > e[3] ? [e[0],e[3],e[2],e[1]] : e);
         this.rooms = level.rooms;
         this.furnitures = level.furnitures;
         /** @todo compute these values from walls data from level */
-        this.topLeft = [20, 20];
-        this.bottomRight = [2048, 2048];
         this.boundaries = [2048, 2048];
-        this.playerStart = level.start;
-        /** 
-         * @type {Adversary}
-         */
-        this.adversary = new Adversary(0,0,0,0,20,adversaryRole,this, level.killerJoke);
         /** @type {Entity[]} */
-        this.PNJs = [this.adversary, ...level.PNJs.map(p => new PNJ(p.scenario, p.dialog, delay, p.skin))];
-        this.adversary.sprite = data[adversaryRole == "police" ? level.policeSkin : level.killerSkin];
+        const firstTalk = [1, "Fais moi rire.", 1600];
+        this.characters = level.PNJs.map((p,i) => new PNJ(i+2, p.scenario, [firstTalk, ...p.dialog], delay, p.skin));
     }
 
+    /**
+     * Adds the two main protagonists to the map
+     * @param {Player} player 
+     * @param {Adversary} adversary 
+     */
+    addPlayerAndAdversary(player, adversary) {
+        this.player = player;
+        this.adversary = adversary;
+        this.characters.unshift(player, adversary);
+    }
+
+    
+    /**
+     * Retrieves a character from its identificator
+     * @param {*} id the id of the character
+     * @returns { Entity } the character that is requested.
+     */
+    getCharacterById(id) {
+        return this.characters[Number(id)];
+    }
+
+
+    /**
+     * Updates the complete set of characters (except player). 
+     * @param {number} dt time elapsed since last update
+     */
     update(dt) {
-        this.player.closestPNJ = null;
-        for (let p in this.PNJs) {
-            this.PNJs[p].id = p;   // crade
-            this.PNJs[p].update(dt);
-            let dist = distanceSQ(this.player.x, this.player.y, this.PNJs[p].x, this.PNJs[p].y);
-            if (dist < PROXIMITY && this.player.sees(this.PNJs[p].x, this.PNJs[p].y) && (this.player.closestPNJ == null || this.player.closestPNJ.distance > dist)) {
-                this.player.closestPNJ = { pnj: this.PNJs[p], distance: dist }; 
+        if (this.player.isAvailable()) {
+            this.player.closestPNJ = null;
+        }
+        let min = Infinity;
+        for (let p=1; p < this.characters.length; p++) {
+            let c = this.characters[p];
+            c.update(dt);
+            let dist = distanceSQ(this.player.x, this.player.y, c.x, c.y);
+            if (this.player.isAvailable() && dist < PROXIMITY && this.player.sees(c.x, c.y) && dist < min) {
+                min = dist;
+                this.player.closestPNJ = c;
             }
         }        
-    }
-
-    getPlayerStart(player) {
-        this.player = player;
-        let roleAdv = this.player.role === "police" ? "killer" : "police";
-        let {x, y} = this.playerStart[roleAdv];
-        this.adversary.x = x;
-        this.adversary.y = y;
-        this.adversary.role = roleAdv;
-        return this.playerStart[this.player.role];
     }
 
     getRoomFor(x,y) {
         return this.rooms[Math.floor(y / TILE_SIDE)] ? this.rooms[Math.floor(y / TILE_SIDE)][Math.floor(x / TILE_SIDE)] : null;
     }
 
-    /** Adversary update (propagation to dedicated object) */
-    updateAdversary(x, y, vecX, vecY) {
-        this.adversary.updateAdversary(x,y,vecX,vecY);
-    }
-    updateAdversaryTalk(x, y, id, px, py) {
-        let pnj = this.PNJs[Number(id)];
-        pnj.x = px;
-        pnj.y = py;
-        this.adversary.updateAdversary(x,y,0,0);
-
-        if(pnj instanceof PNJ){
-            pnj.talk(this.adversary);
-        }
-        if(pnj instanceof Adversary){
-            this.player.talkWithAdversary(this.adversary);
-        }
-    }
 
     render(ctx) {
         // ctx.lineWidth = WALL_THICKNESS;
@@ -153,9 +149,8 @@ export class Map {
         }
 
         const furnitures = this.createFurnitures();
-        const characters = this.PNJs.filter((c) => this.player.sees(c.x, c.y));
+        const characters = this.characters.filter((c) => this.player.sees(c.x, c.y));
         characters.push(...furnitures);
-        characters.push(this.player);
         characters.sort(function(c1,c2) { return (c1.id == FURNITURE_TYPE.CARPET ? -1 :
                                                 (c2.id == FURNITURE_TYPE.CARPET ? 1 :
                                                 (c1.y - (c1.alive ? 0 : (c1.size ?? 0))) -
@@ -165,24 +160,19 @@ export class Map {
         for (let c of characters) {
             c.render(ctx);
             // small dot to indicate closest PNJ
-            if (c instanceof PNJ && this.player.closestPNJ && this.player.closestPNJ.pnj == c && c.isAvailable()) {
+            if (this.player.timeToInteract <= 0 && c.id > 0 && this.player.closestPNJ == c && c.isAvailable()) {
                 ctx.strokeStyle = "black";
+                ctx.textAlign = "center";
                 ctx.beginPath();
                 ctx.lineWidth = 1;
-                ctx.roundRect(c.x-10, c.y-50, 40, 20, [10]);
+                ctx.roundRect(c.x - 20, c.y-63, 40, 20, [10]);
                 ctx.stroke();
                 ctx.fillStyle = "white";
                 ctx.fill();
                 ctx.closePath();
                 ctx.font = "bold 30px serif";
                 ctx.fillStyle = "black";
-                ctx.fillText("...",c.x-1, c.y-37);
-                /*
-                ctx.beginPath();
-                ctx.arc(c.x, c.y - c.size - 15, 5, 0, 2*Math.PI);
-                ctx.closePath();
-                ctx.fill();
-                */
+                ctx.fillText("...",c.x, c.y-50);
             }
             if (c.dialog && c.dialog.isRunning()) {
                 charWithDialog.push(c);

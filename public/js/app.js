@@ -38,15 +38,19 @@ document.addEventListener("DOMContentLoaded", function() {
         gui.startGameFromServer(0);
     });
     socket.on("playerMove", function(data) {
-        //console.log("playerMove", data)
         gui.updateAdversary(data);
     });
     socket.on("playerLeft", function() {
         gui.interruptGame();
     });
     socket.on("playerTalk", function(data) {
-        //console.log("playerTalk", data)
         gui.updateAdversaryTalk(data);
+    });
+    socket.on("playerKill", function(data) {
+        gui.updateAdversaryKill(data);
+    });
+    socket.on("playerArrest", function(data) {
+        gui.updateAdversaryArrest(data);
     });
     socket.on("noSuchGame", function() {
         gui.writeInfo("No available game", 1000);
@@ -143,6 +147,14 @@ document.addEventListener("DOMContentLoaded", function() {
             socket.emit("playerTalk",r.talk);
             return;
         }
+        if (r && r.kill) {
+            socket.emit("playerKill", r.kill);
+            return;
+        }
+        if (r && r.arrest) {
+            socket.emit("playerArrest", r.arrest);
+            return;
+        }
         if (r == "ready") {
             socket.emit("ready");
             return;
@@ -157,11 +169,19 @@ document.addEventListener("DOMContentLoaded", function() {
         if (e.repeat) return;
         let r = gui.keydown(e); 
         if (r && r.move) {
-            socket.emit("playerMove",r.move);
+            socket.emit("playerMove", r.move);
             return;
         }
         if (r && r.talk) {
-            socket.emit("playerTalk",r.talk);
+            socket.emit("playerTalk", r.talk);
+            return;
+        }
+        if (r && r.kill) {
+            socket.emit("playerKill", r.kill);
+            return;
+        }
+        if (r && r.arrest) {
+            socket.emit("playerArrest", r.arrest);
             return;
         }
     });

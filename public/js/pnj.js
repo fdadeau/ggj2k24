@@ -3,22 +3,23 @@
  * Class for Entities, NPCs, and the Adversary of the player
  */
 
-import data from "./assets.js";
-
-import { Player } from "./player.js";
 import { Entity } from "./entity.js";
 
-import { FRAME_DELAY } from "./gui.js";
-import { audio } from "./audio.js";
+const WALK = "walk", WAIT = "wait";
 
-const WALK = "walk", WAIT = "wait", TALK = "talk";
-
-const SPEED = 0.2;
 
 export class PNJ extends Entity {
 
-    constructor(scenario, dialog, delay, skin) {
-        super(0,0,0,0,20);
+    /**
+     * Creates a non-playable character
+     * @param {Array} scenario 
+     * @param {Array} dialog 
+     * @param {number} delay start delay (in case the player starts after a while)
+     * @param {string} skin spritesheet used for the character
+     */
+    constructor(id, scenario, dialog, delay, skin) {
+        super(0,0,0,0,skin,dialog);
+        this.id = id;
         let t = 0;
         // scenario of the character
         this.scenario = scenario.map(function(s) {
@@ -29,39 +30,28 @@ export class PNJ extends Entity {
             obj.endTime = t;
             return obj;
         });
-        this.dialog = new Dialog(dialog);
+        // PNJ scenario 
         this.time = 0;
         this.startTime = Date.now() - delay;
         this.step = 0;
-        this.alive = true;
-        this.arrestedBy = null;
-        this.sprite = data[skin];
+        while (this.scenario[this.step].endTime < delay) {
+            this.step++;
+        }
     }
 
 
     update(dt) {
-        // Updating animation
-        this.updateAnimation(dt);
-        if (!this.alive || this.arrestedBy != null) {
+        if (!this.alive || this.arrested) {
             return;
         }
-        // case 1: taking to someone
+        // Updating animation
+        this.updateAnimation(dt);
+        // case 1: taking to someone --> wait for dialog to be over
         if (this.talkingTo !== null) {
-            // if dialog is over --> 
-            if (!this.dialog.isRunning()) {
-                // remove "talk link" between player and PNJ
-                this.talkingTo.talkingTo = null;
-                this.talkingTo = null;
-                // re-sync timing
-                this.startTime += this.dialog.getDuration();
-            }
-            else {  // dialog is not over --> update it
-                this.dialog.update();
-            }
+            super.update(dt);
             return;
         }
         // case 2: following the steps of the scenario
-        this.startTime = this.startTime || Date.now();
         this.time = Date.now() - this.startTime;
         if (this.time >= this.scenario[this.step].endTime) {
             // time overflow
@@ -108,88 +98,43 @@ export class PNJ extends Entity {
         }
     }
 
-    /**
-     * Check if PNJ is available for interaction
-     * @returns true if the PNJ is not talking to anyone
-     */
-    isAvailable() {
-        return this.talkingTo == null && this.alive;
-    }
 
     /**
-     * Starts talking to the player
-     * @param {Player} player 
+     * @override Entity.release
+     * 
+     * @param {number} delay 
      */
-    talk(player) {
-        if (this.isAvailable()) {
-            this.vecX = 0;
-            this.vecY = 0;
-            this.setOrientationToFace(player.x, player.y);
-            this.setAnimation(this.whichAnimation());
-            this.talkingTo = player;
-            this.dialog.start();
-        } 
+    release(delay) {
+        super.release(delay);
+        this.startTime += delay;
     }
-
-    render(ctx) {
-        super.render(ctx);        
-    }
-
-    renderDialog(ctx) {
-        if (this.dialog.isRunning() && this.talkingTo !== null) {
-            this.dialog.render(ctx, this.x, this.y, this.talkingTo.x, this.talkingTo.y, this.talkingTo instanceof Player);
-        }
-    } 
 }
 
 
+
+/**
+ * Class that represents the adversary of the player.
+ * Controlled through the socket connection. 
+ */
 export class Adversary extends Entity {
 
-    constructor(x,y,vecX,vecY,size,role,map, dialog) {
-        super(x,y,vecX,vecY,size);
+    constructor(x, y, role, map, skin, dialog) {
+        super(x, y, 0, 0, skin, [[1, "Fais moi rire.", 1600],...dialog]);
+        this.id = 1;
         this.role = role;
         this.map = map;
-        this.dialog = new Dialog(dialog);
-        this.oldVecX;
-        this.oldVecY;
-    }
-
-    update(dt) {
-        let newX = this.x + this.vecX * SPEED * dt;
-        let newY = this.y + this.vecY * SPEED * dt;
-        if (!this.map.isTooCloseFromOneWall(newX, newY, this.size)) {
-            this.x = newX;
-            this.y = newY;
-        }
-
-        // taking to someone
-        if (this.talkingTo !== null) {
-            // if dialog is over --> 
-            if (!this.dialog.isRunning()) {
-                // remove "talk link" between player and PNJ
-                this.talkingTo.talkingTo = null;
-                this.talkingTo = null;
-            }
-            else {  // dialog is not over --> update it
-                this.dialog.update();
-            }
-            return;
-        }
-        this.updateAnimation(dt);
     }
 
     /**
-     * 
-     * @param {number} x 
-     * @param {number} y 
-     * @param {number} vecX 
-     * @param {number} vecY 
+     * Update adversary movement
+     * @param {number} x current X coordinate
+     * @param {number} y current Y coodfinate 
+     * @param {number} vecX new X direction
+     * @param {number} vecY new Y direction
      */
-    updateAdversary(x,y,vecX,vecY) {
+    updateAdversaryMove(x,y,vecX,vecY) {
         this.x = x;
         this.y = y;
-        this.oldVecX = this.vecX;
-        this.oldVecY = this.vecY;
         this.vecX = vecX;
         if (this.vecX !== 0) {
             this.orientation.y = 0;
@@ -206,146 +151,39 @@ export class Adversary extends Entity {
         }
     }
 
+    /**
+     * Make the character start talking to another character. 
+     * @param {*} x 
+     * @param {*} y 
+     * @param {*} id 
+     * @param {*} px 
+     * @param {*} py 
+     */
     updateAdversaryTalk(x,y,id,px,py) {
-        this.talkingTo = id;
         this.x = x;
         this.y = y;
-        this.vecX = 0;
-        this.vecY = 0;
-        this.setOrientationToFace(px,py);
-        this.setAnimation(this.whichAnimation());
+        const who = this.map.characters[id];
+        who.x = px;
+        who.y = py;
+        this.startTalkingWith(who);
     }
-
-
-    talk(player) {
-        if (this.isAvailable()) {
-            this.talkingTo = player;
-            this.dialog.start();
-            this.setOrientationToFace(player.x, player.y);
-            this.setAnimation(this.whichAnimation());
-        } 
+    updateAdversaryKill(x,y,id,px,py) {
+        this.x = x;
+        this.y = y;
+        const who = this.map.characters[id];
+        who.x = px;
+        who.y = py;
+        this.kills(who);
     }
-
-    isAvailable(){
-        return this.talkingTo == null;
-    }
-
-    render(ctx) {
-        super.render(ctx);
-    }
-
-    renderDialog(ctx) {
-        if (this.dialog.isRunning() && this.talkingTo !== null) {
-            this.dialog.render(ctx, this.x, this.y, this.talkingTo.x, this.talkingTo.y, this.talkingTo instanceof Player);
-        }
-    } 
-
-}
-
-
-
-export class Dialog {
-
-    constructor(texts) {
-        this.state = -1;
-        this.t0 = 0;
-        let endTime = 0;
-        this.texts = texts.map(t => { 
-            endTime += t[2]
-            return { who: t[0], what: t[1], duration: t[2], endTime };
-        });
-        audio.playSound("speak1",4,0.5,true);
-        audio.playSound("speak2",5,1,true);
-        audio.pause(4);
-        audio.pause(5);
-    }
-
-    update(dt) {
-        if (this.state < 0) {
-            return;
-        }
-        this.time = Date.now() - this.t0;
-        if(this.texts[this.state].who == 0){
-            if(audio.audioIsPlaying(4)){
-                audio.pause(4);
-            }
-            if(!audio.audioIsPlaying(5)){
-                audio.resume(5);
-            }
-        }else{
-            if(audio.audioIsPlaying(5)){
-                audio.pause(5);
-            }
-            if(!audio.audioIsPlaying(4)){
-                audio.resume(4);
-            }
-        }
-        if (this.time >= this.texts[this.state].endTime) {
-            this.state++;
-            if (this.state >= this.texts.length) {
-                this.state = -1;
-                audio.pause(4);
-                audio.pause(5);
-            }
-        }
-    }
-
-    isRunning() {
-        return this.state >= 0;
-    }
-
-    getDuration() {
-        return this.texts[this.texts.length-1].endTime;
-    }
-
-    start() {
-        if (this.state < 0) {
-            this.t0 = Date.now();
-            this.state = 0; 
-            if(this.texts[this.state] && this.texts[this.state].who == 0){
-                audio.pause(4);
-                audio.resume(5);
-            }else{
-                audio.pause(5);
-                audio.resume(4);
-            }
-        }
-    }
-
-    end() {
-        this.state = -1;
-        audio.pause(4);
-        audio.pause(5);
-    }
-
-    render(ctx, x0, y0, x1, y1, showtext) {
-        if (this.state >= 0) {
-            ctx.fillStyle = "white";
-            ctx.strokeStyle = "red";
-            ctx.font = "15px arial";
-            ctx.lineWidth = 3;
-            let [x, y, d] = this.texts[this.state].who == 0 ? [x0,y0,20] : [x1,y1,-20]; 
-            let w = ctx.measureText(this.texts[this.state].what).width;
-            const dy = 50;
-            const pad = 10;
-            ctx.beginPath();
-            ctx.moveTo(x, y - 30);
-            ctx.lineTo(x + d, y - dy);
-            ctx.lineTo(x + w/2 + pad, y - dy);
-            ctx.lineTo(x + w/2 + pad, y - dy - 30);
-            ctx.lineTo(x - w/2 - pad, y - dy - 30);
-            ctx.lineTo(x - w/2 - pad, y - dy);
-            ctx.lineTo(x, y - dy);
-            ctx.closePath();
-            ctx.stroke();
-            ctx.fill();
-            if (showtext) {
-                ctx.fillStyle = "black";
-                ctx.textAlign = "center";
-                ctx.verticalAlign = "middle";
-                ctx.fillText(this.texts[this.state].what, x, y - dy - pad);
-            }
-        }
+    updateAdversaryArrest(x,y,id,px,py) {
+        this.x = x;
+        this.y = y;
+        const who = this.map.characters[id];
+        who.x = px;
+        who.y = py;
+        this.arrests(who);
     }
 
 }
+
+

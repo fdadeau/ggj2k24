@@ -1,10 +1,13 @@
 
 import data from "./assets.js";
+
 import { audio } from "./audio.js";
 
-import { FRAME_DELAY } from "./gui.js";
+import { Player } from "./player.js";
 
-import { KILL_BACK, ARREST_BACK, ARREST_FRONT, ARREST_LEFT, ARREST_RIGHT, KILL_FRONT, KILL_LEFT, KILL_RIGHT } from "./player.js";
+import { Dialog } from "./dialog.js";
+
+export const FRAME_DELAY = 100;
 
 const SPEED = 0.2;
 
@@ -12,20 +15,39 @@ const WALK_FRONT = [0,1,2,1];
 const WALK_LEFT = [3,4,5,4];
 const WALK_RIGHT = [6,7,8,7];
 const WALK_BACK = [9,10,11,10];
+
 const IDLE_FRONT = [1];
 const IDLE_LEFT = [4];
 const IDLE_RIGHT = [7];
 const IDLE_BACK = [10];
 
 const DEAD = [14];
+/*
 const DIE_FRONT = [1,1,1,1,1,1,1];
 const DIE_LEFT = [4,4,4,4,4,4,4];
 const DIE_RIGHT = [7,7,7,7,7,7,7];
 const DIE_BACK = [10,10,10,10,10,10,10];
+*/
 
 const ARRESTED = [17,17,17,17,17,17,17,17,17,17];
 
+const KILL_FRONT = [12,13,12,13,12,13];
+const KILL_RIGHT = [15,16,15,16,15,16];
+const KILL_LEFT = [18,19,18,19,18,19];
+const KILL_BACK = [21,22,21,22,21,22];
+
+const ARREST_FRONT = [1,1,1,1,1,1,1];
+const ARREST_LEFT = [4,4,4,4,4,4,4];
+const ARREST_RIGHT = [7,7,7,7,7,7,7];
+const ARREST_BACK = [10,10,10,10,10,10,10];
+
 const SPRITE_W = 48, SPRITE_H = 72;
+
+// possible current actions (that require to update the entity state once the action is over)
+const ACTION = { KILLS: 3, ARRESTS: 4}
+const ARREST = { BEING_ARRESTED: 5, HAS_BEEN_ARRESTED: 6 };
+
+const DEBUG = true;
 
 /**
  * Abstract class for entities (PNJ, Player, Adversary) 
@@ -36,7 +58,16 @@ const SPRITE_W = 48, SPRITE_H = 72;
  */
 export class Entity {
 
-    constructor(x,y,vecX,vecY,size) {
+    /**
+     * Creates a character. 
+     * @param {number} x starting X
+     * @param {number} y starting Y
+     * @param {number} vecX starting vecX
+     * @param {number} vecY starting vecY
+     * @param {string} skin spritesheet used for the skin
+     * @param {Array} dialog dialog line of the character
+     */
+    constructor(x,y,vecX,vecY,skin,dialog) {
         /** @type {number} X position */
         this.x = x;
         /** @type {number} Y position */
@@ -45,91 +76,172 @@ export class Entity {
         this.vecX = vecX;
         /** @type {number} Y direction */
         this.vecY = vecY;
-        /** @type {number} size of the player (hitbox) */
-        this.size = size;
-        /** @type {number} speed of the player */
+        /** @type {number} size of the character (hitbox) */
+        this.size = 20;
+        /** @type {number} speed of the character */
         this.speed = SPEED;
-        /** @type {Entity} entity to which the player is currently talking to */
-        this.talkingTo = null;
 
         /** @type {Object} orientation of the player {x, y} */
         this.orientation = { x: vecX || 1, y: vecY };
 
+        // Dialogs 
+        /** @type {Dialog} Dialog associated to the character */
+        this.dialog = new Dialog(dialog);
+        /** @type {Entity} entity to which the character is currently talking to */
+        this.talkingTo = null;
+
+        /** Life status of the character */
+        this.alive = true;
+        /** Arrested status */
+        this.arrested = 0;  // 0: not arrested, otherwise ARREST.BEING_ARRESTED or ARREST.HAS_BEEN_ARRESTED
+        /** Current action being performed */
+        this.action = 0;    // 0 none specific (walk or talk), otherwise ACTION.KILLS or ACTION.ARRESTS
+        /** Character that has been arrested (police usage only) */
+        this.hasArrested = null;
+
+        /** @type {Image} spritesheet used for the entity */
+        this.sprite = data[skin];
         /** Animation */
         this.animation = this.whichAnimation();
         this.frame = 0;
         this.frameDelay = FRAME_DELAY;
-        /** @type {Image} spritesheet used for the entity */
-        this.sprite = data["groom-pink-spritesheet"];
 
-        this.alive = true;
+        
     }
 
+
+    //// --- Movement ----
+
+    /**
+     * Updates the character's state. 
+     * @param {number} dt elapsed time since last update
+     * @returns 
+     */
     update(dt) {
-        this.x += this.vecX * this.speed * dt;
-        this.y += this.vecY * this.speed * dt;
+        if (!this.alive) {
+            return;
+        }
+        if (this.arrested) {
+            return;
+        }
+        // Updating animation
+        this.updateAnimation(dt);
+        // no movement if player is talking to a PNJ
+        if (this.talkingTo !== null) {
+            if (this.dialog.speaker == this.id) {
+                if (!this.dialog.isRunning()) {
+                    this.endTalking();  // remove dialog link
+                }
+                else {  // dialog is not over --> update it
+                    this.dialog.update();
+                }
+            }
+            return;
+        }
+        const newX = this.x + this.vecX * SPEED * dt;
+        const newY = this.y + this.vecY * SPEED * dt;
+        if (!this.hitsSomething(newX, newY)) {
+            this.x = newX;
+            this.y = newY;
+        }
     }
 
+
+    /**
+     * Checks if the current entity is hitting something that prevents from moving.  
+     * @param {number} newX new X coordinate 
+     * @param {number} newY new Y coordinate
+     * @returns 
+     */
+    hitsSomething(newX, newY) {
+        return false;
+    }
+
+
+    //// ---- RENDERING character & dialogs -----
+
+    /**
+     * Renders the character
+     * @param {CanvasRenderingContext2D} ctx the context to draw on.
+     */
     render(ctx) {
-        let size = 48;
         let frame = this.animation[this.frame];
         let col = frame % 3;
         let row = Math.floor(frame / 3);
 
-        if(this.animation == DEAD || this.animation == ARRESTED){
-            let mirrorX = 1;
-            if (this.orientation.x <= 0) {
-                mirrorX = -1;
-            }
-            ctx.save();
-            ctx.translate(this.x, this.y);
-            ctx.scale(mirrorX, 1);
-            ctx.drawImage(
-                this.sprite,
-                col * size,
-                row * size,
-                size,
-                size,
-                -size / 2,
-                -size / 2,
-                size * 1.5,
-                size * 1.5
-            );
-
-            ctx.restore();
-            return;
+        let mirrorX = 1;
+        if((!this.alive || this.arrested) && this.orientation.x < 0) {
+            mirrorX = -1;
         }
-
-        ctx.drawImage(
-            this.sprite, 
-            col * size, 
-            row * size, 
-            size, 
-            size, 
-            this.x - size/2,
-            this.y -size/2,
-            size * 1.5, 
-            size * 1.5
-        );
-
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.scale(mirrorX, 1);
+        ctx.drawImage(this.sprite, col * SPRITE_W, row * SPRITE_W, SPRITE_W, SPRITE_W, -SPRITE_H/2, -SPRITE_H/2, SPRITE_H, SPRITE_H);
+        ctx.restore();
+        
         // draw hitbox
         ctx.strokeStyle = "red";
-        ctx.strokeRect(this.x - this.size/2, this.y - this.size/2, this.size, this.size);
-        ctx.strokeRect(this.x-1, this.y-1, 3, 3);
+        ctx.strokeRect(this.x - SPRITE_H/2, this.y - SPRITE_H/2, SPRITE_H, SPRITE_H);
+        ctx.strokeRect(this.x-1, this.y+SPRITE_H/2-1, 3, 3);
     }
 
-    isAvailable() {
-        return this.talkingTo == null;
-    }
+    renderDialog(ctx) {
+        if (this.dialog.isRunning() && this.talkingTo !== null) {
+            this.dialog.render(ctx, this.x, this.y, this.talkingTo.x, this.talkingTo.y, this instanceof Player || this.talkingTo instanceof Player);
+        }
+    } 
 
-    setSprite(s) {
-        this.sprite = s;
-    }
 
     collidesWith(x,y,w,h) {
-        
+
     }
 
+
+    /// --- Talking sequence --- 
+
+    /**
+     * Initiate a dialog with another entity
+     * @param {Entity} who the entity to talk to
+     */
+    startTalkingWith(who) {
+        DEBUG && console.log("startTalkingWith", who.id);
+        this.vecX = 0;
+        this.vecY = 0;
+        this.setOrientationToFace(who.x, who.y);
+        this.setAnimation(this.whichAnimation());
+        this.talkingTo = who;
+        who.respondsTo(this);
+    }
+    /**
+     * Called to start a discussion.
+     * @param {Entity} who the entity that started the discussion
+     */
+    respondsTo(who) {
+        DEBUG && console.log("respondsTo", who.id);
+        this.vecX = 0;
+        this.vecY = 0;
+        this.setOrientationToFace(who.x, who.y);
+        this.setAnimation(this.whichAnimation());
+        this.talkingTo = who;
+        this.dialog.start(this.id);
+    }
+    /**
+     * Ends talking and continues its activites.
+     */
+    endTalking() {
+        DEBUG && console.log("endTalking", this.id);
+        let d = this.dialog.getDuration();
+        this.talkingTo.release(d);
+        this.release(d);
+    }
+    /**
+     * Releases character (not talking to anyone anymore)
+     * @param {number} delay elapsed time during dialog 
+     */    
+    release(delay) { 
+        DEBUG && console.log("release", this.id);
+        this.talkingTo = null;
+    }
     /**
      * Set the entity's orientation to face a given point
      * @param {number} x 
@@ -149,31 +261,93 @@ export class Entity {
         }
     }
 
-    talk(who) {
-        this.talkingTo = who;
-        who.talkingTo = this;
+    //// --- Interactions ---
+
+    /**
+     * Check if character is available for interaction
+     * @returns true if the character is alive and not talking to anyone
+     */
+    isAvailable() {
+        return this.talkingTo == null && this.alive && !this.arrested;
     }
-
-    arrest(arrestedBy, endFlag) {
-        this.dialog.end();
-        this.arrestedBy = arrestedBy;
-        this.endAfterThis = endFlag;
-        this.setAnimation(this.whichAnimation());
-    }
-
-    die() {
-
-        if (this.talkingTo !== null) {
-            this.talkingTo.talkingTo = null;
-            this.talkingTo = null;
+    
+    /**
+     * Arrests another player. 
+     * To be called by the player or the adversary, not by a PNJ. 
+     * @param {Entity} who character that is being arrested
+     */
+    arrests(who) {
+        if (this.role == "police" && this.talkingTo == who) {
+            DEBUG && console.log("arrests", who.id);
+            //who.dialog.end();
+            who.arrested = ARREST.BEING_ARRESTED;
+            this.action = ACTION.ARRESTS;
+            this.setAnimation(this.whichAnimation());
         }
-        this.dialog.end();
-        this.alive = false;
-        audio.playSound("die", 42, 0.5, false);
-        this.setAnimation(
-            this.whichAnimation()
-        );
     }
+    /**
+     * Called after arrestation phase is over. 
+     */
+    afterArrests() {
+        DEBUG && console.log("after arrests");
+        this.hasArrested = this.talkingTo;
+        this.talkingTo.arrested = ARREST.HAS_BEEN_ARRESTED;
+        this.endTalking();
+        this.action = 0;
+        this.setAnimation(this.whichAnimation());
+        this.hasArrested.setAnimation(this.hasArrested.whichAnimation());
+    }
+    /**
+     * 
+     * @returns 
+     */
+    hasBeenArrested() {
+        return this.arrested == ARREST.HAS_BEEN_ARRESTED;
+    }
+
+    kills(who) {
+        DEBUG && console.log("kills", who.id)
+        if (this.role == "killer" && this.talkingTo == who && who.dialog.speaker == who.id) {
+            who.dialog.end();
+            this.action = ACTION.KILLS;
+            this.setAnimation(this.whichAnimation());
+        }        
+    }
+    afterKills() {
+        DEBUG && console.log("after kills");
+        // killed policeman --> being arrested
+        this.action = 0;
+        this.setAnimation(this.whichAnimation());
+        if (this.talkingTo.role == "police") {
+            this.talkingTo.arrests(this);
+            return;
+        }
+        // otherwise kills other character
+        this.talkingTo.die();
+        // steal sprite
+        const spBackup = this.talkingTo.sprite;
+        this.talkingTo.sprite = this.sprite;
+        this.sprite = spBackup;
+        // steal dialog
+        this.dialog = this.talkingTo.dialog;
+        // release bound
+        this.release();
+    }
+    die() {
+        if (this.talkingTo !== null) {
+            this.talkingTo = null;
+            this.alive = false;
+            this.setAnimation(this.whichAnimation());
+            audio.playSound("die", 42, 0.5, false);
+        }
+    }
+
+    //// --- GAME END ---
+    hasLost() {
+        return this.role == "killer" && this.hasBeenArrested() || 
+               this.role == "police" && this.hasArrested != null && this.hasArrested.role === undefined;
+    }
+
 
     /** Sets the animation */
     setAnimation(anim){
@@ -185,20 +359,38 @@ export class Entity {
     }
 
     whichAnimation() {
-        if(this.arrestedBy != null){
+        if(this.arrested > 0) {
             return ARRESTED;
         }
-        if(this.alive !== undefined && !this.alive){
+        // is dead
+        if(!this.alive){
+            return DEAD;
+        }
+        // action of killing
+        if (this.action == ACTION.KILLS) {
             if (this.orientation.x > 0) {
-                return DIE_RIGHT;
+                return KILL_RIGHT;
             }
             if (this.orientation.x < 0) {
-                return DIE_LEFT
+                return KILL_LEFT;
             }
-            if (this.orientation.y < 0) {
-                return DIE_BACK;
+            if (this.orientation.y > 0) {
+                return KILL_FRONT;
             }
-            return DIE_FRONT;
+            return KILL_BACK;
+        }
+        // action of arresting 
+        if (this.action == ACTION.ARRESTS) {
+            if (this.orientation.x > 0) {
+                return ARREST_RIGHT;
+            }
+            if (this.orientation.x < 0) {
+                return ARREST_LEFT;
+            }
+            if (this.orientation.y > 0) {
+                return ARREST_FRONT;
+            }
+            return ARREST_BACK;
         }
         // determine animation
         if (this.vecX == 0 && this.vecY == 0) {
@@ -214,6 +406,7 @@ export class Entity {
             }
             return IDLE_FRONT;
         }
+
         if (this.vecX > 0) {
             return WALK_RIGHT;
         }
@@ -225,31 +418,26 @@ export class Entity {
         }
         return WALK_FRONT;
     }
+
+
     updateAnimation(dt) {
         this.frameDelay -= dt;
-        if (this.frameDelay <= 0) {
-            
-            if(this.frame+1 == this.animation.length && (this.animation == KILL_BACK || this.animation == KILL_FRONT || this.animation == KILL_LEFT || this.animation == KILL_RIGHT)){
-                if(this.endAfterThis != undefined){
-                    this.endGame = this.endAfterThis;
-                }else{
-                    this.setAnimation(this.whichAnimation());
-                    this.switchAfterKill.to.setSprite(this.sprite);
-                    this.setSprite(this.switchAfterKill.skin);
-                }
-            }
-
-            if(this.frame+1 == this.animation.length && (this.animation == DIE_BACK || this.animation == DIE_FRONT || this.animation == DIE_LEFT || this.animation == DIE_RIGHT)){
-                this.setAnimation(DEAD);
-            }
-
-            if(this.frame+1 == this.animation.length && this.animation == ARRESTED){
-                //audio.playSound("die", 42, 0.5, false);
-                this.arrestedBy.endGame = this.endAfterThis;
-                console.log(this.arrestedBy)
-            }
+        if (this.frameDelay <= 0) {    
+            // next frame
+            this.frame++;
             this.frameDelay = FRAME_DELAY;
-            this.frame = (this.frame + 1) % this.animation.length;
+            // if out of frame range
+            if (this.frame >= this.animation.length && this.action == ACTION.KILLS) {
+                this.afterKills();
+                return;
+            }
+            if (this.frame >= this.animation.length && this.action == ACTION.ARRESTS) {
+                this.afterArrests();
+                return;
+            }
+            if (this.frame >= this.animation.length) {
+                this.frame = 0;
+            }
         }
     }
 
