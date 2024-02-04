@@ -120,7 +120,7 @@ export class Adversary extends Entity {
 
     constructor(x, y, role, map, skin, dialog) {
         super(x, y, 0, 0, skin, [[1, "Fais moi rire.", 1600],...dialog]);
-        this.id = 1;
+        this.id = (role == "police") ? 1 : 0;
         this.role = role;
         this.map = map;
     }
@@ -168,19 +168,19 @@ export class Adversary extends Entity {
         this.startTalkingWith(who);
     }
     updateAdversaryKill(x,y,id,px,py) {
-        this.x = x;
-        this.y = y;
+        //this.x = x;
+        //this.y = y;
         const who = this.map.characters[id];
-        who.x = px;
-        who.y = py;
+        //who.x = px;
+        //who.y = py;
         this.kills(who);
     }
     updateAdversaryArrest(x,y,id,px,py) {
-        this.x = x;
-        this.y = y;
+        //this.x = x;
+        //this.y = y;
         const who = this.map.characters[id];
-        who.x = px;
-        who.y = py;
+        //who.x = px;
+        //who.y = py;
         this.arrests(who);
     }
 

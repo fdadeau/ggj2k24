@@ -1,8 +1,7 @@
 
-
-
 import { audio } from "./audio.js";
 
+const TALK = "talk";
 
 export class Dialog {
 
@@ -14,10 +13,6 @@ export class Dialog {
             endTime += t[2]
             return { who: t[0], what: t[1], duration: t[2], endTime };
         });
-        audio.playSound("speak1",4,0.5,true);
-        audio.playSound("speak2",5,1,true);
-        audio.pause(4);
-        audio.pause(5);
         this.speaker = -1;
     }
 
@@ -26,28 +21,23 @@ export class Dialog {
             return;
         }
         this.time = Date.now() - this.t0;
-        if(this.texts[this.state].who == 0){
-            if(audio.audioIsPlaying(4)){
-                audio.pause(4);
-            }
-            if(!audio.audioIsPlaying(5)){
-                audio.resume(5);
-            }
-        }else{
-            if(audio.audioIsPlaying(5)){
-                audio.pause(5);
-            }
-            if(!audio.audioIsPlaying(4)){
-                audio.resume(4);
-            }
-        }
         if (this.time >= this.texts[this.state].endTime) {
             this.state++;
             if (this.state >= this.texts.length) {
                 console.log("End dialog");
+                audio.pause(TALK);
                 this.state = -1;
-                audio.pause(4);
-                audio.pause(5);
+                return;
+            }
+            // change of speaker
+            if (this.soundOn && this.texts[this.state-1].who != this.texts[this.state].who) {
+                audio.pause(TALK);
+                if (this.state % 2 == 0) {
+                    audio.playSound("speak1", TALK, 0.5, 1);
+                }
+                else {
+                    audio.playSound("speak2", TALK, 1, 1);
+                }
             }
         }
     }
@@ -60,18 +50,19 @@ export class Dialog {
         return this.texts[this.texts.length-1].endTime;
     }
 
-    start(id) {
+    start(id, soundOn) {
         if (this.state < 0) {
             console.log("Start dialog", id);
             this.speaker = id;
+            this.soundOn = soundOn;
             this.t0 = Date.now();
             this.state = 0; 
-            if(this.texts[this.state] && this.texts[this.state].who == 0){
-                audio.pause(4);
-                audio.resume(5);
-            }else{
-                audio.pause(5);
-                audio.resume(4);
+            if (soundOn) {
+                if(this.texts[this.state] && this.texts[this.state].who == 1){
+                    audio.playSound("speak1",TALK,0.5,true);
+                }else{
+                    audio.playSound("speak2",TALK,1,true);
+                }
             }
         }
     }
@@ -91,6 +82,9 @@ export class Dialog {
             ctx.lineWidth = 3;
             let [x, y, d] = this.texts[this.state].who == 0 ? [x0,y0,20] : [x1,y1,-20]; 
             let w = ctx.measureText(this.texts[this.state].what).width;
+            if (w < 50) {
+                w = 50;
+            }
             const dy = 50;
             const pad = 10;
             ctx.beginPath();

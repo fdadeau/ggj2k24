@@ -22,14 +22,8 @@ const IDLE_RIGHT = [7];
 const IDLE_BACK = [10];
 
 const DEAD = [14];
-/*
-const DIE_FRONT = [1,1,1,1,1,1,1];
-const DIE_LEFT = [4,4,4,4,4,4,4];
-const DIE_RIGHT = [7,7,7,7,7,7,7];
-const DIE_BACK = [10,10,10,10,10,10,10];
-*/
 
-const ARRESTED = [17,17,17,17,17,17,17,17,17,17];
+const ARRESTED = [17];
 
 const KILL_FRONT = [12,13,12,13,12,13];
 const KILL_RIGHT = [15,16,15,16,15,16];
@@ -41,7 +35,7 @@ const ARREST_LEFT = [4,4,4,4,4,4,4];
 const ARREST_RIGHT = [7,7,7,7,7,7,7];
 const ARREST_BACK = [10,10,10,10,10,10,10];
 
-const SPRITE_W = 48, SPRITE_H = 72;
+export const SPRITE_W = 48, SPRITE_H = 72;
 
 // possible current actions (that require to update the entity state once the action is over)
 const ACTION = { KILLS: 3, ARRESTS: 4}
@@ -77,7 +71,7 @@ export class Entity {
         /** @type {number} Y direction */
         this.vecY = vecY;
         /** @type {number} size of the character (hitbox) */
-        this.size = 20;
+        this.size = 20//SPRITE_H;
         /** @type {number} speed of the character */
         this.speed = SPEED;
 
@@ -105,10 +99,11 @@ export class Entity {
         this.animation = this.whichAnimation();
         this.frame = 0;
         this.frameDelay = FRAME_DELAY;
-
-        
     }
 
+    getZIndex() {
+        return this.y + SPRITE_H * (this.alive ? 0.5 : 0.25); 
+    }
 
     //// --- Movement ----
 
@@ -181,8 +176,8 @@ export class Entity {
         
         // draw hitbox
         ctx.strokeStyle = "red";
-        ctx.strokeRect(this.x - SPRITE_H/2, this.y - SPRITE_H/2, SPRITE_H, SPRITE_H);
-        ctx.strokeRect(this.x-1, this.y+SPRITE_H/2-1, 3, 3);
+        ctx.strokeRect(this.x - SPRITE_H/4, this.y + SPRITE_H/2 - 5, SPRITE_H/2, 5);
+        //ctx.strokeRect(this.x-1, this.y+SPRITE_H/2-1, 3, 3);
     }
 
     renderDialog(ctx) {
@@ -191,10 +186,6 @@ export class Entity {
         }
     } 
 
-
-    collidesWith(x,y,w,h) {
-
-    }
 
 
     /// --- Talking sequence --- 
@@ -223,7 +214,7 @@ export class Entity {
         this.setOrientationToFace(who.x, who.y);
         this.setAnimation(this.whichAnimation());
         this.talkingTo = who;
-        this.dialog.start(this.id);
+        this.dialog.start(this.id, this instanceof Player || who instanceof Player);
     }
     /**
      * Ends talking and continues its activites.
@@ -261,6 +252,7 @@ export class Entity {
         }
     }
 
+
     //// --- Interactions ---
 
     /**
@@ -280,6 +272,10 @@ export class Entity {
         if (this.role == "police" && this.talkingTo == who) {
             DEBUG && console.log("arrests", who.id);
             //who.dialog.end();
+            if (this instanceof Player || who instanceof Player) {
+                audio.pause("talk");
+                audio.playSound("trap_sound", "action", 1, false);
+            }
             who.arrested = ARREST.BEING_ARRESTED;
             this.action = ACTION.ARRESTS;
             this.setAnimation(this.whichAnimation());
@@ -310,6 +306,10 @@ export class Entity {
         if (this.role == "killer" && this.talkingTo == who && who.dialog.speaker == who.id) {
             who.dialog.end();
             this.action = ACTION.KILLS;
+            if (this instanceof Player || who instanceof Player) {
+                audio.playSound("kill", "action", 1, false);
+                audio.pause("talk");
+            }
             this.setAnimation(this.whichAnimation());
         }        
     }
@@ -322,14 +322,17 @@ export class Entity {
             this.talkingTo.arrests(this);
             return;
         }
-        // otherwise kills other character
-        this.talkingTo.die();
+        if (this instanceof Player) {
+            audio.playSound("die", 42, 1, false);        
+        }
         // steal sprite
         const spBackup = this.talkingTo.sprite;
         this.talkingTo.sprite = this.sprite;
         this.sprite = spBackup;
         // steal dialog
         this.dialog = this.talkingTo.dialog;
+        // otherwise kills other character
+        this.talkingTo.die();
         // release bound
         this.release();
     }
@@ -338,7 +341,7 @@ export class Entity {
             this.talkingTo = null;
             this.alive = false;
             this.setAnimation(this.whichAnimation());
-            audio.playSound("die", 42, 0.5, false);
+            audio.playSound("die", "action", 0.5, false);
         }
     }
 

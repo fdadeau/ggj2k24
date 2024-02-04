@@ -50,22 +50,29 @@ export class Game {
      * @param {number} dt elapsed time since last update
      */
     update(dt) {
-        this.player.update(dt);
         this.map.update(dt);
         this.updateViewport();
     }
 
-    updateAdversary(x,y,vx,vy) {
-        this.adversary.updateAdversaryMove(x,y,vx,vy);
-    }
-    updateAdversaryTalk(x,y,id,px,py) {
-        this.adversary.updateAdversaryTalk(x,y,id,px,py);
-    }
-    updateAdversaryKill(x,y,id,px,py) {
-        this.adversary.updateAdversaryKill(x,y,id,px,py);
-    }
-    updateAdversaryArrest(x,y,id,px,py) {
-        this.adversary.updateAdversaryArrest(x,y,id,px,py);
+    /**
+     * Called to update an adversary movement on 
+     * @param {string} what which action has to be updated
+     * @param {Object} data information required to perform the considered update
+     * @returns 
+     */
+    updateAdversary(what, data) {
+        if (what == "move") {
+            return this.adversary.updateAdversaryMove(data.x, data.y, data.vecX, data.vecY);
+        }
+        if (what == "talk") {
+            return this.adversary.updateAdversaryTalk(data.x, data.y, data.id, data.px, data.py);
+        }
+        if (what == "kill") {
+            return this.adversary.updateAdversaryKill(data.x, data.y, data.id, data.px, data.py);
+        }
+        if (what == "arrest") {
+            return this.adversary.updateAdversaryArrest(data.x, data.y, data.id, data.px, data.py);
+        }
     }
 
     /**
@@ -100,6 +107,14 @@ export class Game {
         ctx.save();
         ctx.translate(-this.viewport.x, -this.viewport.y);
         this.map.render(ctx); 
+        if (this.isOver()) {
+            ctx.fillStyle = "black";
+            ctx.beginPath();
+            ctx.arc(this.player.x, this.player.y, 120, 0, 2 * Math.PI);
+            ctx.rect(this.player.x + WIDTH, this.player.y - HEIGHT, -2*WIDTH, 2*HEIGHT);
+            ctx.closePath();
+            ctx.fill();
+        }
         ctx.restore();
     }  
 

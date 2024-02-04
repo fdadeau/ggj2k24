@@ -39,17 +39,17 @@ class GUI {
 
         /** buttons */
         this.buttons = {
-            "CREATE": new Button("Create Game", WIDTH*0.35, HEIGHT*0.7, 180, 60, true, "HotelMadriz"),
-            "JOIN": new Button("Join Game", WIDTH*0.65, HEIGHT*0.7, 180, 60, true, "HotelMadriz"),
-            "CREDITS": new Button("Credits", WIDTH*0.35, HEIGHT*0.84, 180, 60, true, "HotelMadriz"),
-            "CONTROLS": new Button("Rules", WIDTH*0.65, HEIGHT*0.84, 180, 60, true, "HotelMadriz")
+            "CREATE": new Button("Créer partie", WIDTH*0.35, HEIGHT*0.7, 180, 60, true, "HotelMadriz"),
+            "JOIN": new Button("Rejoindre", WIDTH*0.65, HEIGHT*0.7, 180, 60, true, "HotelMadriz"),
+            "CREDITS": new Button("Crédits", WIDTH*0.35, HEIGHT*0.84, 180, 60, true, "HotelMadriz"),
+            "CONTROLS": new Button("Règles", WIDTH*0.65, HEIGHT*0.84, 180, 60, true, "HotelMadriz")
         }
 
         this.interactionButton = new InteractionButton("", WIDTH*.95, HEIGHT*.93, 64, 64, this);
 
         this.closeButton = new Button("X", WIDTH*.95, HEIGHT*.05, 64, 64, false, false);
 
-        this.readyButton = new Button("Ready", WIDTH*0.5, HEIGHT*0.75, 180, 60, true, "HotelMadriz")
+        this.readyButton = new Button("Prêt", WIDTH*0.5, HEIGHT*0.75, 180, 60, true, "HotelMadriz")
 
         this.credits = false;
         this.controls = false;
@@ -84,24 +84,9 @@ class GUI {
      * Called when the other player moves/stops moving. 
      * @param {Object} data Object { x, y, vecX, vecY } representing other player's position/movement
      */
-    updateAdversary(data) {
+    updateAdversary(what, data) {
         if (this.game) {
-            this.game.updateAdversary(data.x, data.y, data.vecX, data.vecY);
-        }
-    }
-    updateAdversaryTalk(data) {
-        if (this.game) {
-            this.game.updateAdversaryTalk(data.x, data.y, data.pnjId, data.pnjX, data.pnjY);
-        }
-    }
-    updateAdversaryKill(data) {
-        if (this.game) {
-            this.game.updateAdversaryKill(data.x, data.y, data.id, data.px, data.py);
-        }
-    }
-    updateAdversaryArrest(data) {
-        if (this.game) {
-            this.game.updateAdversaryArrest(data.x, data.y, data.id, data.px, data.py);
+            this.game.updateAdversary(what, data);
         }
     }
 
@@ -152,18 +137,16 @@ class GUI {
         }
         if (this.state == STATE.RUNNING && this.game !== null) {
             this.game.update(dt);
-            return this.game.isOver();
-
-            if (this.game.player.endGame !== END_GAME_STATE.RUNNING) {
-                //console.log("endGame", gui.game.player.endGame);
-                if (this.game.player.endGame === END_GAME_STATE.WIN) {
-                    this.win(this.game.player.role);
-                    return { gameover: { winner: this.game.player.role }};
+            let go = this.game.isOver();
+            if (go) {
+                if (go.winner == this.game.player.role) {
+                    this.state = STATE.VICTORY;
                 }
-                let winner = this.game.player.role == "police" ? "killer" : "police";
-                this.lose(winner);
-                return { gameover: { winner: winner } };
-            }
+                else {
+                    this.state = STATE.LOSE;
+                }
+            };
+            return { gameover: go };
         }
         
     }
@@ -185,7 +168,7 @@ class GUI {
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, WIDTH, HEIGHT);
         ctx.fillStyle = "white";
-        ctx.fillText("You play the role of the ", WIDTH * 0.45, HEIGHT*0.2); //  + this.game.player.role
+        ctx.fillText("Vous jouez le role ", WIDTH * 0.45, HEIGHT*0.2); //  + this.game.player.role
         ctx.fillStyle = (this.game.player.role == "police") ? "blue" : "red";
         ctx.fillText(this.game.player.role, WIDTH * 0.69, HEIGHT*0.2);
         ctx.fillStyle = "white";
@@ -195,23 +178,23 @@ class GUI {
         this.game.player.render(ctx);
         ctx.restore();
         const whatToDo = this.game.player.role == "killer" ? 
-            ["Stab victims with Morteau sausage.", "Don't get caught."]: 
-            ["Discover who is the killer and arrest him.", "You have one chance only."];
+            ["Tuez des victimes à coup de saucisse de Morteau.", "Ne vous faites pas coincer."]: 
+            ["Coincez le meurtier.", "Ne vous trompez pas. Vous n'avez qu'un seul essai."];
         ctx.fillText(whatToDo[0], WIDTH/2, HEIGHT*0.4);
         ctx.fillText(whatToDo[1], WIDTH/2, HEIGHT*0.5);
         if (!this.ready) {
             this.readyButton.render(ctx);
         }
         else {
-            ctx.fillText("Waiting for your opponent.", WIDTH/2, HEIGHT*0.8)
+            ctx.fillText("En attente de votre adversaire.", WIDTH/2, HEIGHT*0.8)
         }
     }
 
     renderConnectionLost(ctx) {
         ctx.textAlign = "center";
         ctx.font = "18px arial";
-        ctx.fillText("Other player has been disconnected.", WIDTH / 2, HEIGHT / 2 -20);
-        ctx.fillText("Click to return to title screen.", WIDTH / 2, HEIGHT / 2 + 20);
+        ctx.fillText("Adversaire déconnecté.", WIDTH / 2, HEIGHT / 2 -20);
+        ctx.fillText("Cliquez pour revenir à l'écran de titre.", WIDTH / 2, HEIGHT / 2 + 20);
     }
     
     renderInfos(ctx){
@@ -232,31 +215,43 @@ class GUI {
     }
 
     renderVictory(ctx) {
-        if(!this.endScreen){
-            const zoomFactor = 1.75;
-            ctx.scale(zoomFactor, zoomFactor);
-            ctx.translate(-200,-125);
-            this.game.render(ctx);
-            ctx.font = "bold small-caps 60px HotelMadriz";
-            ctx.fillStyle = "white";
-            ctx.textAlign = "center";
-            ctx.fillText("Victoire", WIDTH/2+20, HEIGHT/2+HEIGHT/4);
+        const zoomFactor = 1.75;
+//        ctx.save();
+//        ctx.scale(zoomFactor, zoomFactor);
+//        ctx.translate(-200,-125);
+        this.game.render(ctx);
+        ctx.font = "bold small-caps 60px HotelMadriz";
+        ctx.fillStyle = "white";
+        ctx.textAlign = "center";
+        ctx.fillText("Victoire", WIDTH*0.5, HEIGHT*0.75);
+        ctx.font = "bold small-caps 26px HotelMadriz";
+        if (this.game.player.role == "police") {
+            ctx.fillText("Vous avez réussi à coincer ce meurtrier.", WIDTH / 2, HEIGHT * 0.85);
         }
-        this.endScreen = true;
+        else {
+            ctx.fillText("Vous avez réussi à vous échapper.", WIDTH / 2, HEIGHT * 0.85);
+        }
+//        ctx.restore();
     }
 
     renderLose(ctx) {
-        if(!this.endScreen){
-            const zoomFactor = 1.75;
-            ctx.scale(zoomFactor, zoomFactor);
-            ctx.translate(-200,-125);
-            this.game.render(ctx);
-            ctx.font = "bold small-caps 60px HotelMadriz";
-            ctx.fillStyle = "white";
-            ctx.textAlign = "center";
-            ctx.fillText("Defaite", WIDTH/2+20, HEIGHT/2+HEIGHT/4);
+        const zoomFactor = 1.75;
+        ctx.save();
+//        ctx.scale(zoomFactor, zoomFactor);
+//        ctx.translate(-200,-125);
+        this.game.render(ctx);
+        ctx.font = "bold small-caps 60px HotelMadriz";
+        ctx.fillStyle = "white";
+        ctx.textAlign = "center";
+        ctx.fillText("Défaite", WIDTH*0.5, HEIGHT*0.75);
+        ctx.font = "bold small-caps 26px HotelMadriz";
+        if (this.game.player.role == "police") {
+            ctx.fillText("Vous n'avez pas réussi à coincer ce meurtrier.", WIDTH / 2, HEIGHT * 0.85);
         }
-        this.endScreen = true;
+        else {
+            ctx.fillText("Vous vous êtes fait bêtement coincer.", WIDTH / 2, HEIGHT * 0.85);
+        }
+//        ctx.restore();
     }
 
     renderControls(ctx){
@@ -269,16 +264,16 @@ class GUI {
         ctx.fillText('Concept', 320, 160);
         ctx.fillStyle = '#fff';
         ctx.font = "bold small-caps 20px HotelMadriz";
-        ctx.fillText('Inspector :  Arrest the murderer', 160, 200);
-        ctx.fillText('Murderer :   Kill without being caught', 160, 240);
+        ctx.fillText('Policier :  Arretez le meurtier', 160, 200);
+        ctx.fillText('Meutrier :  Tuez sans vous faire coincer', 160, 240);
         ctx.fillStyle = '#ffd728';
         ctx.font = "bold small-caps 25px HotelMadriz";
 
         ctx.fillText('Controls', 320, 280);
         ctx.fillStyle = '#fff';
         ctx.font = "bold small-caps 20px HotelMadriz";
-        ctx.fillText('Arrows to move', 180, 320);
-        ctx.fillText('Space to use an object', 180, 360);
+        ctx.fillText('Fleches pour se deplacer.', 180, 320);
+        ctx.fillText('Barre d\'espace pour réaliser une action.', 180, 360);
 
         this.closeButton.render(ctx);
     }
@@ -381,8 +376,8 @@ class GUI {
                 break;
         }
 
-        this.renderInfos(ctx);
-        this.renderDebug(ctx);
+        //this.renderInfos(ctx);
+        //this.renderDebug(ctx);
     }
 
 
@@ -451,6 +446,10 @@ class GUI {
                     return this.keydown({code: "Space"});
                 } 
                 break;
+            case STATE.LOSE:
+            case STATE.VICTORY:
+                this.game = null;
+                this.state = STATE.TITLE_SCREEN;
         }
     }
     dblclick(x, y) { }

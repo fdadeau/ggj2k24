@@ -107,13 +107,15 @@ io.on('connection', (socket) => {
         room.adversary[otherID] = socket.id;
         room.adversary[socket.id] = otherID;
 
+        // make it 0 when synchronized
+        const delay = Date.now() - rooms[roomId].t0;
         // Informer le joueur qu'il a rejoint la salle, avec son rôle
-        socket.emit('newgame', { level: rooms[roomId].level, role, delay: Date.now() - rooms[roomId].t0 });
+        socket.emit('newgame', { level: rooms[roomId].level, role, delay  });
         // Informer les autres joueurs de la salle qu'un nouveau joueur a rejoint
         socket.to(otherID).emit("playerJoined");
     });
 
-    // Écouter les mouvements du joueur
+    // Mouvements du joueur
     socket.on('playerMove', (data) => {
         let currentGame = games[socket.id];
         if (currentGame && rooms[currentGame]) {
@@ -121,12 +123,28 @@ io.on('connection', (socket) => {
             socket.volatile.to(rooms[currentGame].adversary[socket.id]).emit('playerMove', data);
         }
     });
-    // Écouter les mouvements du joueur
+    // Discussions du joueur
     socket.on('playerTalk', (data) => {
         let currentGame = games[socket.id];
         if (currentGame && rooms[currentGame]) {
             // inform the adversary that two players are talking to each other
             socket.volatile.to(rooms[currentGame].adversary[socket.id]).emit('playerTalk', data);
+        }
+    });
+    // Interaction 1 - meurtre du joueur
+    socket.on('playerKill', (data) => {
+        let currentGame = games[socket.id];
+        if (currentGame && rooms[currentGame]) {
+            // inform the adversary that a murder is initiated
+            socket.volatile.to(rooms[currentGame].adversary[socket.id]).emit('playerKill', data);
+        }
+    });
+    // Interaction 2 - arrestation du joueur
+    socket.on('playerArrest', (data) => {
+        let currentGame = games[socket.id];
+        if (currentGame && rooms[currentGame]) {
+            // inform the adversary that an arrest is initiated
+            socket.volatile.to(rooms[currentGame].adversary[socket.id]).emit('playerArrest', data);
         }
     });
 
@@ -159,11 +177,13 @@ io.on('connection', (socket) => {
     // Gérer la fin de partie
     socket.on('endGame', (data) => {
         let currentGame = games[socket.id];
+        if (!currentGame) {
+            return;
+        }
         console.log(`Game ${currentGame} ended, data = ${data.winner} won`);
         delete games[socket.id];
         // Retirer le joueur de la salle
         if (currentGame && rooms[currentGame]) {
-            socket.to(rooms[currentGame].adversary[socket.id]).emit('endGame', data);
             delete rooms[currentGame];   
             console.log("--> Game " + currentGame + " deleted")
         }

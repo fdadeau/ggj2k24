@@ -37,20 +37,24 @@ document.addEventListener("DOMContentLoaded", function() {
     socket.on("startGame", function() {
         gui.startGameFromServer(0);
     });
-    socket.on("playerMove", function(data) {
-        gui.updateAdversary(data);
-    });
     socket.on("playerLeft", function() {
         gui.interruptGame();
     });
+    socket.on("playerMove", function(data) {
+        console.log("playerMove", data);
+        gui.updateAdversary("move", data);
+    });
     socket.on("playerTalk", function(data) {
-        gui.updateAdversaryTalk(data);
+        console.log("playerTalk", data);
+        gui.updateAdversary("talk", data);
     });
     socket.on("playerKill", function(data) {
-        gui.updateAdversaryKill(data);
+        console.log("playerKill", data);
+        gui.updateAdversary("kill", data);
     });
     socket.on("playerArrest", function(data) {
-        gui.updateAdversaryArrest(data);
+        console.log("playerArrest", data);
+        gui.updateAdversary("arrest", data);
     });
     socket.on("noSuchGame", function() {
         gui.writeInfo("No available game", 1000);
@@ -58,11 +62,6 @@ document.addEventListener("DOMContentLoaded", function() {
     socket.on("gameIsFull", function() {
         gui.writeInfo("Game is full", 1000);
     });
-    socket.on("endGame", function({winner}) {
-        console.log("endGame", winner);
-        gui.game.player.endGame = winner == gui.game.player.role ? END_GAME_STATE.WIN : END_GAME_STATE.LOSE;
-    }
-    );
     
     /**  
      * Callback invoked each time a resource has been loaded. 

@@ -122,7 +122,7 @@ const JOKES = require("./public/assets/json/jokes.json");
 for (let i = 0; i < TILES.length; i++) {
     for (let j = 0; j < TILES.length; j++) {
         FURNITURES.push([TILE_SIDE * j, TILE_SIDE * i, FURNITURES_MAP[i][j]]) // [x, y, width, length, tyles_type, furniture_type]
-        WALLS_FLOORS.push([TILE_SIDE * j, TILE_SIDE * i, TILE_SIDE, TILE_SIDE, TILES[i][j],])
+        WALLS_FLOORS.push([TILE_SIDE * j, TILE_SIDE * i, TILE_SIDE, TILE_SIDE, TILES[i][j],i,j])
         // identify wall that should be drawn onto the character
         if (isWall(TILES[i][j])) {
             DISPLAY_WALLS.push([i,j]);
