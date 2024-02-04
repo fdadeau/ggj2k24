@@ -191,8 +191,11 @@ class GUI {
     }
 
     renderConnectionLost(ctx) {
+        audio.pause("talk");
+        audio.pause("footsteps");
         ctx.textAlign = "center";
         ctx.font = "18px arial";
+        ctx.fillStyle = "black";
         ctx.fillText("Adversaire déconnecté.", WIDTH / 2, HEIGHT / 2 -20);
         ctx.fillText("Cliquez pour revenir à l'écran de titre.", WIDTH / 2, HEIGHT / 2 + 20);
     }
@@ -455,7 +458,7 @@ class GUI {
     dblclick(x, y) { }
     mousemove(x, y) { }
     touchStart(x, y) {
-        if (!this.game) return;
+        if (!this.game || this.state != STATE.RUNNING) return;
         let key = "";
         if (Math.abs(x) > Math.abs(y)) {
             key = x < 0 ? "ArrowLeft" : "ArrowRight";
@@ -473,7 +476,7 @@ class GUI {
         }
     }
     touchMove(x,y) {
-        if (!this.game) return;
+        if (!this.game || this.state != STATE.RUNNING) return;
         let key = "";
         if (Math.abs(x) > Math.abs(y)) {
             key = x < 0 ? "ArrowLeft" : "ArrowRight";
@@ -492,7 +495,7 @@ class GUI {
         }
     }
     touchEnd() {
-        if (!this.game) return;
+        if (!this.game || this.state != STATE.RUNNING) return;
         this.lastKey = null;
         return this.game.keyup();
     }

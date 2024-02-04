@@ -11,6 +11,9 @@ const PORT = 5500;
 
 app.use(express.static('public'));
 
+// déblocage requetes cross-origin
+app.set('origins', '*:*');
+
 // detault game page 
 app.get('/', function(_req, res) {  
     res.sendFile(__dirname + '/public/index.html');
