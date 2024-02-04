@@ -388,6 +388,10 @@ class Tile {
         if (this.room.O) {
             return hitboxCollision(this.x, this.y, this.x+this.w, this.y+this.h*0.5, x-size/2, y-5, x+size/2, y+5)
         }
+        if (this.room.N) {
+            return hitboxCollision(this.x, this.y, this.x+this.w*0.25, this.y+this.h, x-size/2, y-5, x+size/2, y+5)
+                || hitboxCollision(this.x+0.75*this.w, this.y, this.x+this.w, this.y+this.h, x-size/2, y-5, x+size/2, y+5)
+        }
         return null;
     }
 
