@@ -6,6 +6,8 @@ import { hitboxCollision, distanceSQ } from "./geometry.js";
 import { data } from "./loader.js";
 import { SPRITE_H } from "./entity.js";
 
+import { audio } from "./audio.js";
+
 const TILE_SIDE = 128;
 
 /** @type {number} proximity of the player with other characters */
@@ -72,6 +74,7 @@ export class Map {
         this.characters = [null,null,...level.PNJs.map((p,i) => new PNJ(i+2, p.scenario, [firstTalk, ...p.dialog], delay, p.skin))];
         /** @type {Array} */
         this.toDisplay = [...this.furnitures, ...this.characters, ...this.doors];
+        console.log(this.cat);       
     }
 
     /**
@@ -126,6 +129,11 @@ export class Map {
         const pLine = Math.floor((this.player.y + SPRITE_H/2) / TILE_SIDE);
         const pCol = Math.floor(this.player.x / TILE_SIDE);
         let wOfPlayer = 0;
+
+        if (this.cat.tiles[`${pLine},${pCol}`] && Date.now() - this.cat.lastMeow > 20000) {
+            audio.playSound("miaou","miaou",0.6,0);
+            this.cat.lastMeow = Date.now();
+        }
 
         // Render floors
         for (let t of this.walls) {
@@ -217,9 +225,16 @@ export class Map {
 
     createFurnitures(levelFurnitures) {
         let furnitures_objects = [];
+        
+        // last miaou
+        this.cat = { lastMeow: 0, tiles: {} };
+        
         for (let f of levelFurnitures) {
             if (f[2] != FURNITURE_TYPE.NONE) {
                 furnitures_objects.push(new Furniture(f[0], f[1], f[2]));
+            }
+            if (f[2] == FURNITURE_TYPE.SOFA_RED_CAT_1 || f[2] == FURNITURE_TYPE.SOFA_RED_CAT_2 || f[2] == FURNITURE_TYPE.SOFA_GREEN_CAT) {
+                this.cat.tiles[`${f[3]},${f[4]}`] = 1;
             }
         }
         return furnitures_objects;

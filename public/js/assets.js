@@ -96,7 +96,7 @@ const data = {
     "footsteps": "./assets/sounds/footsteps.m4a",
     "speak1": "./assets/sounds/speak1.m4a",
     "speak2": "./assets/sounds/speak2.m4a",
-    
+    "miaou": "./assets/sounds/miaulement1.mp3"
 }
 
 export default data; 
