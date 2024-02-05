@@ -41,7 +41,7 @@ export const SPRITE_W = 48, SPRITE_H = 72;
 const ACTION = { KILLS: 3, ARRESTS: 4}
 const ARREST = { BEING_ARRESTED: 5, HAS_BEEN_ARRESTED: 6 };
 
-const DEBUG = true;
+const DEBUG = false;
 
 /**
  * Abstract class for entities (PNJ, Player, Adversary) 
@@ -92,6 +92,8 @@ export class Entity {
         this.action = 0;    // 0 none specific (walk or talk), otherwise ACTION.KILLS or ACTION.ARRESTS
         /** Character that has been arrested (police usage only) */
         this.hasArrested = null;
+
+        this.murders = 0;
 
         /** @type {Image} spritesheet used for the entity */
         this.sprite = data[skin];
@@ -176,7 +178,7 @@ export class Entity {
         
         // draw hitbox
         ctx.strokeStyle = "red";
-        ctx.strokeRect(this.x - SPRITE_H/4, this.y + SPRITE_H/2 - 5, SPRITE_H/2, 5);
+        DEBUG && ctx.strokeRect(this.x - SPRITE_H/4, this.y + SPRITE_H/2 - 5, SPRITE_H/2, 5);
         //ctx.strokeRect(this.x-1, this.y+SPRITE_H/2-1, 3, 3);
     }
 
@@ -325,6 +327,7 @@ export class Entity {
         if (this instanceof Player) {
             audio.playSound("die", 42, 1, false);        
         }
+        this.murders++;
         // steal sprite
         const spBackup = this.talkingTo.sprite;
         this.talkingTo.sprite = this.sprite;

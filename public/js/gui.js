@@ -136,8 +136,7 @@ class GUI {
             }
         }
         if (this.state == STATE.RUNNING && this.game !== null) {
-            this.game.update(dt);
-            let go = this.game.isOver();
+            let go = this.game.update(dt) || this.game.isOver();
             if (go) {
                 if (go.winner == this.game.player.role) {
                     this.state = STATE.VICTORY;
@@ -145,6 +144,7 @@ class GUI {
                 else {
                     this.state = STATE.LOSE;
                 }
+                this.game.gameover = go;
             };
             return { gameover: go };
         }
@@ -228,12 +228,13 @@ class GUI {
         ctx.textAlign = "center";
         ctx.fillText("Victoire", WIDTH*0.5, HEIGHT*0.75);
         ctx.font = "bold small-caps 26px HotelMadriz";
-        if (this.game.player.role == "police") {
-            ctx.fillText("Vous avez réussi à coincer ce meurtrier.", WIDTH / 2, HEIGHT * 0.85);
+        let message = (this.game.player.role == "police") 
+                    ? "Vous avez réussi à coincer ce meurtrier."
+                    : "Vous avez réussi à vous échapper.";
+        if (this.game.gameover.message) {
+            message = this.game.gameover.message;
         }
-        else {
-            ctx.fillText("Vous avez réussi à vous échapper.", WIDTH / 2, HEIGHT * 0.85);
-        }
+        ctx.fillText(message, WIDTH / 2, HEIGHT * 0.85);
 //        ctx.restore();
     }
 
@@ -248,12 +249,13 @@ class GUI {
         ctx.textAlign = "center";
         ctx.fillText("Défaite", WIDTH*0.5, HEIGHT*0.75);
         ctx.font = "bold small-caps 26px HotelMadriz";
-        if (this.game.player.role == "police") {
-            ctx.fillText("Vous n'avez pas réussi à coincer ce meurtrier.", WIDTH / 2, HEIGHT * 0.85);
+        let message = (this.game.player.role == "police") 
+                    ? "Vous n'avez pas réussi à coincer ce meurtrier."
+                    : "Vous vous êtes fait bêtement coincer.";
+        if (this.game.gameover.message) {
+            message = this.game.gameover.message;
         }
-        else {
-            ctx.fillText("Vous vous êtes fait bêtement coincer.", WIDTH / 2, HEIGHT * 0.85);
-        }
+        ctx.fillText(message, WIDTH / 2, HEIGHT * 0.85);
 //        ctx.restore();
     }
 

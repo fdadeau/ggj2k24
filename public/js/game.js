@@ -15,6 +15,9 @@ const POLICE_DIALOG = [
     [0,"vous en serez les premiers informés.",1000]
 ];
 
+const NB_ROUNDS = 4;
+const THIRTY_SECONDS = 31 * 1000;
+
 export class Game {
 
     constructor(level, role, delay) {
@@ -34,6 +37,9 @@ export class Game {
         this.map.addPlayerAndAdversary(this.player, this.adversary);
         // Initialize viewport 
         this.viewport = { x: 0, y: 0, w: WIDTH, h: HEIGHT };
+        // Rounds
+        this.time = THIRTY_SECONDS;
+        this.step = 1;
     }
 
     isOver() {
@@ -43,6 +49,12 @@ export class Game {
         if (this.adversary.hasLost()) {
             return { winner: this.player.role };
         }
+        if (this.player.murders + this.adversary.murders > this.step) {
+            return { winner: "police", message: "La folie meurtière du tueur a causé sa perte." };
+        }
+        if (this.step > NB_ROUNDS) {
+            return { winner: "killer", message: "Le tueur a réussi à s'échapper." };
+        }
     }
 
     /**
@@ -50,6 +62,17 @@ export class Game {
      * @param {number} dt elapsed time since last update
      */
     update(dt) {
+        this.time -= dt;
+        if (this.time < 0) {
+            if (this.player.murders + this.adversary.murders < this.step) {
+                this.time = 0;
+                return { winner: "police", message: "Le tueur n'a pas pu assouvir sa folie meurtrière." };
+            }
+            this.step++;
+            if (this.step <= NB_ROUNDS) {
+                this.time = THIRTY_SECONDS;
+            }
+        }
         this.map.update(dt);
         this.updateViewport();
     }
@@ -107,13 +130,29 @@ export class Game {
         ctx.save();
         ctx.translate(-this.viewport.x, -this.viewport.y);
         this.map.render(ctx); 
-        if (this.isOver()) {
+        if (this.gameover) {
             ctx.fillStyle = "black";
             ctx.beginPath();
             ctx.arc(this.player.x, this.player.y, 120, 0, 2 * Math.PI);
-            ctx.rect(this.player.x + WIDTH, this.player.y - HEIGHT, -2*WIDTH, 2*HEIGHT);
+            ctx.rect(this.viewport.x + WIDTH, this.viewport.y, -WIDTH, HEIGHT);
             ctx.closePath();
             ctx.fill();
+        }
+        else {
+            ctx.fillColor = "black";
+            ctx.fillRect(this.viewport.x, this.viewport.y, WIDTH, 30);
+            ctx.textAlign = "right";
+            let chrono = Math.floor(this.time / 1000);
+            if (chrono < 10) {
+                chrono = "0" + chrono;
+            }
+            chrono = "0:" + chrono;
+            const txt = (this.player.role == "police" 
+                    ? "coincez ce meurtrier" 
+                    : (this.player.murders == this.step ? "ne vous faites pas démasquer" : "commettez un meurtre")) + " - Fin du tour " + chrono;
+            ctx.font = "bold 18px arial";
+            ctx.fillStyle = "white";
+            ctx.fillText("Objectif : " + txt, this.viewport.x + WIDTH - 10, this.viewport.y + 20);
         }
         ctx.restore();
     }  

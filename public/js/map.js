@@ -11,6 +11,7 @@ const TILE_SIDE = 128;
 /** @type {number} proximity of the player with other characters */
 const PROXIMITY = 10000;
 
+const DEBUG = false;
 
 const FURNITURE_TYPE = {
     NONE: -1,
@@ -340,7 +341,7 @@ class Furniture {
 
     render(ctx) {
         ctx.strokeStyle = "red";
-        ctx.strokeRect(this.hitbox.x, this.hitbox.y, this.hitbox.w, this.hitbox.h);
+        DEBUG && ctx.strokeRect(this.hitbox.x, this.hitbox.y, this.hitbox.w, this.hitbox.h);
         ctx.drawImage(
             this.img, 
             this.x, 
