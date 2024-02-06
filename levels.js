@@ -246,107 +246,245 @@ const WALK = "walk", WAIT = "wait";
 
 randomWAIT = [0, 10, 100, 300, 1000, 2000, 6000, 10000];
 
+
+coordoneeHautGaucheGeneral ={x:160,y:140};
+coordoneeHautDroiteGeneral ={x:1800,y:140};
+
+coordoneeMilieuGaucheGeneral ={x:160,y:1000};
+coordoneeMilieuDroiteGeneral ={x:1800,y:1000};
+coordoneeMilieuPorte3General ={x:950,y:1000};
+coordoneeMilieuPorte2General ={x:830,y:1000};
+coordoneeChambreHautGeneral ={x:830,y:550};
+coordoneeSdbHautGeneral ={x:1350,y:550};
+
+function calculVitesse(x1,x2, y1,y2) {
+    return Math.abs(x1 - x2 + y1 - y2) *5;
+}
+
 const PNJ_0 = { 
     scenario: [
-        [WAIT, {x: 160, y: 142, vecX: -1, vecY: 0}, 10000],
-        [WALK, {xs: 160, ys: 142, xd: 1810, yd: 142}, 9000],
-        [WAIT, {x: 1810, y: 142, vecX: 1, vecY: 0}, 20000],
-        [WALK, {xs: 1810, ys: 142, xd: 160, yd: 142}, 9000]
-    ],
+        
+        [WAIT, {    x : coordoneeHautGaucheGeneral.x , y: coordoneeHautGaucheGeneral.y+2, vecX: -1, vecY: 0}, 
+                    randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {    xs: coordoneeHautGaucheGeneral.x, ys: coordoneeHautGaucheGeneral.y+2, 
+                    xd: coordoneeHautDroiteGeneral.x+10, yd: coordoneeHautDroiteGeneral.y+2}, 
+            calculVitesse(  coordoneeHautGaucheGeneral.x, coordoneeHautDroiteGeneral.x+10, 
+                            coordoneeHautGaucheGeneral.y+2, coordoneeHautDroiteGeneral.y+2)],
+        [WAIT, {    x: coordoneeHautDroiteGeneral.x+10, y :coordoneeHautDroiteGeneral.y+2, vecX: 1, vecY: 0}, 
+                    randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {    xs: coordoneeHautDroiteGeneral.x+10, ys: coordoneeHautDroiteGeneral.y+2,
+                    xd: coordoneeHautGaucheGeneral.x, yd: coordoneeHautGaucheGeneral.y+2}, 
+            calculVitesse(  coordoneeHautGaucheGeneral.x, coordoneeHautDroiteGeneral.x+10, 
+                            coordoneeHautGaucheGeneral.y+2, coordoneeHautDroiteGeneral.y+2)]],      
     dialog: []
 }
 
 
 const PNJ_1 = { 
+    
     scenario: [
-        [WAIT, {x: 1800, y: 135, vecX: 1, vecY: 0}, 20000],//direction devant
-        [WALK, {xs: 1800, ys: 135, xd: 160, yd: 135}, 8865],
-        [WAIT, {x: 160, y: 135, vecX: -1, vecY: 0}, 30000],//regard gauche
-        [WALK, {xs: 160, ys: 135, xd: 1800, yd: 135}, 8865]
-    ],
+        [WAIT, {    x: coordoneeHautDroiteGeneral.x+5, y: coordoneeHautDroiteGeneral.y-5, vecX: 1, vecY: 0}, 
+                    randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {    xs: coordoneeHautDroiteGeneral.x+5, ys: coordoneeHautDroiteGeneral.y-5, 
+                    xd: coordoneeHautGaucheGeneral.x+5, yd: coordoneeHautGaucheGeneral.y-5}, 
+                    calculVitesse(  coordoneeHautGaucheGeneral.x+5, coordoneeHautDroiteGeneral.x+5, 
+                                    coordoneeHautGaucheGeneral.y-5, coordoneeHautDroiteGeneral.y-5)],
+        [WAIT, {    x: coordoneeHautGaucheGeneral.x+5, y: coordoneeHautGaucheGeneral.y-5, vecX: -1, vecY: 0}, 
+                    randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {    xs: coordoneeHautGaucheGeneral.x+5, ys: coordoneeHautGaucheGeneral.y-5, 
+                    xd: coordoneeHautDroiteGeneral.x+5, yd: coordoneeHautDroiteGeneral.y-5}, 
+                    calculVitesse(  coordoneeHautGaucheGeneral.x+5, coordoneeHautDroiteGeneral.x+5, 
+                                    coordoneeHautGaucheGeneral.y-5, coordoneeHautDroiteGeneral.y-5)]],      
     dialog: []
 }
 
 
-const PNJ_2 = { 
+const PNJ_2 = { //HautGauche MilieuGauche MilieuP3 MilieuDroite HautDroite  
     scenario: [
-        [WAIT, {x: 180, y: 140, vecX: -1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
-        [WALK, {xs: 180, ys: 140, xd: 180, yd: 1020}, 4796],//descend done
-        [WAIT, {x: 180, y: 1020, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+        [WAIT, {    x: coordoneeHautGaucheGeneral.x+30, y: coordoneeHautGaucheGeneral.y, vecX: -1, vecY: 0}, 
+                    randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {    xs: coordoneeHautGaucheGeneral.x+30, ys:  coordoneeHautGaucheGeneral.y+20,
+                    xd: coordoneeMilieuGaucheGeneral.x+30, yd: coordoneeMilieuGaucheGeneral.y+20}, 
+                    calculVitesse(  coordoneeHautGaucheGeneral.x+30, coordoneeMilieuGaucheGeneral.x+30, 
+                                    coordoneeHautGaucheGeneral.y+20, coordoneeMilieuGaucheGeneral.y+20)], 
+        [WAIT, {    x: coordoneeMilieuGaucheGeneral.x+30, y: coordoneeMilieuGaucheGeneral.y + 20, vecX: 0, vecY: 1}, 
+                    randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {    xs: coordoneeMilieuGaucheGeneral.x+30, ys: coordoneeMilieuGaucheGeneral.y+20, 
+                    xd: coordoneeMilieuPorte3General.x-30, yd: coordoneeMilieuPorte3General.y+20}, 
+                    calculVitesse(  coordoneeMilieuGaucheGeneral.x+30, coordoneeMilieuPorte3General.x-30, 
+                                    coordoneeMilieuGaucheGeneral.y+20, coordoneeMilieuPorte3General.y+20)],
+        [WAIT, {    x: coordoneeMilieuPorte3General.x-30, y: coordoneeMilieuPorte3General.y+20, vecX: 1, vecY: 0}, 
+                    randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],       
+
+        [WALK, {    xs: coordoneeMilieuPorte3General.x-30, ys: coordoneeMilieuPorte3General.y+20, 
+                    xd: coordoneeMilieuDroiteGeneral.x, yd: coordoneeMilieuDroiteGeneral.y+20}, 
+                    calculVitesse(  coordoneeMilieuPorte3General.x-30, coordoneeMilieuDroiteGeneral.x, 
+                                    coordoneeMilieuPorte3General.y+20, coordoneeMilieuDroiteGeneral.y+20)],
+        [WAIT, {    x: coordoneeMilieuDroiteGeneral.x , y: coordoneeMilieuDroiteGeneral.y+20, vecX: 1, vecY: 0}, 
+                    randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {    xs: coordoneeMilieuDroiteGeneral.x, ys: coordoneeMilieuDroiteGeneral.y+20, 
+                    xd: coordoneeHautDroiteGeneral.x, yd: coordoneeHautDroiteGeneral.y},  
+                    calculVitesse(  coordoneeMilieuDroiteGeneral.x, coordoneeHautDroiteGeneral.x, 
+                                    coordoneeMilieuDroiteGeneral.y+20, coordoneeHautDroiteGeneral.y)],   
+        [WAIT, {    x: coordoneeHautDroiteGeneral.x, y: coordoneeHautDroiteGeneral.y, vecX: 0, vecY: -1}, 
+                    randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {    xs: coordoneeHautDroiteGeneral.x, ys: coordoneeHautDroiteGeneral.y, 
+                    xd: coordoneeHautGaucheGeneral.x+20, yd: coordoneeHautGaucheGeneral.y+20},  
+                    calculVitesse(  coordoneeMilieuDroiteGeneral.x, coordoneeHautGaucheGeneral.x+20, 
+                                    coordoneeHautDroiteGeneral.y, coordoneeHautGaucheGeneral.y+20)]],
+    dialog: []
+}
+
+
+const PNJ_3 = {  //HautGauche HautDroite MilieuDroite MilieuPorte2 MilieuGauche 
+    scenario: [
+
+        [WAIT, {    x: coordoneeHautGaucheGeneral.x+30, y: coordoneeHautGaucheGeneral.y, vecX: -1, vecY: 0}, 
+                    randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {    xs: coordoneeHautGaucheGeneral.x+30, ys:  coordoneeHautGaucheGeneral.y+20,
+                    xd: coordoneeMilieuGaucheGeneral.x+30, yd: coordoneeMilieuGaucheGeneral.y+20}, 
+                    calculVitesse(  coordoneeHautGaucheGeneral.x+30, coordoneeMilieuGaucheGeneral.x+30, 
+                                    coordoneeHautGaucheGeneral.y+20, coordoneeMilieuGaucheGeneral.y+20)], 
+        [WAIT, {    x: coordoneeMilieuGaucheGeneral.x+30, y: coordoneeMilieuGaucheGeneral.y + 20, vecX: 0, vecY: 1}, 
+                    randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {    xs: coordoneeMilieuGaucheGeneral.x+30, ys: coordoneeMilieuGaucheGeneral.y+20, 
+                    xd: coordoneeMilieuPorte2General.x-30, yd: coordoneeMilieuPorte2General.y+20}, 
+                    calculVitesse(  coordoneeMilieuGaucheGeneral.x+30, coordoneeMilieuPorte2General.x-30, 
+                                    coordoneeMilieuGaucheGeneral.y+20, coordoneeMilieuPorte2General.y+20)],
+        [WAIT, {    x: coordoneeMilieuPorte2General.x-30, y: coordoneeMilieuPorte2General.y+20, vecX: 1, vecY: 0}, 
+                    randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],       
+
+        [WALK, {    xs: coordoneeMilieuPorte2General.x-30, ys: coordoneeMilieuPorte2General.y+20, 
+                    xd: coordoneeMilieuDroiteGeneral.x, yd: coordoneeMilieuDroiteGeneral.y+20}, 
+                    calculVitesse(  coordoneeMilieuPorte2General.x-30, coordoneeMilieuDroiteGeneral.x, 
+                                    coordoneeMilieuPorte2General.y+20, coordoneeMilieuDroiteGeneral.y+20)],
+        [WAIT, {    x: coordoneeMilieuDroiteGeneral.x , y: coordoneeMilieuDroiteGeneral.y+20, vecX: 1, vecY: 0}, 
+                    randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {    xs: coordoneeMilieuDroiteGeneral.x, ys: coordoneeMilieuDroiteGeneral.y+20, 
+                    xd: coordoneeHautDroiteGeneral.x, yd: coordoneeHautDroiteGeneral.y},  
+                    calculVitesse(  coordoneeMilieuDroiteGeneral.x, coordoneeHautDroiteGeneral.x, 
+                                    coordoneeMilieuDroiteGeneral.y+20, coordoneeHautDroiteGeneral.y)],   
+        [WAIT, {    x: coordoneeHautDroiteGeneral.x, y: coordoneeHautDroiteGeneral.y, vecX: 0, vecY: -1}, 
+                    randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {    xs: coordoneeHautDroiteGeneral.x, ys: coordoneeHautDroiteGeneral.y, 
+                    xd: coordoneeHautGaucheGeneral.x+20, yd: coordoneeHautGaucheGeneral.y+20},  
+                    calculVitesse(  coordoneeMilieuDroiteGeneral.x, coordoneeHautGaucheGeneral.x+20, 
+                                    coordoneeHautDroiteGeneral.y, coordoneeHautGaucheGeneral.y+20)]
+
+    ],
+    dialog: []
+}
+
+const PNJ_4 = { //MilieuGauche MilieuP3 MilieuDroite MilieuP2 ChambreHaut ChambreHaut sdbHaut ChambreHaut ChambreHaut ChambreHaut MilieuP2 MilieuGauche
+    scenario: [
+        [WAIT, {    x: coordoneeMilieuGaucheGeneral.x+20, y: coordoneeMilieuGaucheGeneral.y+10, vecX: -1, vecY: 0}, 
+                    randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {    xs: coordoneeMilieuGaucheGeneral.x+20, ys: coordoneeMilieuGaucheGeneral.y+10, 
+                    xd: coordoneeMilieuPorte3General.x-30, yd: coordoneeMilieuPorte3General.y+10}, 
+                    calculVitesse(  coordoneeMilieuGaucheGeneral.x+20, coordoneeMilieuPorte3General.x-30, 
+                                    coordoneeMilieuGaucheGeneral.y+10, coordoneeMilieuPorte3General.y+10)],
+        [WAIT, {    x: coordoneeMilieuPorte3General.x-30, y: coordoneeMilieuPorte3General.y+10, vecX: 1, vecY: 0}, 
+                    randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {    xs: coordoneeMilieuPorte3General.x-30, ys: coordoneeMilieuPorte3General.y+10, 
+                    xd: coordoneeMilieuDroiteGeneral.x, yd: coordoneeMilieuDroiteGeneral.y+10},
+                    calculVitesse(  coordoneeMilieuDroiteGeneral.x, coordoneeMilieuPorte3General.x-30, 
+                                    coordoneeMilieuDroiteGeneral.y+10, coordoneeMilieuPorte3General.y+10)],
+        [WAIT, {    x: coordoneeMilieuDroiteGeneral.x, y: coordoneeMilieuDroiteGeneral.y+10, vecX: 1, vecY: 0}, 
+                    randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
         
-        [WALK, {xs: 180, ys: 1020, xd: 920, yd: 1020}, 4033],//droite 1 done
-        [WAIT, {x: 920, y: 1020, vecX: -1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
-        [WALK, {xs: 920, ys: 1020, xd: 1800, yd: 1020}, 4795],//droite 2 done
-        [WAIT, {x: 1800, y: 1020, vecX: 1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+        [WALK, {    xs: coordoneeMilieuDroiteGeneral.x, ys: coordoneeMilieuDroiteGeneral.y+10, 
+                    xd: coordoneeMilieuPorte2General.x, yd: coordoneeMilieuPorte2General.y+10}, 
+                    calculVitesse(  coordoneeMilieuDroiteGeneral.x, coordoneeMilieuPorte2General.x, 
+                                    coordoneeMilieuDroiteGeneral.y+10, coordoneeMilieuPorte2General.y+10)],
+        [WAIT, {    x: coordoneeMilieuPorte2General.x, y: coordoneeMilieuPorte2General.y+10, vecX: -1, vecY: 0}, 
+                    randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
 
-        [WALK, {xs: 1800, ys: 1020, xd: 1800, yd: 140}, 4795],//haut done   
-        [WAIT, {x: 1800, y: 140, vecX: 0, vecY: -1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+        [WALK, {    xs: coordoneeMilieuPorte2General.x, ys: coordoneeMilieuPorte2General.y+10, 
+                    xd: coordoneeChambreHautGeneral.x, yd: coordoneeChambreHautGeneral.y}, 
+                    calculVitesse(  coordoneeChambreHautGeneral.x, coordoneeMilieuPorte2General.x, 
+                                    coordoneeChambreHautGeneral.y, coordoneeMilieuPorte2General.y+10)],
+        [WAIT, {    x: coordoneeChambreHautGeneral.x, y: coordoneeChambreHautGeneral.y, vecX: 0, vecY: -1}, 
+                    randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
 
-        [WALK, {xs: 1800, ys: 140, xd: 180, yd: 140}, 8829]//gauche done
+        [WALK, {    xs: coordoneeChambreHautGeneral.x, ys: coordoneeChambreHautGeneral.y,
+                    xd: coordoneeChambreHautGeneral.x-70, yd: coordoneeChambreHautGeneral.y}, 
+                    calculVitesse(  coordoneeChambreHautGeneral.x, coordoneeChambreHautGeneral.x-70, 
+                                    coordoneeChambreHautGeneral.y, coordoneeChambreHautGeneral.y)],
+        [WAIT, {    x: coordoneeChambreHautGeneral.x-70, y: coordoneeChambreHautGeneral.y, vecX: -1, vecY: 0}, 
+                    randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+
+                    //test
+        [WALK, {    xs: coordoneeChambreHautGeneral.x-70, ys: coordoneeChambreHautGeneral.y, 
+                    xd: coordoneeChambreHautGeneral.x-70, yd: coordoneeChambreHautGeneral.y+20}, 
+                    calculVitesse(  coordoneeChambreHautGeneral.x-70, coordoneeChambreHautGeneral.x-70, 
+                                    coordoneeChambreHautGeneral.y+20, coordoneeChambreHautGeneral.y)],
+        [WAIT, {    x: coordoneeChambreHautGeneral.x-70, y: coordoneeChambreHautGeneral.y+20, vecX: 1, vecY: 0}, 
+                        randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+    
+
+
+        [WALK, {    xs: coordoneeChambreHautGeneral.x-70, ys: coordoneeChambreHautGeneral.y+20, 
+                    xd: coordoneeSdbHautGeneral.x, yd: coordoneeSdbHautGeneral.y+20}, 
+                    calculVitesse(  coordoneeChambreHautGeneral.x-70, coordoneeSdbHautGeneral.x, 
+                                    coordoneeChambreHautGeneral.y+20, coordoneeSdbHautGeneral.y+20)],
+        [WAIT, {    x: coordoneeSdbHautGeneral.x, y: coordoneeSdbHautGeneral.y+20, vecX: 1, vecY: 0}, 
+                    randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+
+
+
+        [WALK, {    xs: coordoneeSdbHautGeneral.x, ys: coordoneeSdbHautGeneral.y+20, 
+                    xd: coordoneeChambreHautGeneral.x+5, yd: coordoneeChambreHautGeneral.y+20}, 
+                    calculVitesse(  coordoneeChambreHautGeneral.x+5, coordoneeSdbHautGeneral.x, 
+                                    coordoneeChambreHautGeneral.y+20, coordoneeSdbHautGeneral.y+20)],
+        [WAIT, {    x: coordoneeChambreHautGeneral.x+5, y: coordoneeChambreHautGeneral.y+20, vecX: -1, vecY: 0}, 
+                    randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {    xs: coordoneeChambreHautGeneral.x+5, ys: coordoneeChambreHautGeneral.y+20, 
+                    xd: coordoneeChambreHautGeneral.x+120, yd: coordoneeChambreHautGeneral.y+20},
+                    calculVitesse(  coordoneeChambreHautGeneral.x+5, coordoneeChambreHautGeneral.x+120, 
+                                    coordoneeChambreHautGeneral.y+20, coordoneeChambreHautGeneral.y+20)], 
+        [WAIT, {    x: coordoneeChambreHautGeneral.x+120, y: coordoneeChambreHautGeneral.y+20, vecX: 1, vecY: 0}, 
+                    randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {    xs: coordoneeChambreHautGeneral.x+120, ys: coordoneeChambreHautGeneral.y+20, 
+                    xd: coordoneeChambreHautGeneral.x, yd: coordoneeChambreHautGeneral.y+20}, 
+                    calculVitesse(  coordoneeChambreHautGeneral.x, coordoneeChambreHautGeneral.x+120, 
+                                    coordoneeChambreHautGeneral.y+20, coordoneeChambreHautGeneral.y+20)],
+        [WAIT, {    x: coordoneeChambreHautGeneral.x, y: coordoneeChambreHautGeneral.y+20, vecX: -1, vecY: 0}, 
+                    randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {    xs: coordoneeChambreHautGeneral.x, ys: coordoneeChambreHautGeneral.y+20,
+                    xd: coordoneeMilieuPorte2General.x, yd: coordoneeMilieuPorte2General.y+10}, 
+                    calculVitesse(  coordoneeChambreHautGeneral.x, coordoneeMilieuPorte2General.x, 
+                                    coordoneeChambreHautGeneral.y+20, coordoneeMilieuPorte2General.y+10)],
+        [WAIT, {    x: coordoneeMilieuPorte2General.x, y: coordoneeMilieuPorte2General.y+10, vecX: 0, vecY: 1}, 
+                    randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
+
+        [WALK, {    xs: coordoneeMilieuPorte2General.x, ys: coordoneeMilieuPorte2General.y, 
+                    xd: coordoneeMilieuGaucheGeneral.x+20, yd: coordoneeMilieuGaucheGeneral.y+10}, 
+                    calculVitesse(  coordoneeMilieuGaucheGeneral.x+20, coordoneeMilieuPorte2General.x, 
+                                    coordoneeMilieuGaucheGeneral.y+10, coordoneeMilieuPorte2General.y)]
+
     ],
     dialog: []
 }
 
-
-const PNJ_3 = { 
-    scenario: [
-        [WALK, {xs: 180, ys: 120, xd: 1800, yd: 120}, 8831],//droite done
-        [WAIT, {x: 1800, y: 120, vecX: 1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
-        
-        [WALK, {xs: 1800, ys: 120, xd: 1800, yd: 1020}, 8831],//bas done
-        [WAIT, {x: 1800, y: 1020, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
-        [WALK, {xs: 1800, ys: 1020, xd: 855, yd: 1020}, 5152],//gauche 1 done
-        [WAIT, {x: 855, y: 1020, vecX: -1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
-
-        [WALK, {xs: 855, ys: 1020, xd: 180, yd: 1020}, 3679],//gauche 2 done
-        [WAIT, {x: 180, y: 1020, vecX: -1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
-
-        [WALK, {xs: 180, ys: 1020, xd: 180, yd: 120}, 4905],//haut done
-        [WAIT, {x: 180, y: 120, vecX: 0, vecY: -1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]]
-
-    ],
-    dialog: []
-}
-
-const PNJ_4 = { //visite piece centre
-    scenario: [
-        [WAIT, {x: 180, y: 1010, vecX: -1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
-
-        [WALK, {xs: 180, ys: 1010, xd: 920, yd: 1010}, 4035],//droite 1  done        
-        [WAIT, {x: 920, y: 1010, vecX: 1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
-
-        [WALK, {xs: 920, ys: 1010, xd: 1800, yd: 1010}, 4796],//droite 2 done
-        [WAIT, {x: 1800, y: 1010, vecX: 1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
-        
-        [WALK, {xs: 1800, ys: 1010, xd: 830, yd: 1010}, 5288],//gauche 1 done
-        [WAIT, {x: 830, y: 1010, vecX: -1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
-
-        [WALK, {xs: 830, ys: 1010, xd: 830, yd: 550}, 2520],//piece 1a done
-        [WAIT, {x: 830, y: 550, vecX: 0, vecY: -1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
-
-        [WALK, {xs: 830, ys: 550, xd: 750, yd: 550}, 436],//piece 1a gauche a done
-        [WAIT, {x: 750, y: 550, vecX: -1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
-
-        [WALK, {xs: 750, ys: 550, xd: 1350, yd: 550}, 3270],//piece 1a gauche b done
-        [WAIT, {x: 1350, y: 550, vecX: 1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
-
-        [WALK, {xs: 1350, ys: 550, xd: 835, yd: 550}, 2806],//piece 2 droite done
-        [WAIT, {x: 835, y: 550, vecX: -1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
-
-        [WALK, {xs: 835, ys: 550, xd: 950, yd: 550}, 627],//piece 1a gauche b done 
-        [WAIT, {x: 950, y: 550, vecX: 1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
-
-        [WALK, {xs: 950, ys: 550, xd: 830, yd: 550}, 654],//piece 1b retour done
-        [WAIT, {x: 830, y: 550, vecX: -1, vecY: 0}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
-
-        [WALK, {xs: 830, ys: 550, xd: 830, yd: 1010}, 2507],//gauche 2 done
-        [WAIT, {x: 830, y: 1010, vecX: 0, vecY: 1}, randomWAIT[Math.floor(Math.random() * randomWAIT.length)]],
-
-        [WALK, {xs: 830, ys: 1010, xd: 180, yd: 1010}, 3860 ]   //gauche 2 done
-
-    ],
-    dialog: []
-}
 
 
 const PNJ_5 = { //visite piece centre avec scenar salle de bain
