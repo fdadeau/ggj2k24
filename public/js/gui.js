@@ -173,15 +173,15 @@ class GUI {
         ctx.fillText(this.game.player.role, WIDTH * 0.69, HEIGHT*0.2);
         ctx.fillStyle = "white";
         ctx.save();
-        ctx.translate(WIDTH/2, HEIGHT/2);
-        //ctx.translate(-this.game.player.x, -this.game.player.y);
+        ctx.translate(WIDTH/2, HEIGHT*0.35);
+        ctx.translate(-this.game.player.x, -this.game.player.y);
         this.game.player.render(ctx);
         ctx.restore();
         const whatToDo = this.game.player.role == "killer" ? 
             ["Tuez des victimes à coup de saucisse de Morteau.", "Ne vous faites pas coincer."]: 
             ["Coincez le meurtier.", "Ne vous trompez pas. Vous n'avez qu'un seul essai."];
-        ctx.fillText(whatToDo[0], WIDTH/2, HEIGHT*0.4);
-        ctx.fillText(whatToDo[1], WIDTH/2, HEIGHT*0.5);
+        ctx.fillText(whatToDo[0], WIDTH/2, HEIGHT*0.5);
+        ctx.fillText(whatToDo[1], WIDTH/2, HEIGHT*0.6);
         if (!this.ready) {
             this.readyButton.render(ctx);
         }

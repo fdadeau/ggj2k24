@@ -31,8 +31,8 @@ function generate() {
     const policeSkin = availableSkin.splice(Math.floor(Math.random() * availableSkin.length), 1)[0];
     const killerSkin = availableSkin.splice(Math.floor(Math.random() * availableSkin.length), 1)[0];
     const killerJoke = availableJokes.splice(Math.floor(Math.random() * availableJokes.length), 1)[0];
-    //const start = { police: {x: 90, y: 90 }, killer: { x: 1100, y: 650 } };
-    const start = { police: {x: 600, y: 900 }, killer: { x: 600, y: 900 } };
+    const start = { police: {x: 300, y: 180 }, killer: { x: 1100, y: 650 } };
+    //const start = { police: {x: 600, y: 900 }, killer: { x: 600, y: 900 } };
 
     return { walls, furnitures, PNJs, start, rooms, killerJoke, policeSkin, killerSkin };
 } 
