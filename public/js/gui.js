@@ -49,7 +49,7 @@ class GUI {
 
         this.closeButton = new Button("X", WIDTH*.95, HEIGHT*.05, 64, 64, false, false);
 
-        this.readyButton = new Button("Prêt", WIDTH*0.5, HEIGHT*0.75, 180, 60, true, "HotelMadriz")
+        this.readyButton = new Button("Prêt", WIDTH*0.5, HEIGHT*0.85, 180, 60, true, "HotelMadriz")
 
         this.credits = false;
         this.controls = false;
@@ -178,10 +178,13 @@ class GUI {
         this.game.player.render(ctx);
         ctx.restore();
         const whatToDo = this.game.player.role == "killer" ? 
-            ["Tuez des victimes à coup de saucisse de Morteau.", "Ne vous faites pas coincer."]: 
+            ["Tuez des victimes à coup de saucisse de Morteau.", "Lorsque vous tuer quelqu'un, vous changez d'apparence.", "Ne vous faites pas coincer."]: 
             ["Coincez le meurtier.", "Ne vous trompez pas. Vous n'avez qu'un seul essai."];
         ctx.fillText(whatToDo[0], WIDTH/2, HEIGHT*0.5);
         ctx.fillText(whatToDo[1], WIDTH/2, HEIGHT*0.6);
+        if(whatToDo[2]){
+            ctx.fillText(whatToDo[2], WIDTH/2, HEIGHT*0.7);
+        }
         if (!this.ready) {
             this.readyButton.render(ctx);
         }
